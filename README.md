@@ -184,3 +184,7 @@ Plan output includes both flattened `task_order` and per-level structure.
 ```bash
 python3 -m unittest discover -s tests -p "test_*.py"
 ```
+
+## License
+
+Apache-2.0. See `LICENSE`.
