@@ -1,0 +1,18 @@
+# MissionGraph Worklog
+
+## 2026-02-13
+
+### Sprint: Autonomous 5-milestone run
+
+Status: in_progress
+
+Milestone status:
+- `M1` Planning scaffolding: in_progress
+- `M2` Artifact contracts (`produces`/`consumes`): pending
+- `M3` Verify diagnostics: pending
+- `M4` CLI validation workflow: pending
+- `M5` Conformance and docs hardening: pending
+
+Notes:
+- Execution mode: autonomous implementation with atomic commits and frequent pushes.
+- Stop conditions: only hard blockers (credentials, destructive-op requirement, or legal/safety conflict).
