@@ -81,12 +81,12 @@ Rules for safe migration:
 - Added formal JSON schemas and golden fixtures.
 - Added task execution policies in DSL (`with timeout/retries/backoff`).
 - Runtime now supports timeout + retries + exponential backoff per task.
+- Added explicit artifact contracts in `plan` (`consumes`/`produces`).
 
 ## Near-Term Direction
 
-1. Explicit artifact contracts (`produces`/`consumes`) beyond generic output maps.
-2. Better verifier diagnostics (grouped failures + source locations).
-3. Rust runtime prototype that can pass current golden suite.
+1. Better verifier diagnostics (grouped failures + source locations).
+2. Rust runtime prototype that can pass current golden suite.
 
 ## Resume Checklist
 

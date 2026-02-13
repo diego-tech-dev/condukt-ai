@@ -27,6 +27,8 @@ class Task:
     worker: str
     requires: set[str] = field(default_factory=set)
     after: list[str] = field(default_factory=list)
+    consumes: list[str] = field(default_factory=list)
+    produces: list[str] = field(default_factory=list)
     timeout_seconds: float | None = None
     retries: int = 0
     backoff_seconds: float = 0.0

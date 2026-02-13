@@ -14,6 +14,8 @@ from missiongraph.parser import ParseError, parse_file, parse_program
 from missiongraph.planner import build_mermaid_graph
 from missiongraph.serialization import program_to_ast
 from missiongraph.spec import (
+    ERROR_CODE_ARTIFACT_CONSUME_MISSING,
+    ERROR_CODE_ARTIFACT_OUTPUT_MISSING,
     ERROR_CODE_CONTRACT_INPUT_VIOLATION,
     ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
     ERROR_CODE_WORKER_TIMEOUT,
@@ -183,7 +185,7 @@ plan {{
 goal "policy parse demo"
 
 plan {{
-  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" with timeout 250ms retries 2 backoff 1s requires capability.prod_access after lint
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" with timeout 250ms retries 2 backoff 1s requires capability.prod_access after lint consumes test_report produces release_ticket
   task lint uses "{(ROOT / 'workers' / 'lint.py').as_posix()}" requires capability.ci
 }}
 """.strip()
@@ -195,9 +197,13 @@ plan {{
         self.assertAlmostEqual(deploy.backoff_seconds, 1.0)
         self.assertEqual(deploy.requires, {"prod_access"})
         self.assertEqual(deploy.after, ["lint"])
+        self.assertEqual(deploy.consumes, ["test_report"])
+        self.assertEqual(deploy.produces, ["release_ticket"])
         self.assertIsNone(lint.timeout_seconds)
         self.assertEqual(lint.retries, 0)
         self.assertEqual(lint.backoff_seconds, 0.0)
+        self.assertEqual(lint.consumes, [])
+        self.assertEqual(lint.produces, [])
 
         ast = program_to_ast(program)
         deploy_ast = ast["tasks"][0]
@@ -205,9 +211,109 @@ plan {{
         self.assertAlmostEqual(deploy_ast["timeout_seconds"], 0.25)
         self.assertEqual(deploy_ast["retries"], 2)
         self.assertAlmostEqual(deploy_ast["backoff_seconds"], 1.0)
+        self.assertEqual(deploy_ast["consumes"], ["test_report"])
+        self.assertEqual(deploy_ast["produces"], ["release_ticket"])
         self.assertNotIn("timeout_seconds", lint_ast)
         self.assertNotIn("retries", lint_ast)
         self.assertNotIn("backoff_seconds", lint_ast)
+        self.assertNotIn("consumes", lint_ast)
+        self.assertNotIn("produces", lint_ast)
+
+    def test_artifact_consumption_is_passed_to_worker_payload(self) -> None:
+        program = parse_program(
+            f"""
+goal "artifact payload demo"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci produces test_report
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" requires capability.prod_access after test_suite consumes test_report
+}}
+""".strip()
+        )
+
+        def fake_run_task(task, payload, base_dir):  # type: ignore[no-untyped-def]
+            if task.name == "test_suite":
+                return {
+                    "task": task.name,
+                    "worker": task.worker,
+                    "status": "ok",
+                    "confidence": 1.0,
+                    "output": {"test_report": {"coverage": 0.95}},
+                    "error": None,
+                    "started_at": "t0",
+                    "finished_at": "t1",
+                    "provenance": {},
+                }
+            self.assertIn("artifacts", payload)
+            self.assertEqual(payload["artifacts"]["test_report"]["coverage"], 0.95)
+            return {
+                "task": task.name,
+                "worker": task.worker,
+                "status": "ok",
+                "confidence": 1.0,
+                "output": {},
+                "error": None,
+                "started_at": "t0",
+                "finished_at": "t1",
+                "provenance": {},
+            }
+
+        with patch("missiongraph.executor._run_task", side_effect=fake_run_task):
+            trace = execute_program(
+                program,
+                capabilities={"ci", "prod_access"},
+                parallel=False,
+            )
+
+        self.assertEqual(trace["status"], "ok")
+
+    def test_missing_consumed_artifact_fails_fast(self) -> None:
+        program = parse_program(
+            f"""
+goal "missing artifact demo"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" requires capability.prod_access after test_suite consumes test_report
+}}
+""".strip()
+        )
+        with self.assertRaises(ExecutionError):
+            execute_program(program, capabilities={"ci", "prod_access"})
+
+    def test_declared_produced_artifact_must_exist_in_output(self) -> None:
+        program = parse_program(
+            f"""
+goal "missing produced artifact demo"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci produces test_report
+}}
+""".strip()
+        )
+        trace = execute_program(program, capabilities={"ci"})
+        self.assertEqual(trace["status"], "failed")
+        self.assertEqual(trace["tasks"][0]["error_code"], ERROR_CODE_ARTIFACT_OUTPUT_MISSING)
+
+    def test_missing_artifact_error_code_when_runtime_path_not_statically_valid(self) -> None:
+        program = parse_program(
+            f"""
+goal "runtime artifact fail demo"
+
+plan {{
+  task build uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci produces coverage
+  task deploy uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" requires capability.prod_access after build consumes release_ticket
+}}
+""".strip()
+        )
+        with patch("missiongraph.executor.validate_program", return_value=[]):
+            trace = execute_program(
+                program,
+                capabilities={"ci", "prod_access"},
+                parallel=False,
+            )
+        self.assertEqual(trace["status"], "failed")
+        self.assertEqual(trace["tasks"][-1]["error_code"], ERROR_CODE_ARTIFACT_CONSUME_MISSING)
 
     def test_retry_policy_recovers_from_transient_failure(self) -> None:
         program = parse_program(

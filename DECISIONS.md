@@ -64,3 +64,10 @@ Status: accepted
 Decision: add task execution policies to `plan` via `with timeout/retries/backoff`.
 Rationale: support resilient orchestration in the DSL without pushing retry logic into each worker.
 Consequences: parser, AST schema, and executor now include policy semantics; runtime applies timeout + retries + exponential backoff per task.
+
+## 2026-02-13
+
+Status: accepted
+Decision: add explicit task artifact contracts in `plan` via `consumes` and `produces`.
+Rationale: make inter-task data dependencies first-class instead of implicit output-key coupling.
+Consequences: parser/AST include artifact clauses, validator enforces producer-path correctness, and executor fails fast on missing artifacts.

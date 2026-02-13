@@ -50,6 +50,39 @@ def validate_program(
                     f"capabilities: {', '.join(missing)}"
                 )
 
+    producer_by_artifact: dict[str, str] = {}
+    for task in program.tasks:
+        for artifact in task.produces:
+            producer = producer_by_artifact.get(artifact)
+            if producer is not None and producer != task.name:
+                errors.append(
+                    f"line {task.line}: artifact '{artifact}' is produced by multiple tasks "
+                    f"('{producer}', '{task.name}')"
+                )
+            else:
+                producer_by_artifact[artifact] = task.name
+        for artifact in task.consumes:
+            if artifact in task.produces:
+                errors.append(
+                    f"line {task.line}: task '{task.name}' cannot both consume and produce "
+                    f"artifact '{artifact}'"
+                )
+
+    ancestors_by_task = _build_ancestor_map(program)
+    for task in program.tasks:
+        for artifact in task.consumes:
+            producer = producer_by_artifact.get(artifact)
+            if producer is None:
+                errors.append(
+                    f"line {task.line}: task '{task.name}' consumes unknown artifact '{artifact}'"
+                )
+                continue
+            if producer not in ancestors_by_task.get(task.name, set()):
+                errors.append(
+                    f"line {task.line}: task '{task.name}' consumes artifact '{artifact}' "
+                    f"from '{producer}' but has no dependency path to that producer"
+                )
+
     for check in program.verify:
         try:
             eval_expr(check.expression, {})
@@ -74,3 +107,30 @@ def _resolve_worker(base_dir: Path, worker: str) -> Path:
     if path.is_absolute():
         return path
     return (base_dir / path).resolve()
+
+
+def _build_ancestor_map(program: Program) -> dict[str, set[str]]:
+    task_by_name = {task.name: task for task in program.tasks}
+    memo: dict[str, set[str]] = {}
+    visiting: set[str] = set()
+
+    def _ancestors(task_name: str) -> set[str]:
+        if task_name in memo:
+            return memo[task_name]
+        if task_name in visiting:
+            return set()
+
+        visiting.add(task_name)
+        out: set[str] = set()
+        task = task_by_name.get(task_name)
+        if task is not None:
+            for dep in task.after:
+                if dep not in task_by_name:
+                    continue
+                out.add(dep)
+                out.update(_ancestors(dep))
+        visiting.remove(task_name)
+        memo[task_name] = out
+        return out
+
+    return {name: _ancestors(name) for name in task_by_name}

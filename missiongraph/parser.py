@@ -19,13 +19,14 @@ _TYPE_DEF_RE = re.compile(r'^type\s+([A-Za-z_][A-Za-z0-9_]*)\s+"([^"]*)"\s*$')
 _TASK_HEAD_RE = re.compile(
     r'^task\s+([A-Za-z_][A-Za-z0-9_\-]*)\s+uses\s+"([^"]+)"(?:\s+(.*))?\s*$'
 )
-_TASK_CLAUSE_SPLIT_RE = re.compile(r"\s+(requires|after|with)\s+")
+_TASK_CLAUSE_SPLIT_RE = re.compile(r"\s+(requires|after|consumes|produces|with)\s+")
 _CONTRACT_TASK_RE = re.compile(r"^task\s+([A-Za-z_][A-Za-z0-9_\-]*)\s*(.*)$")
 _CONTRACT_CLAUSE_RE = re.compile(
     r'\b(input|output)\s+("[^"]*"|@[A-Za-z_][A-Za-z0-9_]*)'
 )
 _FIELD_SPEC_RE = re.compile(r"^([A-Za-z_][\w\.]*)\s*:\s*([A-Za-z_][A-Za-z0-9_]*\??)$")
 _CAP_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_\-]*$")
+_ARTIFACT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_\-]*$")
 _RETRIES_RE = re.compile(r"^\d+$")
 _DURATION_RE = re.compile(r"^(\d+(?:\.\d+)?)(ms|s)?$")
 _VALID_SCHEMA_TYPES = {
@@ -289,6 +290,8 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
     name, worker, tail = match.groups()
     requires: set[str] = set()
     after: list[str] = []
+    consumes: list[str] = []
+    produces: list[str] = []
     policy = _TaskPolicy(timeout_seconds=None, retries=0, backoff_seconds=0.0)
     seen_clauses: set[str] = set()
     remaining = (tail or "").strip()
@@ -322,6 +325,34 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
             seen_clauses.add("after")
             continue
 
+        if remaining.startswith("consumes "):
+            if "consumes" in seen_clauses:
+                raise ParseError(
+                    f"{source}:{line_no}: duplicate consumes clause for task '{name}'"
+                )
+            clause, remaining = _consume_task_clause_value(remaining[len("consumes "):])
+            if not clause:
+                raise ParseError(
+                    f"{source}:{line_no}: consumes clause cannot be empty for task '{name}'"
+                )
+            consumes = _parse_artifact_names(clause, source, line_no, "consumes")
+            seen_clauses.add("consumes")
+            continue
+
+        if remaining.startswith("produces "):
+            if "produces" in seen_clauses:
+                raise ParseError(
+                    f"{source}:{line_no}: duplicate produces clause for task '{name}'"
+                )
+            clause, remaining = _consume_task_clause_value(remaining[len("produces "):])
+            if not clause:
+                raise ParseError(
+                    f"{source}:{line_no}: produces clause cannot be empty for task '{name}'"
+                )
+            produces = _parse_artifact_names(clause, source, line_no, "produces")
+            seen_clauses.add("produces")
+            continue
+
         if remaining.startswith("with "):
             if "with" in seen_clauses:
                 raise ParseError(
@@ -342,6 +373,8 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
         worker=worker,
         requires=requires,
         after=after,
+        consumes=consumes,
+        produces=produces,
         timeout_seconds=policy.timeout_seconds,
         retries=policy.retries,
         backoff_seconds=policy.backoff_seconds,
@@ -657,6 +690,28 @@ def _parse_after(raw: str | None) -> list[str]:
     if raw is None:
         return []
     return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def _parse_artifact_names(
+    raw: str,
+    source: str,
+    line_no: int,
+    clause_name: str,
+) -> list[str]:
+    artifacts: list[str] = []
+    seen: set[str] = set()
+    for token in [part.strip() for part in raw.split(",") if part.strip()]:
+        if not _ARTIFACT_RE.fullmatch(token):
+            raise ParseError(
+                f"{source}:{line_no}: invalid artifact name '{token}' in {clause_name}"
+            )
+        if token in seen:
+            raise ParseError(
+                f"{source}:{line_no}: duplicate artifact '{token}' in {clause_name}"
+            )
+        seen.add(token)
+        artifacts.append(token)
+    return artifacts
 
 
 def _is_ignored(line: str) -> bool:

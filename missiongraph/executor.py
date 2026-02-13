@@ -16,6 +16,8 @@ from .models import Constraint, FieldSpec, Program, Task, VerifyCheck
 from .planner import build_execution_levels
 from .safe_eval import EvalError, eval_expr
 from .spec import (
+    ERROR_CODE_ARTIFACT_CONSUME_MISSING,
+    ERROR_CODE_ARTIFACT_OUTPUT_MISSING,
     ERROR_CODE_CONTRACT_INPUT_VIOLATION,
     ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
     ERROR_CODE_RUNTIME_EXECUTION_FAILURE,
@@ -54,18 +56,36 @@ def execute_program(
     task_results: dict[str, dict[str, Any]] = {}
     trace_tasks: list[dict[str, Any]] = []
     shared_context: dict[str, Any] = dict(variables)
+    artifact_registry: dict[str, Any] = {}
 
     for level in levels:
         payload_by_task: dict[str, dict[str, Any]] = {}
         input_failed = False
 
         for task in level:
+            missing_artifacts = [
+                artifact for artifact in task.consumes if artifact not in artifact_registry
+            ]
+            if missing_artifacts:
+                failure = _build_artifact_failure_result(
+                    task=task,
+                    base_dir=program.base_dir,
+                    missing_artifacts=missing_artifacts,
+                )
+                task_results[task.name] = failure
+                trace_tasks.append(failure)
+                input_failed = True
+                break
+
             dep_payload = {dep: task_results[dep] for dep in task.after}
             payload = {
                 "task": task.name,
                 "goal": program.goal,
                 "constraints": [_constraint_to_dict(c) for c in program.constraints],
                 "dependencies": dep_payload,
+                "artifacts": {
+                    artifact: artifact_registry[artifact] for artifact in task.consumes
+                },
                 "variables": shared_context,
             }
             input_errors = _validate_schema(payload, task.input_schema)
@@ -105,6 +125,24 @@ def execute_program(
                     result.get("error"),
                     f"output contract violation: {'; '.join(output_errors)}",
                 )
+
+            if result.get("status") == "ok":
+                missing_output_artifacts = [
+                    artifact for artifact in task.produces if artifact not in result["output"]
+                ]
+                if missing_output_artifacts:
+                    result["status"] = "error"
+                    result["confidence"] = 0.0
+                    result["error_code"] = ERROR_CODE_ARTIFACT_OUTPUT_MISSING
+                    result["error"] = _merge_error(
+                        result.get("error"),
+                        "declared produced artifact(s) missing from output: "
+                        + ", ".join(missing_output_artifacts),
+                    )
+                else:
+                    for artifact in task.produces:
+                        artifact_registry[artifact] = result["output"][artifact]
+
             task_results[task.name] = result
             trace_tasks.append(result)
             if result.get("status") != "ok":
@@ -359,6 +397,10 @@ def _build_task_result(
         default_provenance["retries"] = task.retries
     if task.backoff_seconds > 0:
         default_provenance["backoff_seconds"] = task.backoff_seconds
+    if task.consumes:
+        default_provenance["consumes"] = task.consumes
+    if task.produces:
+        default_provenance["produces"] = task.produces
     provenance = parsed.get("provenance")
     if not isinstance(provenance, dict):
         provenance = {}
@@ -535,6 +577,33 @@ def _build_contract_failure_result(
             "worker": str(_resolve_worker_path(task.worker, base_dir)),
             "contract_stage": stage,
             "contract_only": True,
+        },
+    }
+
+
+def _build_artifact_failure_result(
+    task: Task,
+    base_dir: Path,
+    missing_artifacts: list[str],
+) -> dict[str, Any]:
+    now = _now()
+    return {
+        "task": task.name,
+        "worker": task.worker,
+        "status": "error",
+        "confidence": 0.0,
+        "output": {},
+        "error_code": ERROR_CODE_ARTIFACT_CONSUME_MISSING,
+        "error": (
+            "missing required artifact(s): " + ", ".join(missing_artifacts)
+        ),
+        "started_at": now,
+        "finished_at": now,
+        "provenance": {
+            "worker": str(_resolve_worker_path(task.worker, base_dir)),
+            "artifact_stage": "consume",
+            "missing_artifacts": missing_artifacts,
+            "artifact_only": True,
         },
     }
 

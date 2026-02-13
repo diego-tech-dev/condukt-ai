@@ -57,6 +57,10 @@ def _task_to_ast(task: Task) -> dict[str, Any]:
         ],
         "line": task.line,
     }
+    if task.consumes:
+        item["consumes"] = task.consumes
+    if task.produces:
+        item["produces"] = task.produces
     if task.timeout_seconds is not None:
         item["timeout_seconds"] = task.timeout_seconds
     if task.retries > 0:

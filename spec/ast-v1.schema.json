@@ -135,6 +135,18 @@
             "type": "string"
           }
         },
+        "consumes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "produces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "input_schema": {
           "type": "array",
           "items": {
