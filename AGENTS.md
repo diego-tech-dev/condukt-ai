@@ -26,6 +26,7 @@ Read first for deeper context:
 ## Key Commands
 
 - Parse program: `python3 -m missiongraph parse examples/ship_release.mgl`
+- Validate program: `python3 -m missiongraph validate examples/ship_release.mgl --capability ci --capability prod_access`
 - Show plan levels: `python3 -m missiongraph plan examples/ship_release.mgl --capability ci --capability prod_access`
 - Run program (sequential): `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
 - Run fan-out demo: `python3 -m missiongraph run examples/release_fanout.mgl --capability ci --capability prod_access --max-parallel 8`

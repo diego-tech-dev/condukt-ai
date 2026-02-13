@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import copy
+import io
 import json
 import subprocess
 import threading
 import time
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
+from missiongraph.cli import main as cli_main
 from missiongraph.executor import ExecutionError, execute_program
 from missiongraph.parser import ParseError, parse_file, parse_program
 from missiongraph.planner import build_mermaid_graph
@@ -41,6 +44,46 @@ class MissionGraphEndToEndTests(unittest.TestCase):
         program = parse_file(ROOT / "examples" / "ship_release.mgl")
         with self.assertRaises(ExecutionError):
             execute_program(program, capabilities={"ci"})
+
+    def test_validate_command_json_success(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            exit_code = cli_main(
+                [
+                    "validate",
+                    str(ROOT / "examples" / "ship_release.mgl"),
+                    "--capability",
+                    "ci",
+                    "--capability",
+                    "prod_access",
+                    "--json",
+                ]
+            )
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(stdout.getvalue())
+        self.assertTrue(payload["valid"])
+        self.assertEqual(payload["errors"], [])
+        self.assertEqual(stderr.getvalue(), "")
+
+    def test_validate_command_json_failure(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            exit_code = cli_main(
+                [
+                    "validate",
+                    str(ROOT / "examples" / "ship_release.mgl"),
+                    "--capability",
+                    "ci",
+                    "--json",
+                ]
+            )
+        self.assertEqual(exit_code, 1)
+        payload = json.loads(stdout.getvalue())
+        self.assertFalse(payload["valid"])
+        self.assertGreaterEqual(len(payload["errors"]), 1)
+        self.assertEqual(stderr.getvalue(), "")
 
     def test_verify_summary_reports_failed_checks_with_lines(self) -> None:
         program = parse_program(

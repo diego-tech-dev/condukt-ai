@@ -80,6 +80,7 @@ Parse, inspect levels, and render graph:
 
 ```bash
 python3 -m missiongraph parse examples/ship_release.mgl
+python3 -m missiongraph validate examples/ship_release.mgl --capability ci --capability prod_access
 python3 -m missiongraph plan examples/ship_release.mgl --capability ci --capability prod_access
 python3 -m missiongraph graph examples/release_fanout.mgl
 ```

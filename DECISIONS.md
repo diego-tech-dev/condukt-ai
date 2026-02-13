@@ -78,3 +78,10 @@ Status: accepted
 Decision: emit grouped verify diagnostics under `verify_summary` in traces.
 Rationale: speed up failure triage by exposing aggregate verify health and failed-check details with source lines.
 Consequences: trace schema includes `verify_summary`, while existing `verify` entries remain stable for compatibility.
+
+## 2026-02-13
+
+Status: accepted
+Decision: add `mgl validate` as first-class static validation command.
+Rationale: provide a dedicated preflight path for CI/automation without executing workers.
+Consequences: CLI supports human and JSON validation output with deterministic exit codes.

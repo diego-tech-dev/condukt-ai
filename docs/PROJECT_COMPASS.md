@@ -83,11 +83,12 @@ Rules for safe migration:
 - Runtime now supports timeout + retries + exponential backoff per task.
 - Added explicit artifact contracts in `plan` (`consumes`/`produces`).
 - Added grouped verify diagnostics in trace output (`verify_summary`).
+- Added CLI preflight validation command (`mgl validate`).
 
 ## Near-Term Direction
 
-1. CLI validation workflow (`mgl validate`) with machine-readable output.
-2. Rust runtime prototype that can pass current golden suite.
+1. Rust runtime prototype that can pass current golden suite.
+2. Artifact schema typing (beyond name-level artifacts).
 
 ## Resume Checklist
 
