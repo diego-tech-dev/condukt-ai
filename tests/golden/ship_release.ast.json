@@ -1,0 +1,151 @@
+{
+  "ast_version": "1.0",
+  "goal": "ship release",
+  "types": {
+    "DeployInput": [
+      {
+        "path": "dependencies.test_suite.status",
+        "type": "str",
+        "optional": false,
+        "line": 5
+      },
+      {
+        "path": "dependencies.test_suite.output.coverage",
+        "type": "number",
+        "optional": false,
+        "line": 5
+      }
+    ],
+    "DeployReport": [
+      {
+        "path": "release",
+        "type": "str",
+        "optional": false,
+        "line": 6
+      },
+      {
+        "path": "rollback_ready",
+        "type": "bool",
+        "optional": false,
+        "line": 6
+      },
+      {
+        "path": "risk",
+        "type": "number",
+        "optional": false,
+        "line": 6
+      }
+    ],
+    "TestReport": [
+      {
+        "path": "coverage",
+        "type": "number",
+        "optional": false,
+        "line": 4
+      },
+      {
+        "path": "tests_passed",
+        "type": "int",
+        "optional": false,
+        "line": 4
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "key": "risk",
+      "op": "<=",
+      "value": 0.2,
+      "line": 10
+    }
+  ],
+  "tasks": [
+    {
+      "name": "test_suite",
+      "worker": "../workers/test_suite.py",
+      "requires": [
+        "ci"
+      ],
+      "after": [],
+      "input_schema": [],
+      "output_schema": [
+        {
+          "path": "coverage",
+          "type": "number",
+          "optional": false,
+          "line": 19
+        },
+        {
+          "path": "tests_passed",
+          "type": "int",
+          "optional": false,
+          "line": 19
+        }
+      ],
+      "line": 14
+    },
+    {
+      "name": "deploy_prod",
+      "worker": "../workers/deploy_prod.py",
+      "requires": [
+        "prod_access"
+      ],
+      "after": [
+        "test_suite"
+      ],
+      "input_schema": [
+        {
+          "path": "dependencies.test_suite.status",
+          "type": "str",
+          "optional": false,
+          "line": 20
+        },
+        {
+          "path": "dependencies.test_suite.output.coverage",
+          "type": "number",
+          "optional": false,
+          "line": 20
+        }
+      ],
+      "output_schema": [
+        {
+          "path": "release",
+          "type": "str",
+          "optional": false,
+          "line": 20
+        },
+        {
+          "path": "rollback_ready",
+          "type": "bool",
+          "optional": false,
+          "line": 20
+        },
+        {
+          "path": "risk",
+          "type": "number",
+          "optional": false,
+          "line": 20
+        }
+      ],
+      "line": 15
+    }
+  ],
+  "verify": [
+    {
+      "line": 24,
+      "expression": "test_suite.status == \"ok\""
+    },
+    {
+      "line": 25,
+      "expression": "test_suite.output.coverage >= 0.9"
+    },
+    {
+      "line": 26,
+      "expression": "deploy_prod.status == \"ok\""
+    },
+    {
+      "line": 27,
+      "expression": "deploy_prod.output.rollback_ready == true"
+    }
+  ]
+}

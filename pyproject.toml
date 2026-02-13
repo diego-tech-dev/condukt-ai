@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "missiongraph-prototype"
+version = "0.1.0"
+description = "Intent-first agent orchestration language prototype"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+mgl = "missiongraph.cli:main"
+
+[tool.setuptools]
+packages = ["missiongraph"]

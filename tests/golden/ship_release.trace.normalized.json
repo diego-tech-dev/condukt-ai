@@ -1,0 +1,101 @@
+{
+  "trace_version": "1.0",
+  "goal": "ship release",
+  "status": "ok",
+  "started_at": "<ts>",
+  "finished_at": "<ts>",
+  "capabilities": [
+    "ci",
+    "prod_access"
+  ],
+  "execution": {
+    "mode": "sequential",
+    "max_parallel": 1,
+    "levels": [
+      [
+        "test_suite"
+      ],
+      [
+        "deploy_prod"
+      ]
+    ]
+  },
+  "task_order": [
+    "test_suite",
+    "deploy_prod"
+  ],
+  "tasks": [
+    {
+      "task": "test_suite",
+      "worker": "../workers/test_suite.py",
+      "status": "ok",
+      "confidence": 0.93,
+      "output": {
+        "coverage": 0.94,
+        "tests_passed": 128
+      },
+      "error_code": null,
+      "error": null,
+      "started_at": "<ts>",
+      "finished_at": "<ts>",
+      "provenance": {
+        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/agent-programing-language/workers/test_suite.py",
+        "command": "<cmd>",
+        "return_code": 0,
+        "stdout_sha256": "<sha256>",
+        "source": "simulated-local-ci"
+      }
+    },
+    {
+      "task": "deploy_prod",
+      "worker": "../workers/deploy_prod.py",
+      "status": "ok",
+      "confidence": 0.88,
+      "output": {
+        "release": "2026.02.0",
+        "rollback_ready": true,
+        "risk": 0.06
+      },
+      "error_code": null,
+      "error": null,
+      "started_at": "<ts>",
+      "finished_at": "<ts>",
+      "provenance": {
+        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/agent-programing-language/workers/deploy_prod.py",
+        "command": "<cmd>",
+        "return_code": 0,
+        "stdout_sha256": "<sha256>",
+        "source": "simulated-deploy"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "line": 10,
+      "expression": "risk <= 0.2",
+      "passed": true
+    }
+  ],
+  "verify": [
+    {
+      "line": 24,
+      "expression": "test_suite.status == \"ok\"",
+      "passed": true
+    },
+    {
+      "line": 25,
+      "expression": "test_suite.output.coverage >= 0.9",
+      "passed": true
+    },
+    {
+      "line": 26,
+      "expression": "deploy_prod.status == \"ok\"",
+      "passed": true
+    },
+    {
+      "line": 27,
+      "expression": "deploy_prod.output.rollback_ready == true",
+      "passed": true
+    }
+  ]
+}
