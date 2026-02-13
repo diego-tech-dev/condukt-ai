@@ -85,3 +85,10 @@ Status: accepted
 Decision: add `mgl validate` as first-class static validation command.
 Rationale: provide a dedicated preflight path for CI/automation without executing workers.
 Consequences: CLI supports human and JSON validation output with deterministic exit codes.
+
+## 2026-02-13
+
+Status: accepted
+Decision: maintain runnable example programs as conformance assets, including artifact-flow scenarios.
+Rationale: keep language features grounded in executable references and reduce doc/runtime drift.
+Consequences: new examples and worker fixtures are treated as part of behavior coverage and regression testing.

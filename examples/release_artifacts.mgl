@@ -1,0 +1,27 @@
+goal "publish release from explicit artifacts"
+
+types {
+  type TestReport "coverage:number, tests_passed:int"
+  type PublishInput "artifacts.coverage:number"
+  type PublishOutput "release_id:str, quality_gate:str"
+}
+
+constraints {
+  release_id != ""
+}
+
+plan {
+  task test_suite uses "../workers/test_suite.py" requires capability.ci produces coverage
+  task publish_release uses "../workers/publish_release.py" requires capability.prod_access after test_suite consumes coverage produces release_id
+}
+
+contracts {
+  task test_suite output @TestReport
+  task publish_release input @PublishInput output @PublishOutput
+}
+
+verify {
+  test_suite.status == "ok"
+  publish_release.status == "ok"
+  publish_release.output.quality_gate == "high"
+}

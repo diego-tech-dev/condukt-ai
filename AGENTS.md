@@ -31,6 +31,7 @@ Read first for deeper context:
 - Run program (sequential): `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
 - Run fan-out demo: `python3 -m missiongraph run examples/release_fanout.mgl --capability ci --capability prod_access --max-parallel 8`
 - Run resilient policy demo: `python3 -m missiongraph run examples/release_resilient.mgl --capability ci --capability prod_access --max-parallel 8`
+- Run artifact-flow demo: `python3 -m missiongraph run examples/release_artifacts.mgl --capability ci --capability prod_access --sequential`
 - Render graph: `python3 -m missiongraph graph examples/release_fanout.mgl`
 - Test suite: `python3 -m unittest discover -s tests -p "test_*.py"`
 

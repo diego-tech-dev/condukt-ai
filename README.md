@@ -76,6 +76,15 @@ python3 -m missiongraph run examples/release_resilient.mgl \
   --max-parallel 8
 ```
 
+Run explicit artifact-flow demo (`produces`/`consumes`):
+
+```bash
+python3 -m missiongraph run examples/release_artifacts.mgl \
+  --capability ci \
+  --capability prod_access \
+  --sequential
+```
+
 Parse, inspect levels, and render graph:
 
 ```bash

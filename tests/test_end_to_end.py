@@ -40,6 +40,17 @@ class MissionGraphEndToEndTests(unittest.TestCase):
         self.assertEqual(trace["task_order"], ["test_suite", "deploy_prod"])
         self.assertTrue(all(item["passed"] for item in trace["verify"]))
 
+    def test_artifact_demo_program_executes(self) -> None:
+        program = parse_file(ROOT / "examples" / "release_artifacts.mgl")
+        trace = execute_program(
+            program,
+            capabilities={"ci", "prod_access"},
+            parallel=False,
+        )
+        self.assertEqual(trace["status"], "ok")
+        self.assertEqual(trace["task_order"], ["test_suite", "publish_release"])
+        self.assertEqual(trace["tasks"][1]["output"]["quality_gate"], "high")
+
     def test_missing_capability_fails_validation(self) -> None:
         program = parse_file(ROOT / "examples" / "ship_release.mgl")
         with self.assertRaises(ExecutionError):

@@ -2,6 +2,8 @@
 
 Last updated: 2026-02-13
 
+Current sprint status: completed
+
 ## Autonomy Sprint (5 milestones)
 
 1. `M1` Planning scaffolding

@@ -84,6 +84,7 @@ Rules for safe migration:
 - Added explicit artifact contracts in `plan` (`consumes`/`produces`).
 - Added grouped verify diagnostics in trace output (`verify_summary`).
 - Added CLI preflight validation command (`mgl validate`).
+- Added artifact-flow runnable example coverage (`examples/release_artifacts.mgl`).
 
 ## Near-Term Direction
 

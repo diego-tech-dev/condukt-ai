@@ -4,14 +4,14 @@
 
 ### Sprint: Autonomous 5-milestone run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `M1` Planning scaffolding: completed
 - `M2` Artifact contracts (`produces`/`consumes`): completed
 - `M3` Verify diagnostics: completed
 - `M4` CLI validation workflow: completed
-- `M5` Conformance and docs hardening: pending
+- `M5` Conformance and docs hardening: completed
 
 Notes:
 - Execution mode: autonomous implementation with atomic commits and frequent pushes.
@@ -21,3 +21,4 @@ Notes:
   - Implemented task-level artifact contracts (`consumes`/`produces`) with parser/validator/executor coverage.
   - Added `verify_summary` diagnostics in trace output (counts + failed-check details).
   - Added `mgl validate` command with optional JSON output.
+  - Added artifact-flow example (`release_artifacts.mgl`) with dedicated worker and end-to-end coverage.
