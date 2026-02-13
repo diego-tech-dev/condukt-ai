@@ -162,10 +162,11 @@ def execute_program(
 
     constraints_report = _evaluate_constraints(program.constraints, shared_context)
     verify_report = _evaluate_verify(program.verify, task_results, shared_context)
+    verify_summary = _summarize_verify(verify_report)
 
     task_status_ok = all(task["status"] == "ok" for task in trace_tasks)
     constraints_ok = all(item["passed"] is not False for item in constraints_report)
-    verify_ok = all(item["passed"] for item in verify_report)
+    verify_ok = verify_summary["failed"] == 0
     overall_ok = task_status_ok and constraints_ok and verify_ok
 
     return {
@@ -184,6 +185,7 @@ def execute_program(
         "tasks": trace_tasks,
         "constraints": constraints_report,
         "verify": verify_report,
+        "verify_summary": verify_summary,
     }
 
 
@@ -701,6 +703,24 @@ def _evaluate_verify(
                 }
             )
     return report
+
+
+def _summarize_verify(report: list[dict[str, Any]]) -> dict[str, Any]:
+    failures = [
+        {
+            "line": item["line"],
+            "expression": item["expression"],
+            "reason": item.get("reason"),
+        }
+        for item in report
+        if item.get("passed") is False
+    ]
+    return {
+        "total": len(report),
+        "passed": len(report) - len(failures),
+        "failed": len(failures),
+        "failures": failures,
+    }
 
 
 def _constraint_to_dict(constraint: Constraint) -> dict[str, Any]:

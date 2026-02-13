@@ -9,7 +9,7 @@ Status: in_progress
 Milestone status:
 - `M1` Planning scaffolding: completed
 - `M2` Artifact contracts (`produces`/`consumes`): completed
-- `M3` Verify diagnostics: pending
+- `M3` Verify diagnostics: completed
 - `M4` CLI validation workflow: pending
 - `M5` Conformance and docs hardening: pending
 
@@ -19,3 +19,4 @@ Notes:
 - Completed:
   - Added `ROADMAP.md` and initialized this worklog.
   - Implemented task-level artifact contracts (`consumes`/`produces`) with parser/validator/executor coverage.
+  - Added `verify_summary` diagnostics in trace output (counts + failed-check details).

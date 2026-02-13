@@ -42,6 +42,31 @@ class MissionGraphEndToEndTests(unittest.TestCase):
         with self.assertRaises(ExecutionError):
             execute_program(program, capabilities={"ci"})
 
+    def test_verify_summary_reports_failed_checks_with_lines(self) -> None:
+        program = parse_program(
+            f"""
+goal "verify diagnostics demo"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci
+}}
+
+verify {{
+  test_suite.status == "ok"
+  test_suite.output.coverage > 0.99
+}}
+""".strip()
+        )
+        trace = execute_program(program, capabilities={"ci"})
+        self.assertEqual(trace["status"], "failed")
+        summary = trace["verify_summary"]
+        self.assertEqual(summary["total"], 2)
+        self.assertEqual(summary["passed"], 1)
+        self.assertEqual(summary["failed"], 1)
+        self.assertEqual(len(summary["failures"]), 1)
+        self.assertEqual(summary["failures"][0]["line"], 9)
+        self.assertIn("coverage > 0.99", summary["failures"][0]["expression"])
+
     def test_output_contract_violation_halts_plan(self) -> None:
         program = parse_program(
             f"""

@@ -97,6 +97,9 @@
       "items": {
         "$ref": "#/$defs/check_result"
       }
+    },
+    "verify_summary": {
+      "$ref": "#/$defs/verify_summary"
     }
   },
   "$defs": {
@@ -207,6 +210,57 @@
         },
         "reason": {
           "type": "string"
+        }
+      }
+    },
+    "verify_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "passed",
+        "failed",
+        "failures"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "line",
+              "expression",
+              "reason"
+            ],
+            "properties": {
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "expression": {
+                "type": "string"
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
         }
       }
     }

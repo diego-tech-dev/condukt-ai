@@ -82,10 +82,11 @@ Rules for safe migration:
 - Added task execution policies in DSL (`with timeout/retries/backoff`).
 - Runtime now supports timeout + retries + exponential backoff per task.
 - Added explicit artifact contracts in `plan` (`consumes`/`produces`).
+- Added grouped verify diagnostics in trace output (`verify_summary`).
 
 ## Near-Term Direction
 
-1. Better verifier diagnostics (grouped failures + source locations).
+1. CLI validation workflow (`mgl validate`) with machine-readable output.
 2. Rust runtime prototype that can pass current golden suite.
 
 ## Resume Checklist

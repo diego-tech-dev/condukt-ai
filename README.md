@@ -195,6 +195,7 @@ Plan output includes both flattened `task_order` and per-level structure.
 - `parse_file` rejects non-`.mgl` extensions.
 - `parse` output includes `ast_version` for stable AST interoperability.
 - `run` output includes `trace_version` and normalized `error_code` fields.
+- `run` output includes `verify_summary` for grouped verify diagnostics.
 - JSON schemas are versioned in `spec/ast-v1.schema.json` and `spec/trace-v1.schema.json`.
 - Conformance goldens live in `tests/golden/` to validate future runtimes.
 

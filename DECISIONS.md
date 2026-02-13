@@ -71,3 +71,10 @@ Status: accepted
 Decision: add explicit task artifact contracts in `plan` via `consumes` and `produces`.
 Rationale: make inter-task data dependencies first-class instead of implicit output-key coupling.
 Consequences: parser/AST include artifact clauses, validator enforces producer-path correctness, and executor fails fast on missing artifacts.
+
+## 2026-02-13
+
+Status: accepted
+Decision: emit grouped verify diagnostics under `verify_summary` in traces.
+Rationale: speed up failure triage by exposing aggregate verify health and failed-check details with source lines.
+Consequences: trace schema includes `verify_summary`, while existing `verify` entries remain stable for compatibility.
