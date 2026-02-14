@@ -344,3 +344,10 @@ Status: accepted
 Decision: decommission Python and Rust runtime tracks and keep Condukt AI repository scope TypeScript-only.
 Rationale: active product direction and release workflow are fully centered on the `condukt-ai` TS package; maintaining legacy runtimes no longer provides sufficient value for the ongoing roadmap.
 Consequences: removed Python/Rust runtime code, `.mgl` examples/spec artifacts, and cross-runtime conformance/parity test harnesses; root project docs now describe a TS-only architecture.
+
+## 2026-02-14
+
+Status: accepted
+Decision: make provider/model-level type safety a first-class API contract in the TS runtime.
+Rationale: preventing model-setting mismatches at compile time improves workflow correctness and DX for multi-provider agent pipelines.
+Consequences: `LLMProvider` is now generic over model IDs and per-model settings maps, `llmTask` infers model-specific settings from the selected provider/model, and typecheck now includes dedicated compile-time provider typing fixtures.

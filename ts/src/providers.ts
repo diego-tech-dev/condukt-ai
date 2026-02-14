@@ -1,24 +1,55 @@
-export interface LLMJsonRequest {
-  readonly model: string;
+export interface LLMJsonRequest<
+  TModel extends string = string,
+  TSettings extends object = Record<string, never>,
+> {
+  readonly model: TModel;
   readonly prompt: string;
   readonly system?: string;
-  readonly temperature?: number;
-  readonly maxTokens?: number;
+  readonly settings?: TSettings;
 }
 
-export interface LLMJsonResponse {
+export interface LLMJsonResponse<TModel extends string = string> {
   readonly provider: string;
-  readonly model: string;
+  readonly model: TModel;
   readonly rawText: string;
   readonly data: unknown;
   readonly responseId?: string;
   readonly usage?: Record<string, unknown>;
 }
 
-export interface LLMProvider {
+export interface LLMProvider<
+  TModel extends string = string,
+  TSettingsByModel extends Record<TModel, object> = Record<
+    TModel,
+    Record<string, never>
+  >,
+> {
   readonly name: string;
-  generateJSON(request: LLMJsonRequest): Promise<LLMJsonResponse>;
+  readonly models: readonly TModel[];
+  generateJSON<TSelectedModel extends TModel>(
+    request: LLMJsonRequest<TSelectedModel, TSettingsByModel[TSelectedModel]>,
+  ): Promise<LLMJsonResponse<TSelectedModel>>;
 }
+
+export type ProviderModelName<TProvider> =
+  TProvider extends LLMProvider<
+    infer TModel extends string,
+    infer _TSettingsByModel
+  >
+    ? TModel
+    : never;
+
+export type ProviderModelSettings<
+  TProvider,
+  TModel extends ProviderModelName<TProvider>,
+> = TProvider extends LLMProvider<
+  infer _TProviderModel extends string,
+  infer TSettingsByModel
+>
+  ? TSettingsByModel extends Record<string, object>
+    ? TSettingsByModel[TModel]
+    : never
+  : never;
 
 export interface OpenAIProviderOptions {
   readonly apiKey?: string;
@@ -35,7 +66,58 @@ export interface AnthropicProviderOptions {
   readonly fetchFn?: typeof fetch;
 }
 
-export function createOpenAIProvider(options: OpenAIProviderOptions = {}): LLMProvider {
+export interface OpenAIChatModelSettings {
+  readonly temperature?: number;
+  readonly maxTokens?: number;
+}
+
+export interface OpenAIReasoningModelSettings {
+  readonly maxTokens?: number;
+  readonly reasoningEffort?: "low" | "medium" | "high";
+}
+
+export type OpenAIChatModel = "gpt-4.1" | "gpt-4.1-mini" | "gpt-4o" | "gpt-4o-mini";
+export type OpenAIReasoningModel = "o3-mini" | "o4-mini";
+export type OpenAIModel = OpenAIChatModel | OpenAIReasoningModel;
+
+export type OpenAIModelSettingsByModel = {
+  readonly [TModel in OpenAIChatModel]: OpenAIChatModelSettings;
+} & {
+  readonly [TModel in OpenAIReasoningModel]: OpenAIReasoningModelSettings;
+};
+
+export const OPENAI_MODELS: readonly OpenAIModel[] = [
+  "gpt-4.1",
+  "gpt-4.1-mini",
+  "gpt-4o",
+  "gpt-4o-mini",
+  "o3-mini",
+  "o4-mini",
+] as const;
+
+export interface AnthropicModelSettings {
+  readonly maxTokens?: number;
+  readonly temperature?: number;
+}
+
+export type AnthropicModel =
+  | "claude-opus-4-1-20250805"
+  | "claude-sonnet-4-5-20250929"
+  | "claude-3-5-haiku-latest";
+
+export type AnthropicModelSettingsByModel = {
+  readonly [TModel in AnthropicModel]: AnthropicModelSettings;
+};
+
+export const ANTHROPIC_MODELS: readonly AnthropicModel[] = [
+  "claude-opus-4-1-20250805",
+  "claude-sonnet-4-5-20250929",
+  "claude-3-5-haiku-latest",
+] as const;
+
+export function createOpenAIProvider(
+  options: OpenAIProviderOptions = {},
+): LLMProvider<OpenAIModel, OpenAIModelSettingsByModel> {
   const apiKey = options.apiKey ?? process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY is required for OpenAI provider");
@@ -46,18 +128,29 @@ export function createOpenAIProvider(options: OpenAIProviderOptions = {}): LLMPr
 
   return {
     name: "openai",
-    async generateJSON(request) {
+    models: OPENAI_MODELS,
+    async generateJSON<TSelectedModel extends OpenAIModel>(request: LLMJsonRequest<TSelectedModel, OpenAIModelSettingsByModel[TSelectedModel]>) {
       const body: Record<string, unknown> = {
         model: request.model,
         messages: buildMessages(request.system, request.prompt),
         response_format: { type: "json_object" },
       };
 
-      if (typeof request.temperature === "number") {
-        body.temperature = request.temperature;
+      const settings = request.settings;
+      if (typeof settings?.maxTokens === "number") {
+        body.max_tokens = settings.maxTokens;
       }
-      if (typeof request.maxTokens === "number") {
-        body.max_tokens = request.maxTokens;
+
+      if (isOpenAIReasoningModel(request.model)) {
+        const reasoningSettings = settings as OpenAIReasoningModelSettings | undefined;
+        if (reasoningSettings?.reasoningEffort) {
+          body.reasoning_effort = reasoningSettings.reasoningEffort;
+        }
+      } else {
+        const chatSettings = settings as OpenAIChatModelSettings | undefined;
+        if (typeof chatSettings?.temperature === "number") {
+          body.temperature = chatSettings.temperature;
+        }
       }
 
       const headers: Record<string, string> = {
@@ -96,7 +189,9 @@ export function createOpenAIProvider(options: OpenAIProviderOptions = {}): LLMPr
   };
 }
 
-export function createAnthropicProvider(options: AnthropicProviderOptions = {}): LLMProvider {
+export function createAnthropicProvider(
+  options: AnthropicProviderOptions = {},
+): LLMProvider<AnthropicModel, AnthropicModelSettingsByModel> {
   const apiKey = options.apiKey ?? process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error("ANTHROPIC_API_KEY is required for Anthropic provider");
@@ -108,14 +203,19 @@ export function createAnthropicProvider(options: AnthropicProviderOptions = {}):
 
   return {
     name: "anthropic",
-    async generateJSON(request) {
+    models: ANTHROPIC_MODELS,
+    async generateJSON<TSelectedModel extends AnthropicModel>(request: LLMJsonRequest<TSelectedModel, AnthropicModelSettingsByModel[TSelectedModel]>) {
       const body: Record<string, unknown> = {
         model: request.model,
-        max_tokens: request.maxTokens ?? 1024,
+        max_tokens: request.settings?.maxTokens ?? 1024,
         messages: [{ role: "user", content: request.prompt }],
       };
+
       if (request.system) {
         body.system = request.system;
+      }
+      if (typeof request.settings?.temperature === "number") {
+        body.temperature = request.settings.temperature;
       }
 
       const response = await fetchFn(`${baseUrl}/v1/messages`, {
@@ -159,6 +259,10 @@ export function createAnthropicProvider(options: AnthropicProviderOptions = {}):
       };
     },
   };
+}
+
+function isOpenAIReasoningModel(model: OpenAIModel): model is OpenAIReasoningModel {
+  return model === "o3-mini" || model === "o4-mini";
 }
 
 function buildMessages(system: string | undefined, prompt: string): Array<Record<string, string>> {

@@ -243,3 +243,18 @@ Notes:
 - Removed legacy runtime source trees (`condukt/`, `rust/condukt-rs/`) and Python worker/example/spec assets tied to the old `.mgl` track.
 - Removed Python-based conformance/parity tooling and the full Python/Rust test suite.
 - Rewrote root docs (`README.md`, `docs/PROJECT_COMPASS.md`, `docs/FOUNDATIONS.md`) to reflect TS-only product scope.
+
+### Sprint: Typed provider DX run
+
+Status: completed
+
+Milestone status:
+- `L1` Introduce provider/model generic typing surface in runtime API: completed
+- `L2` Enforce model-specific settings inference in `llmTask`: completed
+- `L3` Add compile-time type fixtures for provider/model contract safety: completed
+
+Notes:
+- Refactored `ts/src/providers.ts` to expose model-aware provider generics and exported provider model catalogs (`OPENAI_MODELS`, `ANTHROPIC_MODELS`).
+- Updated `llmTask` typing in `ts/src/pipeline.ts` so `modelSettings` are inferred from selected provider/model instead of generic untyped task-level knobs.
+- Added compile-time provider typing fixtures under `ts/typecheck/` and moved `pnpm typecheck` to `tsconfig.typecheck.json` to enforce these contracts.
+- Expanded provider runtime tests to validate request payload shaping for chat vs reasoning settings.

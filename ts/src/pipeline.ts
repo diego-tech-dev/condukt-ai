@@ -83,21 +83,42 @@ export interface PipelineTrace {
   };
 }
 
-export interface LLMTaskDefinition<TOutput = unknown> {
+type RequiredKeys<TValue extends object> = {
+  [TKey in keyof TValue]-?: object extends Pick<TValue, TKey> ? never : TKey;
+}[keyof TValue];
+
+type LLMTaskModelSettingsField<TSettings extends object> =
+  keyof TSettings extends never
+    ? { readonly modelSettings?: undefined }
+    : RequiredKeys<TSettings> extends never
+      ? { readonly modelSettings?: TSettings }
+      : { readonly modelSettings: TSettings };
+
+export type LLMTaskDefinition<
+  TOutput = unknown,
+  TModel extends string = string,
+  TSettingsByModel extends Record<TModel, object> = Record<TModel, Record<string, never>>,
+  TSelectedModel extends TModel = TModel,
+> = {
   readonly id: string;
   readonly description?: string;
   readonly after?: readonly string[];
   readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
-  readonly provider: LLMProvider;
-  readonly model: string;
+  readonly provider: LLMProvider<TModel, TSettingsByModel>;
+  readonly model: TSelectedModel;
   readonly prompt: (context: TaskRuntimeContext) => string | Promise<string>;
   readonly system?: string | ((context: TaskRuntimeContext) => string | Promise<string>);
-  readonly temperature?: number;
-  readonly maxTokens?: number;
-}
+} & LLMTaskModelSettingsField<TSettingsByModel[TSelectedModel]>;
 
-export function llmTask<TOutput>(definition: LLMTaskDefinition<TOutput>): TaskDefinition<TOutput> {
+export function llmTask<
+  TOutput,
+  TModel extends string,
+  TSettingsByModel extends Record<TModel, object>,
+  TSelectedModel extends TModel,
+>(
+  definition: LLMTaskDefinition<TOutput, TModel, TSettingsByModel, TSelectedModel>,
+): TaskDefinition<TOutput> {
   return {
     id: definition.id,
     description: definition.description,
@@ -115,8 +136,7 @@ export function llmTask<TOutput>(definition: LLMTaskDefinition<TOutput>): TaskDe
         model: definition.model,
         prompt,
         system,
-        temperature: definition.temperature,
-        maxTokens: definition.maxTokens,
+        settings: definition.modelSettings,
       });
 
       return {
@@ -127,6 +147,7 @@ export function llmTask<TOutput>(definition: LLMTaskDefinition<TOutput>): TaskDe
           model: definition.model,
           prompt,
           ...(system ? { system } : {}),
+          ...(definition.modelSettings ? { model_settings: definition.modelSettings } : {}),
         },
         meta: {
           provider: response.provider,

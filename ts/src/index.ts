@@ -19,16 +19,29 @@ export type {
 } from "./pipeline.js";
 
 export {
+  ANTHROPIC_MODELS,
+  OPENAI_MODELS,
   createAnthropicProvider,
   createOpenAIProvider,
 } from "./providers.js";
 
 export type {
+  AnthropicModel,
+  AnthropicModelSettings,
+  AnthropicModelSettingsByModel,
   AnthropicProviderOptions,
   LLMJsonRequest,
   LLMJsonResponse,
   LLMProvider,
+  OpenAIChatModel,
+  OpenAIChatModelSettings,
+  OpenAIModel,
+  OpenAIModelSettingsByModel,
   OpenAIProviderOptions,
+  OpenAIReasoningModel,
+  OpenAIReasoningModelSettings,
+  ProviderModelName,
+  ProviderModelSettings,
 } from "./providers.js";
 
 export { validateContract } from "./contracts.js";

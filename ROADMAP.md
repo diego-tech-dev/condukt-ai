@@ -132,3 +132,11 @@ Status: completed
 1. `K1` Remove Python and Rust runtime tracks from repository: completed
 2. `K2` Remove cross-runtime conformance/parity scripts and tests: completed
 3. `K3` Rewrite root architecture docs for TS-only scope: completed
+
+## Typed Provider DX Sprint (Autonomous)
+
+Status: completed
+
+1. `L1` Introduce provider/model generic typing surface in runtime API: completed
+2. `L2` Enforce model-specific settings inference in `llmTask`: completed
+3. `L3` Add compile-time type fixtures for provider/model contract safety: completed

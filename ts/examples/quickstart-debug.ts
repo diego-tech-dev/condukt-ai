@@ -5,21 +5,26 @@ import { z } from "zod";
 
 import {
   Pipeline,
+  type LLMJsonRequest,
+  type LLMJsonResponse,
   type LLMProvider,
   llmTask,
 } from "../src/index.js";
 
-class DemoProvider implements LLMProvider {
+type DemoModel = "demo-model";
+type DemoModelSettingsByModel = {
+  readonly "demo-model": Record<string, never>;
+};
+
+class DemoProvider implements LLMProvider<DemoModel, DemoModelSettingsByModel> {
   readonly name = "demo";
+  readonly models = ["demo-model"] as const;
 
   constructor(private readonly broken: boolean) {}
 
-  async generateJSON(request: { readonly prompt: string; readonly model: string }): Promise<{
-    readonly provider: string;
-    readonly model: string;
-    readonly rawText: string;
-    readonly data: unknown;
-  }> {
+  async generateJSON<TSelectedModel extends DemoModel>(
+    request: LLMJsonRequest<TSelectedModel, DemoModelSettingsByModel[TSelectedModel]>,
+  ): Promise<LLMJsonResponse<TSelectedModel>> {
     const data = this.resolvePrompt(request.prompt);
     return {
       provider: this.name,

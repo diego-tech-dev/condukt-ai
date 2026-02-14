@@ -4,22 +4,27 @@ import { z } from "zod";
 
 import {
   ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
+  type LLMJsonRequest,
+  type LLMJsonResponse,
   Pipeline,
   type LLMProvider,
   llmTask,
 } from "../src/index.js";
 
-class FakeProvider implements LLMProvider {
+type FakeModel = "fake-model";
+type FakeModelSettingsByModel = {
+  readonly "fake-model": Record<string, never>;
+};
+
+class FakeProvider implements LLMProvider<FakeModel, FakeModelSettingsByModel> {
   readonly name = "fake";
+  readonly models = ["fake-model"] as const;
 
   constructor(private readonly responses: Record<string, unknown>) {}
 
-  async generateJSON(request: { readonly prompt: string; readonly model: string }): Promise<{
-    readonly provider: string;
-    readonly model: string;
-    readonly rawText: string;
-    readonly data: unknown;
-  }> {
+  async generateJSON<TSelectedModel extends FakeModel>(
+    request: LLMJsonRequest<TSelectedModel, FakeModelSettingsByModel[TSelectedModel]>,
+  ): Promise<LLMJsonResponse<TSelectedModel>> {
     const data = this.responses[request.prompt];
     if (typeof data === "undefined") {
       throw new Error(`no fake response for prompt '${request.prompt}'`);

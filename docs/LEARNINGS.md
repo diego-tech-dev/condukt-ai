@@ -35,6 +35,21 @@ Guardrail:
 ## 2026-02-14
 
 Context:
+- Strengthened TS provider/model type-safety to reduce runtime misconfiguration errors.
+
+Learning:
+- Provider-level generics only deliver DX value when task builders (`llmTask`) preserve model-specific setting inference all the way to call sites.
+
+What changed:
+- Added model-aware provider contracts and per-model settings maps.
+- Added compile-time type fixtures in `ts/typecheck/provider-models.typecheck.ts`.
+
+Guardrail:
+- Any new provider or model family must ship typed model IDs/settings and at least one compile-time fixture proving invalid settings fail typecheck.
+
+## 2026-02-14
+
+Context:
 - Added dual-runtime conformance and golden parity gates.
 
 Learning:

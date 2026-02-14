@@ -6,6 +6,7 @@ Focus of this package:
 - Standard Schema task contracts (`@standard-schema/spec`) so users can bring Zod or any compliant schema library
 - structured execution traces for fast failure diagnosis
 - LLM task adapters for OpenAI and Anthropic JSON workflows
+- provider-model-aware typing (model IDs + settings inferred per provider/model)
 - task-level retry policies (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces
 - Vitest-powered TypeScript test workflow
 
@@ -81,6 +82,10 @@ pipeline.addTask(
     id: "research",
     provider,
     model: "gpt-4.1-mini",
+    modelSettings: {
+      temperature: 0.2,
+      maxTokens: 300,
+    },
     output: z.object({ topics: z.array(z.string()) }),
     prompt: () => "Return JSON with topics.",
   }),
