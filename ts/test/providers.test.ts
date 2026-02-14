@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { createAnthropicProvider, createOpenAIProvider } from "../src/index.js";
 
@@ -28,10 +27,10 @@ test("openai provider parses JSON chat completion responses", async () => {
     prompt: "Return JSON",
   });
 
-  assert.equal(result.provider, "openai");
-  assert.equal(result.model, "gpt-4.1-mini");
-  assert.deepEqual(result.data, { ok: true, issues: [] });
-  assert.equal(result.responseId, "resp_123");
+  expect(result.provider).toBe("openai");
+  expect(result.model).toBe("gpt-4.1-mini");
+  expect(result.data).toEqual({ ok: true, issues: [] });
+  expect(result.responseId).toBe("resp_123");
 });
 
 test("anthropic provider parses JSON text blocks", async () => {
@@ -53,11 +52,11 @@ test("anthropic provider parses JSON text blocks", async () => {
     prompt: "Return JSON",
   });
 
-  assert.equal(result.provider, "anthropic");
-  assert.equal(result.model, "claude-sonnet-4-5-20250929");
-  assert.deepEqual(result.data, {
+  expect(result.provider).toBe("anthropic");
+  expect(result.model).toBe("claude-sonnet-4-5-20250929");
+  expect(result.data).toEqual({
     verified: false,
     issues: ["missing source"],
   });
-  assert.equal(result.responseId, "msg_123");
+  expect(result.responseId).toBe("msg_123");
 });

@@ -224,3 +224,18 @@ What changed:
 
 Guardrail:
 - Any new JS/TS workflow command must use `pnpm` and be represented in both package scripts and CI if it is release-critical.
+
+## 2026-02-14
+
+Context:
+- Migrated TypeScript tests to Vitest.
+
+Learning:
+- Vitest improves test ergonomics and speed for a TS library package without requiring a Vite app or bundler migration.
+
+What changed:
+- Replaced `tsx --test` runner with Vitest scripts.
+- Updated TS tests to use Vitest assertion APIs.
+
+Guardrail:
+- Keep `pnpm test` in CI and local release checks as the single source of truth for TS test execution.

@@ -274,3 +274,10 @@ Status: accepted
 Decision: standardize TypeScript lint/format checks on Biome and enforce pnpm-only JS/TS package operations.
 Rationale: fast deterministic linting plus one package-manager path reduces drift across local and CI workflows.
 Consequences: added `ts/biome.json`, new TS scripts (`lint`, `format`, `typecheck`), updated CI quality/publish workflows, and removed npm-based pack/publish commands from TS release paths.
+
+## 2026-02-14
+
+Status: accepted
+Decision: adopt Vitest as the TypeScript test runner while keeping the existing non-Vite library build path.
+Rationale: Vitest provides faster feedback and stronger test ergonomics for mocks, watch mode, and future coverage without requiring a Vite app/tooling migration.
+Consequences: TS test scripts now use Vitest (`pnpm test`, `pnpm test:watch`) and TS test files use Vitest assertions.

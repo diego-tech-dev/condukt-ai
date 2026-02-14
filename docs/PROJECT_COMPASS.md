@@ -117,6 +117,7 @@ Rules for safe migration:
 - Added TS quality and publish GitHub Actions workflows for reproducible CI/release gates.
 - Added TS trace-diagnosis and external-trial metric instrumentation (session start/finish/report with JSONL records).
 - Added TS Biome lint/format baseline and pnpm-only package workflow enforcement.
+- Migrated TS tests to Vitest while keeping non-Vite build/runtime tooling.
 
 ## Near-Term Direction
 

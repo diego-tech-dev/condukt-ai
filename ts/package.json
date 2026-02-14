@@ -50,7 +50,8 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "pnpm lint && pnpm typecheck",
-    "test": "tsx --test test/*.test.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "quickstart": "tsx examples/quickstart-debug.ts",
     "quickstart:broken": "tsx examples/quickstart-debug.ts --broken",
     "trial:start": "tsx scripts/trial-metrics.ts start",
@@ -67,6 +68,7 @@
     "@types/node": "^22.10.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
+    "vitest": "^4.0.18",
     "zod": "^3.24.1"
   }
 }

@@ -160,3 +160,12 @@ Notes:
 - Updated `pnpm check` and `pnpm release:check` to include lint/typecheck and pnpm-based pack validation.
 - Updated TS GitHub workflows to run lint and to publish with `pnpm publish`.
 - Updated agent conventions to enforce pnpm-only JS/TS workflow and no TypeScript `any`.
+
+### Sprint: TS test runner migration
+
+Status: completed
+
+Notes:
+- Migrated TS tests from `tsx --test` to Vitest (`pnpm test`, `pnpm test:watch`).
+- Updated TS test files to Vitest assertions/imports.
+- Kept runtime/build path unchanged (`tsc` + `tsx` for scripts), no Vite bundler integration required.

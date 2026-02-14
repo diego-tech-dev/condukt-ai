@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { z } from "zod";
 
@@ -102,13 +101,13 @@ test("runs an LLM pipeline with typed contracts and trace output", async () => {
 
   const trace = await pipeline.run();
 
-  assert.equal(trace.status, "ok");
-  assert.deepEqual(trace.task_order, ["research", "draft", "verify"]);
-  assert.equal(trace.summary.failed, 0);
-  assert.equal(trace.tasks.length, 3);
-  assert.equal(trace.tasks[2]?.status, "ok");
-  assert.deepEqual(trace.tasks[2]?.output, { verified: true, issues: [] });
-  assert.equal(trace.tasks[1]?.input?.provider, "fake");
+  expect(trace.status).toBe("ok");
+  expect(trace.task_order).toEqual(["research", "draft", "verify"]);
+  expect(trace.summary.failed).toBe(0);
+  expect(trace.tasks.length).toBe(3);
+  expect(trace.tasks[2]?.status).toBe("ok");
+  expect(trace.tasks[2]?.output).toEqual({ verified: true, issues: [] });
+  expect(trace.tasks[1]?.input?.provider).toBe("fake");
 });
 
 test("fails fast with contract diagnostics when a task returns invalid shape", async () => {
@@ -154,17 +153,17 @@ test("fails fast with contract diagnostics when a task returns invalid shape", a
 
   const trace = await pipeline.run();
 
-  assert.equal(trace.status, "failed");
-  assert.equal(trace.tasks.length, 2);
-  assert.equal(trace.summary.failed, 1);
+  expect(trace.status).toBe("failed");
+  expect(trace.tasks.length).toBe(2);
+  expect(trace.summary.failed).toBe(1);
 
   const failedTask = trace.tasks[1];
-  assert.equal(failedTask?.task, "draft");
-  assert.equal(failedTask?.status, "error");
-  assert.equal(failedTask?.error_code, ERROR_CODE_CONTRACT_OUTPUT_VIOLATION);
-  assert.equal(failedTask?.error, "task output contract violation");
-  assert.ok(Array.isArray(failedTask?.contract_issues));
-  assert.equal(failedTask?.contract_issues?.[0]?.path, "claims");
+  expect(failedTask?.task).toBe("draft");
+  expect(failedTask?.status).toBe("error");
+  expect(failedTask?.error_code).toBe(ERROR_CODE_CONTRACT_OUTPUT_VIOLATION);
+  expect(failedTask?.error).toBe("task output contract violation");
+  expect(Array.isArray(failedTask?.contract_issues)).toBe(true);
+  expect(failedTask?.contract_issues?.[0]?.path).toBe("claims");
 });
 
 test("rejects unknown dependencies", async () => {
@@ -184,10 +183,7 @@ test("rejects unknown dependencies", async () => {
     }),
   );
 
-  await assert.rejects(
-    async () => pipeline.run(),
-    /depends on unknown task 'missing_task'/,
-  );
+  await expect(pipeline.run()).rejects.toThrow(/depends on unknown task 'missing_task'/);
 });
 
 test("retries execution failures and succeeds on later attempt", async () => {
@@ -219,10 +215,10 @@ test("retries execution failures and succeeds on later attempt", async () => {
   );
 
   const trace = await pipeline.run();
-  assert.equal(trace.status, "ok");
-  assert.equal(trace.tasks.length, 1);
-  assert.equal(trace.tasks[0]?.status, "ok");
-  assert.equal(trace.tasks[0]?.attempts?.length, 2);
-  assert.equal(trace.tasks[0]?.attempts?.[0]?.status, "error");
-  assert.equal(trace.tasks[0]?.attempts?.[1]?.status, "ok");
+  expect(trace.status).toBe("ok");
+  expect(trace.tasks.length).toBe(1);
+  expect(trace.tasks[0]?.status).toBe("ok");
+  expect(trace.tasks[0]?.attempts?.length).toBe(2);
+  expect(trace.tasks[0]?.attempts?.[0]?.status).toBe("error");
+  expect(trace.tasks[0]?.attempts?.[1]?.status).toBe("ok");
 });

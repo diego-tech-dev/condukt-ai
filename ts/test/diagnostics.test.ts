@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { diagnoseFailure, type PipelineTrace } from "../src/index.js";
 
@@ -43,10 +42,10 @@ test("diagnoseFailure returns first failing task boundary", () => {
   };
 
   const diagnosis = diagnoseFailure(trace);
-  assert.equal(diagnosis.failed, true);
-  assert.equal(diagnosis.task, "draft");
-  assert.equal(diagnosis.error_code, "CONTRACT_OUTPUT_VIOLATION");
-  assert.deepEqual(diagnosis.contract_paths, ["claims"]);
+  expect(diagnosis.failed).toBe(true);
+  expect(diagnosis.task).toBe("draft");
+  expect(diagnosis.error_code).toBe("CONTRACT_OUTPUT_VIOLATION");
+  expect(diagnosis.contract_paths).toEqual(["claims"]);
 });
 
 test("diagnoseFailure handles successful traces", () => {
@@ -79,7 +78,7 @@ test("diagnoseFailure handles successful traces", () => {
   };
 
   const diagnosis = diagnoseFailure(trace);
-  assert.equal(diagnosis.failed, false);
-  assert.equal(diagnosis.task, undefined);
-  assert.deepEqual(diagnosis.contract_paths, []);
+  expect(diagnosis.failed).toBe(false);
+  expect(diagnosis.task).toBeUndefined();
+  expect(diagnosis.contract_paths).toEqual([]);
 });

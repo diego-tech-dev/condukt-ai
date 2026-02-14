@@ -7,6 +7,7 @@ Focus of this package:
 - structured execution traces for fast failure diagnosis
 - LLM task adapters for OpenAI and Anthropic JSON workflows
 - task-level retry policies (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces
+- Vitest-powered TypeScript test workflow
 
 ## Install
 

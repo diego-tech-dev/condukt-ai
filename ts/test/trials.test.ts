@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   completeTrialSession,
@@ -58,10 +57,10 @@ test("createTrialSession derives expected diagnosis from trace", () => {
     startedAt: "2026-02-14T10:00:00.000Z",
   });
 
-  assert.equal(session.session_id, "session-1");
-  assert.equal(session.expected.task, "draft");
-  assert.equal(session.expected.error_code, "CONTRACT_OUTPUT_VIOLATION");
-  assert.deepEqual(session.expected.contract_paths, ["claims"]);
+  expect(session.session_id).toBe("session-1");
+  expect(session.expected.task).toBe("draft");
+  expect(session.expected.error_code).toBe("CONTRACT_OUTPUT_VIOLATION");
+  expect(session.expected.contract_paths).toEqual(["claims"]);
 });
 
 test("completeTrialSession marks diagnosis accuracy", () => {
@@ -83,10 +82,10 @@ test("completeTrialSession marks diagnosis accuracy", () => {
     finishedAt: "2026-02-14T10:00:30.000Z",
   });
 
-  assert.equal(record.elapsed_ms, 30_000);
-  assert.equal(record.diagnosis_correct, true);
-  assert.equal(record.matched_task, true);
-  assert.equal(record.matched_error_code, true);
+  expect(record.elapsed_ms).toBe(30_000);
+  expect(record.diagnosis_correct).toBe(true);
+  expect(record.matched_task).toBe(true);
+  expect(record.matched_error_code).toBe(true);
 });
 
 test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
@@ -136,8 +135,8 @@ test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
   ];
 
   const summary = summarizeTrialRecords(records);
-  assert.equal(summary.total, 2);
-  assert.equal(summary.by_mode.condukt.total, 1);
-  assert.equal(summary.by_mode.baseline.total, 1);
-  assert.equal(summary.condukt_vs_baseline_speedup, 4);
+  expect(summary.total).toBe(2);
+  expect(summary.by_mode.condukt.total).toBe(1);
+  expect(summary.by_mode.baseline.total).toBe(1);
+  expect(summary.condukt_vs_baseline_speedup).toBe(4);
 });
