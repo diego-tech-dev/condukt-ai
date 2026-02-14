@@ -1,0 +1,162 @@
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::{BTreeMap, BTreeSet};
+
+pub const AST_VERSION: &str = "1.0";
+pub const TRACE_VERSION: &str = "1.0";
+
+#[derive(Debug, Deserialize)]
+pub struct Ast {
+    pub ast_version: String,
+    pub goal: String,
+    pub tasks: Vec<AstTask>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AstTask {
+    pub name: String,
+    #[serde(default)]
+    pub after: Vec<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Trace {
+    pub trace_version: String,
+    pub goal: String,
+    pub status: String,
+    pub started_at: String,
+    pub finished_at: String,
+    pub capabilities: Vec<String>,
+    pub execution: ExecutionInfo,
+    pub task_order: Vec<String>,
+    pub tasks: Vec<Value>,
+    pub constraints: Vec<Value>,
+    pub verify: Vec<Value>,
+    pub verify_summary: VerifySummary,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ExecutionInfo {
+    pub mode: String,
+    pub max_parallel: i32,
+    pub levels: Vec<Vec<String>>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct VerifySummary {
+    pub total: i32,
+    pub passed: i32,
+    pub failed: i32,
+    pub failures: Vec<Value>,
+}
+
+pub fn parse_ast(text: &str) -> Result<Ast, String> {
+    serde_json::from_str::<Ast>(text).map_err(|err| format!("invalid AST JSON: {err}"))
+}
+
+pub fn validate_ast(ast: &Ast) -> Result<(), String> {
+    if ast.ast_version != AST_VERSION {
+        return Err(format!(
+            "unsupported ast_version '{}', expected '{}'",
+            ast.ast_version, AST_VERSION
+        ));
+    }
+
+    let mut seen = BTreeSet::new();
+    for task in &ast.tasks {
+        if !seen.insert(task.name.clone()) {
+            return Err(format!("duplicate task name '{}'", task.name));
+        }
+    }
+
+    let mut by_name = BTreeMap::new();
+    for task in &ast.tasks {
+        by_name.insert(task.name.clone(), task);
+    }
+    for task in &ast.tasks {
+        for dep in &task.after {
+            if !by_name.contains_key(dep) {
+                return Err(format!(
+                    "task '{}' depends on unknown task '{}'",
+                    task.name, dep
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+pub fn build_trace_skeleton(ast: &Ast) -> Trace {
+    let task_order = ast.tasks.iter().map(|task| task.name.clone()).collect::<Vec<_>>();
+    let levels = if task_order.is_empty() {
+        vec![]
+    } else {
+        vec![task_order.clone()]
+    };
+
+    Trace {
+        trace_version: TRACE_VERSION.to_string(),
+        goal: ast.goal.clone(),
+        status: "failed".to_string(),
+        started_at: "<ts>".to_string(),
+        finished_at: "<ts>".to_string(),
+        capabilities: vec![],
+        execution: ExecutionInfo {
+            mode: "sequential".to_string(),
+            max_parallel: 1,
+            levels,
+        },
+        task_order,
+        tasks: vec![],
+        constraints: vec![],
+        verify: vec![],
+        verify_summary: VerifySummary {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            failures: vec![],
+        },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_golden_ast() {
+        let ast_text = include_str!("../../../tests/golden/ship_release.ast.json");
+        let ast = parse_ast(ast_text).expect("golden AST should parse");
+        validate_ast(&ast).expect("golden AST should validate");
+        assert_eq!(ast.goal, "ship release");
+        assert_eq!(ast.tasks.len(), 2);
+    }
+
+    #[test]
+    fn rejects_unsupported_ast_version() {
+        let ast_text = r#"{
+          "ast_version":"9.9",
+          "goal":"x",
+          "tasks":[]
+        }"#;
+        let ast = parse_ast(ast_text).expect("json should parse");
+        let err = validate_ast(&ast).expect_err("version mismatch should fail");
+        assert!(err.contains("unsupported ast_version"));
+    }
+
+    #[test]
+    fn emits_trace_skeleton_with_contract_version() {
+        let ast_text = r#"{
+          "ast_version":"1.0",
+          "goal":"hello",
+          "tasks":[{"name":"a","after":[]},{"name":"b","after":["a"]}]
+        }"#;
+        let ast = parse_ast(ast_text).expect("json should parse");
+        validate_ast(&ast).expect("ast should validate");
+        let trace = build_trace_skeleton(&ast);
+        assert_eq!(trace.trace_version, TRACE_VERSION);
+        assert_eq!(trace.goal, "hello");
+        assert_eq!(trace.task_order, vec!["a".to_string(), "b".to_string()]);
+    }
+}

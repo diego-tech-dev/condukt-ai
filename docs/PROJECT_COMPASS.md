@@ -87,10 +87,11 @@ Rules for safe migration:
 - Added artifact-flow runnable example coverage (`examples/release_artifacts.mgl`).
 - Added typed artifact contracts (`artifact:type`) for `consumes`/`produces`.
 - Added retry policy controls (`retry_if`, jitter) in task execution policy.
+- Added Rust bootstrap runtime (`rust/missiongraph-rs`) for contract-level conformance checks.
 
 ## Near-Term Direction
 
-1. Rust runtime prototype that can pass current golden suite.
+1. Rust runtime prototype with execution parity on golden suite.
 2. Multi-runtime conformance harness (shared fixtures runner).
 
 ## Resume Checklist

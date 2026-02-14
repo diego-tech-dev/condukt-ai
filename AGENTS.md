@@ -34,6 +34,7 @@ Read first for deeper context:
 - Run artifact-flow demo: `python3 -m missiongraph run examples/release_artifacts.mgl --capability ci --capability prod_access --sequential`
 - Render graph: `python3 -m missiongraph graph examples/release_fanout.mgl`
 - Test suite: `python3 -m unittest discover -s tests -p "test_*.py"`
+- Rust bootstrap tests: `cargo test --manifest-path rust/missiongraph-rs/Cargo.toml`
 
 ## Hard Invariants
 

@@ -47,8 +47,8 @@ For each milestone:
 
 ## Backlog Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `B1` Typed artifact payload contracts: completed
 2. `B2` Policy enhancements (`retry_if`, jitter): completed
-3. `B3` Rust runtime bootstrap: pending
+3. `B3` Rust runtime bootstrap: completed

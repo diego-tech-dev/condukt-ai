@@ -25,14 +25,15 @@ Notes:
 
 ### Sprint: Autonomous backlog run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `B1` Typed artifact payload contracts: completed
 - `B2` Policy enhancements (`retry_if`, jitter): completed
-- `B3` Rust runtime bootstrap: pending
+- `B3` Rust runtime bootstrap: completed
 
 Notes:
 - Added typed artifact contracts (`artifact:type`) in `consumes`/`produces`.
 - Added static/runtime checks for artifact type compatibility.
 - Added `retry_if` strategy and retry jitter controls in `with` task policies.
+- Added `rust/missiongraph-rs` bootstrap CLI (`check-ast`, `trace-skeleton`) with Rust tests.

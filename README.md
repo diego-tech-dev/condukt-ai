@@ -221,6 +221,16 @@ Plan output includes both flattened `task_order` and per-level structure.
 - JSON schemas are versioned in `spec/ast-v1.schema.json` and `spec/trace-v1.schema.json`.
 - Conformance goldens live in `tests/golden/` to validate future runtimes.
 
+## Rust Bootstrap
+
+Rust bootstrap runtime is available at `rust/missiongraph-rs`.
+
+```bash
+python3 -m missiongraph parse examples/ship_release.mgl > /tmp/ship_release.ast.json
+cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json
+cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
+```
+
 ## Tests
 
 ```bash

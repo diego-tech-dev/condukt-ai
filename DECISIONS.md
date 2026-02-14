@@ -106,3 +106,10 @@ Status: accepted
 Decision: extend retry policy with `retry_if` strategy and jittered delay.
 Rationale: give orchestration-level control over retry eligibility and thundering-herd mitigation.
 Consequences: `with` supports `retry_if` and `jitter`; executor retries conditionally and applies randomized delay on retries.
+
+## 2026-02-13
+
+Status: accepted
+Decision: bootstrap a Rust reference runtime focused on AST/trace contract conformance.
+Rationale: de-risk multi-runtime migration by validating shared contracts before full executor parity.
+Consequences: `rust/missiongraph-rs` provides AST checks and trace-skeleton emission against v1 contracts.
