@@ -234,6 +234,7 @@ python3 -m missiongraph parse examples/ship_release.mgl > /tmp/ship_release.ast.
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
+cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
 ```
 
 ## Multi-Runtime Conformance

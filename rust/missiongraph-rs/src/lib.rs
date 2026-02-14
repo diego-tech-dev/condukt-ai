@@ -113,7 +113,7 @@ pub fn build_trace_skeleton(ast: &Ast) -> Trace {
     }
 }
 
-fn build_dependency_levels(ast: &Ast) -> Result<Vec<Vec<String>>, String> {
+pub fn build_dependency_levels(ast: &Ast) -> Result<Vec<Vec<String>>, String> {
     let mut seen = BTreeSet::new();
     for task in &ast.tasks {
         if !seen.insert(task.name.clone()) {

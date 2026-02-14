@@ -81,6 +81,6 @@ Status: completed
 
 Status: in_progress
 
-1. `E1` Rust multi-task sequential execution (dependency order): pending
+1. `E1` Rust multi-task sequential execution (dependency order): completed
 2. `E2` Rust retry/timeout policy loop parity for task execution: pending
 3. `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending

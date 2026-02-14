@@ -93,10 +93,12 @@ Notes:
 Status: in_progress
 
 Milestone status:
-- `E1` Rust multi-task sequential execution (dependency order): pending
+- `E1` Rust multi-task sequential execution (dependency order): completed
 - `E2` Rust retry/timeout policy loop parity for task execution: pending
 - `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending
 
 Notes:
 - Added `docs/FOUNDATIONS.md` to capture explicit language/runtime design baselines, tradeoffs, and migration paths across all core design dimensions.
 - Added `docs/LEARNINGS.md` as a persistent memory track for implementation lessons and guardrails.
+- Added Rust `run-plan` command for sequential dependency-order task execution from AST.
+- Added Rust CLI coverage for run-plan order semantics and fail-fast behavior.

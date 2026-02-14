@@ -190,3 +190,10 @@ Status: accepted
 Decision: maintain a dedicated implementation learning log in `docs/LEARNINGS.md`.
 Rationale: important execution lessons (root causes + guardrails) are different from architecture decisions and should persist across agent sessions.
 Consequences: resume workflow now includes a memory track of operational learnings to reduce repeated mistakes.
+
+## 2026-02-14
+
+Status: accepted
+Decision: add Rust `run-plan` command for sequential dependency-order execution.
+Rationale: migration needs a full-plan execution slice beyond single-task prototypes to validate end-to-end task ordering and fail-fast behavior.
+Consequences: Rust CLI now executes plan DAGs sequentially with dependency payload wiring and emits trace-shaped outputs with executed task results.

@@ -101,11 +101,12 @@ Rules for safe migration:
 - Aligned Rust `run-task` result shape with contract-style error/provenance/timestamp fields.
 - Expanded parity matrix coverage to `release_fanout` and `release_resilient` with dedicated matrix tooling.
 - Added `FOUNDATIONS.md` with explicit decisions/tradeoffs/migration paths across core language dimensions.
+- Added Rust `run-plan` prototype with sequential dependency-order task execution and fail-fast semantics.
 
 ## Near-Term Direction
 
-1. Expand Rust runtime from single-task prototype to multi-task execution flow.
-2. Implement Rust retry/timeout loop parity and full trace assembly.
+1. Implement Rust retry/timeout loop parity for both `run-task` and `run-plan`.
+2. Assemble full Rust `run-plan` trace fields for constraints/verify diagnostics parity.
 
 ## Resume Checklist
 

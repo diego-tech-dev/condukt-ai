@@ -8,6 +8,7 @@ This prototype focuses on AST/trace contract handling:
 - emit trace skeleton with `trace_version = "1.1"` (`trace-skeleton`)
 - derive dependency-aware execution metadata (`execution.levels`, `mode`, `max_parallel`)
 - execute a single dependency-free worker task (`run-task`, prototype)
+- execute full plans sequentially in dependency order (`run-plan`, prototype)
 
 ## Usage
 
@@ -36,6 +37,12 @@ cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_
 ```
 
 `run-task` reports contract-style fields including `status`, `error_code`, `started_at`, `finished_at`, and merged `provenance`.
+
+Execute full plan sequentially (prototype):
+
+```bash
+cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
+```
 
 Run Rust tests:
 

@@ -1,9 +1,14 @@
 use clap::{Parser, Subcommand};
-use missiongraph_rs::{build_trace_skeleton, parse_ast, validate_ast};
+use missiongraph_rs::{
+    build_dependency_levels, build_trace_skeleton, parse_ast, validate_ast, AstTask,
+    TRACE_VERSION,
+};
 use serde::Serialize;
 use serde_json::Value;
+use serde_json::json;
 use std::fs;
 use std::io::Write;
+use std::collections::BTreeMap;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -52,6 +57,23 @@ enum Commands {
         /// Emit machine-readable JSON status payload.
         #[arg(long)]
         json: bool,
+        /// Internal: allow tasks with dependencies.
+        #[arg(long, hide = true)]
+        allow_deps: bool,
+    },
+    /// Execute all tasks sequentially in dependency order from AST.
+    RunPlan {
+        /// Path to AST JSON file (for example output of `mgl parse`).
+        ast: PathBuf,
+        /// Base directory used to resolve relative worker paths.
+        #[arg(long, default_value = ".")]
+        base_dir: PathBuf,
+        /// Declared capabilities for trace metadata.
+        #[arg(long = "capability")]
+        capabilities: Vec<String>,
+        /// Emit machine-readable JSON trace payload.
+        #[arg(long)]
+        json: bool,
     },
 }
 
@@ -82,6 +104,53 @@ struct RunTaskReport {
     stderr: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+struct TraceTaskResult {
+    task: String,
+    worker: String,
+    status: String,
+    confidence: f64,
+    output: Value,
+    error_code: Option<String>,
+    error: Option<String>,
+    started_at: String,
+    finished_at: String,
+    provenance: Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    stderr: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+struct TraceExecution {
+    mode: String,
+    max_parallel: i32,
+    levels: Vec<Vec<String>>,
+}
+
+#[derive(Debug, Serialize)]
+struct TraceVerifySummary {
+    total: i32,
+    passed: i32,
+    failed: i32,
+    failures: Vec<Value>,
+}
+
+#[derive(Debug, Serialize)]
+struct RunPlanTrace {
+    trace_version: String,
+    goal: String,
+    status: String,
+    started_at: String,
+    finished_at: String,
+    capabilities: Vec<String>,
+    execution: TraceExecution,
+    task_order: Vec<String>,
+    tasks: Vec<TraceTaskResult>,
+    constraints: Vec<Value>,
+    verify: Vec<Value>,
+    verify_summary: TraceVerifySummary,
+}
+
 fn main() {
     let cli = Cli::parse();
     let exit_code = run(cli);
@@ -98,7 +167,14 @@ fn run(cli: Cli) -> i32 {
             base_dir,
             input,
             json,
-        } => run_task(ast, task, base_dir, input, json),
+            allow_deps,
+        } => run_task(ast, task, base_dir, input, json, allow_deps),
+        Commands::RunPlan {
+            ast,
+            base_dir,
+            capabilities,
+            json,
+        } => run_plan(ast, base_dir, capabilities, json),
     }
 }
 
@@ -189,10 +265,229 @@ fn run_trace_skeleton(ast: PathBuf) -> i32 {
     0
 }
 
-fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, json: bool) -> i32 {
-    let mut report = RunTaskReport {
+fn run_task(
+    ast: PathBuf,
+    task_name: String,
+    base_dir: PathBuf,
+    input: String,
+    json: bool,
+    allow_deps: bool,
+) -> i32 {
+    let input_payload = match serde_json::from_str::<Value>(&input) {
+        Ok(value) => value,
+        Err(err) => {
+            let mut report = empty_run_task_report(&task_name);
+            report.error = Some(format!("invalid --input JSON: {err}"));
+            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            return finish_run_task_report(report, json);
+        }
+    };
+
+    let ast_text = match fs::read_to_string(&ast) {
+        Ok(text) => text,
+        Err(err) => {
+            let mut report = empty_run_task_report(&task_name);
+            report.error = Some(format!("failed to read AST file '{}': {err}", ast.display()));
+            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            return finish_run_task_report(report, json);
+        }
+    };
+    let ast_doc = match parse_ast(&ast_text) {
+        Ok(parsed) => parsed,
+        Err(err) => {
+            let mut report = empty_run_task_report(&task_name);
+            report.error = Some(err);
+            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            return finish_run_task_report(report, json);
+        }
+    };
+    if let Err(err) = validate_ast(&ast_doc) {
+        let mut report = empty_run_task_report(&task_name);
+        report.error = Some(err);
+        report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+        return finish_run_task_report(report, json);
+    }
+
+    let ast_task = match ast_doc.tasks.iter().find(|candidate| candidate.name == task_name) {
+        Some(task) => task,
+        None => {
+            let mut report = empty_run_task_report(&task_name);
+            report.error = Some(format!("task '{}' not found in AST", task_name));
+            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            return finish_run_task_report(report, json);
+        }
+    };
+
+    let report = execute_task_from_ast(ast_task, &base_dir, input_payload, allow_deps);
+    finish_run_task_report(report, json)
+}
+
+fn run_plan(ast: PathBuf, base_dir: PathBuf, capabilities: Vec<String>, json: bool) -> i32 {
+    let ast_text = match fs::read_to_string(&ast) {
+        Ok(text) => text,
+        Err(err) => {
+            if json {
+                println!(
+                    "{}",
+                    json!({
+                        "trace_version": TRACE_VERSION,
+                        "status": "failed",
+                        "error": format!("failed to read AST file '{}': {err}", ast.display()),
+                    })
+                );
+            } else {
+                eprintln!("failed to read AST file '{}': {err}", ast.display());
+            }
+            return 1;
+        }
+    };
+    let ast_doc = match parse_ast(&ast_text) {
+        Ok(parsed) => parsed,
+        Err(err) => {
+            if json {
+                println!(
+                    "{}",
+                    json!({
+                        "trace_version": TRACE_VERSION,
+                        "status": "failed",
+                        "error": err,
+                    })
+                );
+            } else {
+                eprintln!("{err}");
+            }
+            return 1;
+        }
+    };
+    if let Err(err) = validate_ast(&ast_doc) {
+        if json {
+            println!(
+                "{}",
+                json!({
+                    "trace_version": TRACE_VERSION,
+                    "status": "failed",
+                    "error": err,
+                })
+            );
+        } else {
+            eprintln!("{err}");
+        }
+        return 1;
+    }
+
+    let levels = match build_dependency_levels(&ast_doc) {
+        Ok(levels) => levels,
+        Err(err) => {
+            if json {
+                println!(
+                    "{}",
+                    json!({
+                        "trace_version": TRACE_VERSION,
+                        "status": "failed",
+                        "error": err,
+                    })
+                );
+            } else {
+                eprintln!("{err}");
+            }
+            return 1;
+        }
+    };
+    let task_order = levels
+        .iter()
+        .flat_map(|level| level.iter().cloned())
+        .collect::<Vec<_>>();
+    let task_by_name = ast_doc
+        .tasks
+        .iter()
+        .map(|task| (task.name.clone(), task))
+        .collect::<BTreeMap<String, &AstTask>>();
+
+    let started_at = now_timestamp();
+    let mut task_values: BTreeMap<String, Value> = BTreeMap::new();
+    let mut tasks: Vec<TraceTaskResult> = vec![];
+
+    for task_name in &task_order {
+        let task = task_by_name
+            .get(task_name)
+            .expect("validated task order should resolve to task definitions");
+
+        let mut dependencies = serde_json::Map::new();
+        for dep in &task.after {
+            if let Some(value) = task_values.get(dep) {
+                dependencies.insert(dep.clone(), value.clone());
+            }
+        }
+
+        let payload = json!({
+            "task": task.name,
+            "goal": ast_doc.goal,
+            "constraints": [],
+            "dependencies": dependencies,
+            "variables": {},
+        });
+
+        let report = execute_task_from_ast(task, &base_dir, payload, true);
+        let trace_task = report_to_trace_task(&report);
+        task_values.insert(task.name.clone(), trace_task_to_value(&trace_task));
+        let failed = trace_task.status != "ok";
+        tasks.push(trace_task);
+        if failed {
+            break;
+        }
+    }
+
+    let trace = RunPlanTrace {
+        trace_version: TRACE_VERSION.to_string(),
+        goal: ast_doc.goal,
+        status: if tasks.len() == task_order.len() && tasks.iter().all(|t| t.status == "ok") {
+            "ok".to_string()
+        } else {
+            "failed".to_string()
+        },
+        started_at,
+        finished_at: now_timestamp(),
+        capabilities: {
+            let mut out = capabilities;
+            out.sort();
+            out.dedup();
+            out
+        },
+        execution: TraceExecution {
+            mode: "sequential".to_string(),
+            max_parallel: 1,
+            levels,
+        },
+        task_order,
+        tasks,
+        constraints: vec![],
+        verify: vec![],
+        verify_summary: TraceVerifySummary {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            failures: vec![],
+        },
+    };
+
+    if json {
+        let rendered = serde_json::to_string_pretty(&trace).unwrap_or_else(|err| {
+            format!(
+                "{{\"trace_version\":\"{}\",\"status\":\"failed\",\"error\":\"failed to serialize run-plan trace: {}\"}}",
+                TRACE_VERSION, err
+            )
+        });
+        println!("{rendered}");
+    } else {
+        println!("{}", trace.status);
+    }
+    if trace.status == "ok" { 0 } else { 1 }
+}
+
+fn empty_run_task_report(task_name: &str) -> RunTaskReport {
+    RunTaskReport {
         ok: false,
-        task: task_name.clone(),
+        task: task_name.to_string(),
         worker: None,
         worker_path: None,
         exit_code: None,
@@ -205,72 +500,39 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
         started_at: None,
         finished_at: None,
         stderr: None,
-    };
-
-    let input_payload = match serde_json::from_str::<Value>(&input) {
-        Ok(value) => value,
-        Err(err) => {
-            report.error = Some(format!("invalid --input JSON: {err}"));
-            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-            return finish_run_task_report(report, json);
-        }
-    };
-
-    let ast_text = match fs::read_to_string(&ast) {
-        Ok(text) => text,
-        Err(err) => {
-            report.error = Some(format!("failed to read AST file '{}': {err}", ast.display()));
-            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-            return finish_run_task_report(report, json);
-        }
-    };
-
-    let ast_doc = match parse_ast(&ast_text) {
-        Ok(parsed) => parsed,
-        Err(err) => {
-            report.error = Some(err);
-            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-            return finish_run_task_report(report, json);
-        }
-    };
-
-    if let Err(err) = validate_ast(&ast_doc) {
-        report.error = Some(err);
-        report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-        return finish_run_task_report(report, json);
     }
+}
 
-    let ast_task = match ast_doc.tasks.iter().find(|candidate| candidate.name == task_name) {
-        Some(task) => task,
-        None => {
-            report.error = Some(format!("task '{}' not found in AST", task_name));
-            report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-            return finish_run_task_report(report, json);
-        }
-    };
+fn execute_task_from_ast(
+    ast_task: &AstTask,
+    base_dir: &Path,
+    input_payload: Value,
+    allow_deps: bool,
+) -> RunTaskReport {
+    let mut report = empty_run_task_report(&ast_task.name);
     report.worker = Some(ast_task.worker.clone());
 
-    if !ast_task.after.is_empty() {
+    if !allow_deps && !ast_task.after.is_empty() {
         report.error = Some(format!(
             "run-task prototype only supports dependency-free tasks; '{}' depends on: {}",
-            task_name,
+            ast_task.name,
             ast_task.after.join(", ")
         ));
         report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-        return finish_run_task_report(report, json);
+        return report;
     }
     if ast_task.worker.trim().is_empty() {
-        report.error = Some(format!("task '{}' has empty worker path", task_name));
+        report.error = Some(format!("task '{}' has empty worker path", ast_task.name));
         report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-        return finish_run_task_report(report, json);
+        return report;
     }
 
-    let worker_path = resolve_worker_path(&base_dir, &ast_task.worker);
+    let worker_path = resolve_worker_path(base_dir, &ast_task.worker);
     report.worker_path = Some(worker_path.display().to_string());
     if !worker_path.exists() {
         report.error = Some(format!("worker path does not exist: {}", worker_path.display()));
         report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-        return finish_run_task_report(report, json);
+        return report;
     }
 
     let payload_text = match serde_json::to_string(&input_payload) {
@@ -278,12 +540,11 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
         Err(err) => {
             report.error = Some(format!("failed to serialize input payload: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
-            return finish_run_task_report(report, json);
+            return report;
         }
     };
 
-    let started_at = now_timestamp();
-    report.started_at = Some(started_at.clone());
+    report.started_at = Some(now_timestamp());
 
     let mut child = match Command::new("python3")
         .arg(&worker_path)
@@ -297,7 +558,7 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
             report.error = Some(format!("failed to launch worker: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
             report.finished_at = Some(now_timestamp());
-            return finish_run_task_report(report, json);
+            return report;
         }
     };
 
@@ -306,7 +567,7 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
             report.error = Some(format!("failed to write worker stdin: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
             report.finished_at = Some(now_timestamp());
-            return finish_run_task_report(report, json);
+            return report;
         }
     }
 
@@ -316,24 +577,24 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
             report.error = Some(format!("failed waiting for worker process: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
             report.finished_at = Some(now_timestamp());
-            return finish_run_task_report(report, json);
+            return report;
         }
     };
     report.finished_at = Some(now_timestamp());
-
     report.exit_code = output.status.code();
+
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
     if !stderr.is_empty() {
-        report.stderr = Some(stderr.clone());
+        report.stderr = Some(stderr);
     }
     let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
     if stdout.is_empty() {
         report.error = Some("worker returned empty stdout".to_string());
-        if !output.status.success() {
-            report.error_code = Some(ERROR_CODE_WORKER_EXIT_NONZERO.to_string());
+        report.error_code = Some(if !output.status.success() {
+            ERROR_CODE_WORKER_EXIT_NONZERO.to_string()
         } else {
-            report.error_code = Some(ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string());
-        }
+            ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string()
+        });
         report.status = Some("error".to_string());
         report.confidence = Some(0.0);
         report.output = Some(Value::Object(serde_json::Map::new()));
@@ -343,7 +604,7 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
             &ast_task.worker,
             None,
         ));
-        return finish_run_task_report(report, json);
+        return finalize_run_task_report(report);
     }
 
     let worker_payload = match serde_json::from_str::<Value>(&stdout) {
@@ -360,10 +621,9 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
                 &ast_task.worker,
                 None,
             ));
-            return finish_run_task_report(report, json);
+            return finalize_run_task_report(report);
         }
     };
-
     let worker_object = match worker_payload.as_object() {
         Some(obj) => obj,
         None => {
@@ -378,7 +638,7 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
                 &ast_task.worker,
                 None,
             ));
-            return finish_run_task_report(report, json);
+            return finalize_run_task_report(report);
         }
     };
 
@@ -411,16 +671,19 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
         }
     });
 
-    let worker_provenance = worker_object.get("provenance").cloned();
     report.provenance = Some(default_provenance(
         &worker_path,
         report.exit_code,
         &ast_task.worker,
-        worker_provenance,
+        worker_object.get("provenance").cloned(),
     ));
 
+    finalize_run_task_report(report)
+}
+
+fn finalize_run_task_report(mut report: RunTaskReport) -> RunTaskReport {
     if report.status.is_none() {
-        report.status = Some(if output.status.success() {
+        report.status = Some(if report.exit_code == Some(0) {
             "ok".to_string()
         } else {
             "error".to_string()
@@ -434,7 +697,7 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
         });
     }
 
-    if !output.status.success() {
+    if report.exit_code != Some(0) {
         if report.status.as_deref() == Some("ok") {
             report.status = Some("error".to_string());
         }
@@ -453,7 +716,42 @@ fn run_task(ast: PathBuf, task_name: String, base_dir: PathBuf, input: String, j
     }
 
     report.ok = report.status.as_deref() == Some("ok");
-    finish_run_task_report(report, json)
+    report
+}
+
+fn report_to_trace_task(report: &RunTaskReport) -> TraceTaskResult {
+    TraceTaskResult {
+        task: report.task.clone(),
+        worker: report.worker.clone().unwrap_or_default(),
+        status: report
+            .status
+            .clone()
+            .unwrap_or_else(|| "error".to_string()),
+        confidence: report.confidence.unwrap_or(0.0),
+        output: report
+            .output
+            .clone()
+            .unwrap_or_else(|| Value::Object(serde_json::Map::new())),
+        error_code: report.error_code.clone(),
+        error: report.error.clone(),
+        started_at: report
+            .started_at
+            .clone()
+            .unwrap_or_else(now_timestamp),
+        finished_at: report
+            .finished_at
+            .clone()
+            .unwrap_or_else(now_timestamp),
+        provenance: report
+            .provenance
+            .clone()
+            .unwrap_or_else(|| Value::Object(serde_json::Map::new())),
+        stderr: report.stderr.clone(),
+    }
+}
+
+fn trace_task_to_value(task: &TraceTaskResult) -> Value {
+    serde_json::to_value(task).unwrap_or_else(|_| Value::Object(serde_json::Map::new()))
 }
 
 fn finish_run_task_report(report: RunTaskReport, json: bool) -> i32 {
