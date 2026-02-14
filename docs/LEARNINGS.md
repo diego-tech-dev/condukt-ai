@@ -148,3 +148,18 @@ What changed:
 
 Guardrail:
 - Any retry or provider parser change must add/update deterministic tests that assert trace-level diagnosis fields.
+
+## 2026-02-14
+
+Context:
+- Built a TS onboarding path intended to validate value quickly with no API keys.
+
+Learning:
+- A deterministic broken-path demo is critical for proving trace-debug value; happy-path demos alone do not expose diagnostic advantage.
+
+What changed:
+- Added `pnpm quickstart` and `pnpm quickstart:broken` demo scripts.
+- Added walkthrough instructions that point users directly to `tasks[].error_code`, `contract_issues`, and `raw_output`.
+
+Guardrail:
+- Keep a credential-free broken demo path in-repo and ensure it remains runnable as part of onboarding updates.

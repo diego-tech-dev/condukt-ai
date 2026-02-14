@@ -111,10 +111,11 @@ Rules for safe migration:
 - Added Rust run-plan diagnostics assembly for `constraints`, `verify`, and grouped `verify_summary` outputs.
 - Added TypeScript runtime prototype (`ts/`) with Standard Schema contracts, trace-first pipeline execution, and OpenAI/Anthropic adapters.
 - Added TypeScript task retry policies with per-attempt trace history and provider integration tests.
+- Added credential-free TS quickstart + broken-run walkthrough to demonstrate trace-based failure diagnosis in under 10 minutes.
 
 ## Near-Term Direction
 
-1. Deliver a 10-minute TS onboarding path with template pipeline and trace-debug walkthrough.
+1. Prepare package/distribution path for TS runtime consumption outside this repo.
 2. Run external user trials and measure time-to-diagnose against current agent workflow baselines.
 
 ## Resume Checklist

@@ -34,7 +34,11 @@ cd ts
 pnpm install
 pnpm test
 pnpm check
+pnpm quickstart
+pnpm quickstart:broken
 ```
+
+Walkthrough: `ts/docs/TRACE_WALKTHROUGH.md`.
 
 Example pipeline:
 

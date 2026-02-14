@@ -48,6 +48,8 @@ Read first for deeper context:
 - TypeScript install/check: `cd ts && pnpm install && pnpm check`
 - TypeScript tests: `cd ts && pnpm test`
 - TypeScript build: `cd ts && pnpm build`
+- TypeScript quickstart trace demo: `cd ts && pnpm quickstart`
+- TypeScript quickstart broken demo: `cd ts && pnpm quickstart:broken`
 
 ## Hard Invariants
 

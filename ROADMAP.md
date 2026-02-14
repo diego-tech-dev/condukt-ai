@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: in_progress
+Current sprint status: completed
 
 ## Autonomy Sprint (5 milestones)
 
@@ -87,8 +87,8 @@ Status: completed
 
 ## TS Pivot Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
 2. `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): completed
-3. `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): pending
+3. `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): completed

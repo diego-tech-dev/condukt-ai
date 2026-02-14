@@ -23,6 +23,22 @@ pnpm check
 pnpm build
 ```
 
+## 10-minute quickstart
+
+Run successful flow:
+
+```bash
+pnpm quickstart
+```
+
+Run intentionally broken flow:
+
+```bash
+pnpm quickstart:broken
+```
+
+Both commands write `trace.quickstart.json`. Follow `docs/TRACE_WALKTHROUGH.md` to diagnose the broken run from trace data.
+
 ## Minimal usage
 
 ```ts

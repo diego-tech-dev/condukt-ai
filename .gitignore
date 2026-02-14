@@ -5,3 +5,4 @@ AGENT.md
 rust/**/target/
 ts/node_modules/
 ts/dist/
+ts/trace.quickstart.json

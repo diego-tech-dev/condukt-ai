@@ -109,12 +109,12 @@ Notes:
 
 ### Sprint: TypeScript pivot run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
 - `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): completed
-- `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): pending
+- `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): completed
 
 Notes:
 - Added `ts/` package managed by `pnpm`.
@@ -125,3 +125,5 @@ Notes:
 - Added TypeScript tests for success path, contract violation diagnostics, and dependency validation.
 - Added task-level retry policy in TS runtime (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces.
 - Added TS provider tests with mocked HTTP responses for OpenAI and Anthropic JSON parsing behavior.
+- Added TS quickstart demo (`pnpm quickstart` / `pnpm quickstart:broken`) that writes a trace and demonstrates boundary-failure diagnosis.
+- Added 10-minute walkthrough doc at `ts/docs/TRACE_WALKTHROUGH.md`.

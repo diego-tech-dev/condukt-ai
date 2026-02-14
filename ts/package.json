@@ -10,7 +10,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test test/**/*.test.ts"
+    "test": "tsx --test test/**/*.test.ts",
+    "quickstart": "tsx examples/quickstart-debug.ts",
+    "quickstart:broken": "tsx examples/quickstart-debug.ts --broken"
   },
   "dependencies": {
     "@standard-schema/spec": "^1.0.0"
