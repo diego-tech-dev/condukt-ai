@@ -92,3 +92,10 @@ Status: accepted
 Decision: maintain runnable example programs as conformance assets, including artifact-flow scenarios.
 Rationale: keep language features grounded in executable references and reduce doc/runtime drift.
 Consequences: new examples and worker fixtures are treated as part of behavior coverage and regression testing.
+
+## 2026-02-13
+
+Status: accepted
+Decision: support typed artifact contracts in `consumes`/`produces` via `artifact:type`.
+Rationale: enforce payload compatibility at artifact boundaries without requiring every task I/O schema to inline artifact checks.
+Consequences: parser/AST encode artifact type annotations, validator checks static compatibility, and runtime enforces typed consume/produce contracts.

@@ -29,6 +29,8 @@ class Task:
     after: list[str] = field(default_factory=list)
     consumes: list[str] = field(default_factory=list)
     produces: list[str] = field(default_factory=list)
+    consumes_types: dict[str, str] = field(default_factory=dict)
+    produces_types: dict[str, str] = field(default_factory=dict)
     timeout_seconds: float | None = None
     retries: int = 0
     backoff_seconds: float = 0.0

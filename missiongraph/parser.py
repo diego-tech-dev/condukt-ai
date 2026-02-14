@@ -27,6 +27,9 @@ _CONTRACT_CLAUSE_RE = re.compile(
 _FIELD_SPEC_RE = re.compile(r"^([A-Za-z_][\w\.]*)\s*:\s*([A-Za-z_][A-Za-z0-9_]*\??)$")
 _CAP_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_\-]*$")
 _ARTIFACT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_\-]*$")
+_ARTIFACT_TYPED_RE = re.compile(
+    r"^([A-Za-z_][A-Za-z0-9_\-]*)(?::([A-Za-z_][A-Za-z0-9_]*))?$"
+)
 _RETRIES_RE = re.compile(r"^\d+$")
 _DURATION_RE = re.compile(r"^(\d+(?:\.\d+)?)(ms|s)?$")
 _VALID_SCHEMA_TYPES = {
@@ -292,6 +295,8 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
     after: list[str] = []
     consumes: list[str] = []
     produces: list[str] = []
+    consumes_types: dict[str, str] = {}
+    produces_types: dict[str, str] = {}
     policy = _TaskPolicy(timeout_seconds=None, retries=0, backoff_seconds=0.0)
     seen_clauses: set[str] = set()
     remaining = (tail or "").strip()
@@ -335,7 +340,12 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
                 raise ParseError(
                     f"{source}:{line_no}: consumes clause cannot be empty for task '{name}'"
                 )
-            consumes = _parse_artifact_names(clause, source, line_no, "consumes")
+            consumes, consumes_types = _parse_artifact_names(
+                clause,
+                source,
+                line_no,
+                "consumes",
+            )
             seen_clauses.add("consumes")
             continue
 
@@ -349,7 +359,12 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
                 raise ParseError(
                     f"{source}:{line_no}: produces clause cannot be empty for task '{name}'"
                 )
-            produces = _parse_artifact_names(clause, source, line_no, "produces")
+            produces, produces_types = _parse_artifact_names(
+                clause,
+                source,
+                line_no,
+                "produces",
+            )
             seen_clauses.add("produces")
             continue
 
@@ -375,6 +390,8 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
         after=after,
         consumes=consumes,
         produces=produces,
+        consumes_types=consumes_types,
+        produces_types=produces_types,
         timeout_seconds=policy.timeout_seconds,
         retries=policy.retries,
         backoff_seconds=policy.backoff_seconds,
@@ -697,21 +714,30 @@ def _parse_artifact_names(
     source: str,
     line_no: int,
     clause_name: str,
-) -> list[str]:
+) -> tuple[list[str], dict[str, str]]:
     artifacts: list[str] = []
+    artifact_types: dict[str, str] = {}
     seen: set[str] = set()
     for token in [part.strip() for part in raw.split(",") if part.strip()]:
-        if not _ARTIFACT_RE.fullmatch(token):
+        typed_match = _ARTIFACT_TYPED_RE.fullmatch(token)
+        if typed_match is None:
             raise ParseError(
                 f"{source}:{line_no}: invalid artifact name '{token}' in {clause_name}"
             )
-        if token in seen:
+        artifact, type_token = typed_match.groups()
+        if not _ARTIFACT_RE.fullmatch(artifact):
             raise ParseError(
-                f"{source}:{line_no}: duplicate artifact '{token}' in {clause_name}"
+                f"{source}:{line_no}: invalid artifact name '{artifact}' in {clause_name}"
             )
-        seen.add(token)
-        artifacts.append(token)
-    return artifacts
+        if artifact in seen:
+            raise ParseError(
+                f"{source}:{line_no}: duplicate artifact '{artifact}' in {clause_name}"
+            )
+        seen.add(artifact)
+        artifacts.append(artifact)
+        if type_token is not None:
+            artifact_types[artifact] = type_token
+    return artifacts, artifact_types
 
 
 def _is_ignored(line: str) -> bool:

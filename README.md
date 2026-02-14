@@ -156,6 +156,7 @@ Use task-level artifact contracts in `plan` to make dataflow explicit:
 
 - `produces <artifact[, ...]>`: task must emit matching keys in `output`.
 - `consumes <artifact[, ...]>`: task requires artifacts from dependency producers.
+- Optional typed form: `<artifact>:<type>` where `<type>` is primitive (`number`, `str`, etc.) or a named type from `types`.
 
 Example:
 
@@ -164,10 +165,18 @@ task test_suite uses "../workers/test_suite.py" requires capability.ci produces 
 task deploy_prod uses "../workers/deploy_prod.py" requires capability.prod_access after test_suite consumes test_report
 ```
 
+Typed example:
+
+```mgl
+task lint uses "../workers/lint.py" requires capability.ci produces report:number
+task deploy_prod uses "../workers/deploy_prod.py" requires capability.prod_access after lint consumes report:number
+```
+
 Runtime behavior:
 
 - Consumers fail fast if required artifacts are unavailable.
 - Producers fail if declared artifacts are missing from worker `output`.
+- Typed consumers/producers fail on artifact type contract violations.
 
 ## Parallel execution
 

@@ -85,11 +85,12 @@ Rules for safe migration:
 - Added grouped verify diagnostics in trace output (`verify_summary`).
 - Added CLI preflight validation command (`mgl validate`).
 - Added artifact-flow runnable example coverage (`examples/release_artifacts.mgl`).
+- Added typed artifact contracts (`artifact:type`) for `consumes`/`produces`.
 
 ## Near-Term Direction
 
-1. Rust runtime prototype that can pass current golden suite.
-2. Artifact schema typing (beyond name-level artifacts).
+1. Policy enhancements (retry jitter, retry conditions).
+2. Rust runtime prototype that can pass current golden suite.
 
 ## Resume Checklist
 

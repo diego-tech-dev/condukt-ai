@@ -18,6 +18,8 @@ from missiongraph.planner import build_mermaid_graph
 from missiongraph.serialization import program_to_ast
 from missiongraph.spec import (
     ERROR_CODE_ARTIFACT_CONSUME_MISSING,
+    ERROR_CODE_ARTIFACT_CONTRACT_CONSUME_VIOLATION,
+    ERROR_CODE_ARTIFACT_CONTRACT_OUTPUT_VIOLATION,
     ERROR_CODE_ARTIFACT_OUTPUT_MISSING,
     ERROR_CODE_CONTRACT_INPUT_VIOLATION,
     ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
@@ -345,6 +347,89 @@ plan {{
             )
 
         self.assertEqual(trace["status"], "ok")
+
+    def test_typed_artifact_contract_is_parsed_and_serialized(self) -> None:
+        program = parse_program(
+            f"""
+goal "typed artifact parse demo"
+
+plan {{
+  task lint uses "{(ROOT / 'workers' / 'lint.py').as_posix()}" requires capability.ci produces report:number
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" requires capability.prod_access after lint consumes report:number
+}}
+""".strip()
+        )
+        lint = program.tasks[0]
+        deploy = program.tasks[1]
+        self.assertEqual(lint.produces, ["report"])
+        self.assertEqual(lint.produces_types, {"report": "number"})
+        self.assertEqual(deploy.consumes, ["report"])
+        self.assertEqual(deploy.consumes_types, {"report": "number"})
+        ast = program_to_ast(program)
+        self.assertEqual(ast["tasks"][0]["produces_types"]["report"], "number")
+        self.assertEqual(ast["tasks"][1]["consumes_types"]["report"], "number")
+
+    def test_unknown_typed_artifact_type_fails_validation(self) -> None:
+        program = parse_program(
+            f"""
+goal "unknown typed artifact"
+
+plan {{
+  task lint uses "{(ROOT / 'workers' / 'lint.py').as_posix()}" requires capability.ci produces report:UnknownType
+}}
+""".strip()
+        )
+        with self.assertRaises(ExecutionError):
+            execute_program(program, capabilities={"ci"})
+
+    def test_incompatible_typed_artifact_contract_fails_validation(self) -> None:
+        program = parse_program(
+            f"""
+goal "typed incompatibility"
+
+plan {{
+  task lint uses "{(ROOT / 'workers' / 'lint.py').as_posix()}" requires capability.ci produces report:number
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" requires capability.prod_access after lint consumes report:str
+}}
+""".strip()
+        )
+        with self.assertRaises(ExecutionError):
+            execute_program(program, capabilities={"ci", "prod_access"})
+
+    def test_produced_typed_artifact_violation_fails_runtime(self) -> None:
+        program = parse_program(
+            f"""
+goal "produce typed violation"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci produces coverage:dict
+}}
+""".strip()
+        )
+        trace = execute_program(program, capabilities={"ci"})
+        self.assertEqual(trace["status"], "failed")
+        self.assertEqual(
+            trace["tasks"][0]["error_code"],
+            ERROR_CODE_ARTIFACT_CONTRACT_OUTPUT_VIOLATION,
+        )
+
+    def test_consumed_typed_artifact_violation_fails_runtime(self) -> None:
+        program = parse_program(
+            f"""
+goal "consume typed violation"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" requires capability.ci produces coverage
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" requires capability.prod_access after test_suite consumes coverage:dict
+}}
+""".strip()
+        )
+        trace = execute_program(program, capabilities={"ci", "prod_access"}, parallel=False)
+        self.assertEqual(trace["status"], "failed")
+        self.assertEqual(
+            trace["tasks"][1]["error_code"],
+            ERROR_CODE_ARTIFACT_CONTRACT_CONSUME_VIOLATION,
+        )
 
     def test_missing_consumed_artifact_fails_fast(self) -> None:
         program = parse_program(

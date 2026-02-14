@@ -44,3 +44,11 @@ For each milestone:
 1. Artifact schema typing (typed artifact payload contracts)
 2. Policy enhancements (retry jitter, retry conditions)
 3. Rust runtime bootstrap against existing AST/trace contracts
+
+## Backlog Sprint (Autonomous)
+
+Status: in_progress
+
+1. `B1` Typed artifact payload contracts: completed
+2. `B2` Policy enhancements (`retry_if`, jitter): pending
+3. `B3` Rust runtime bootstrap: pending

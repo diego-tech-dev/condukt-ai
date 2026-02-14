@@ -147,6 +147,18 @@
             "type": "string"
           }
         },
+        "consumes_types": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "produces_types": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
         "input_schema": {
           "type": "array",
           "items": {

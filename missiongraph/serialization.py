@@ -61,6 +61,10 @@ def _task_to_ast(task: Task) -> dict[str, Any]:
         item["consumes"] = task.consumes
     if task.produces:
         item["produces"] = task.produces
+    if task.consumes_types:
+        item["consumes_types"] = dict(sorted(task.consumes_types.items()))
+    if task.produces_types:
+        item["produces_types"] = dict(sorted(task.produces_types.items()))
     if task.timeout_seconds is not None:
         item["timeout_seconds"] = task.timeout_seconds
     if task.retries > 0:

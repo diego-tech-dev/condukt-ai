@@ -6,6 +6,26 @@ from .models import Program
 from .planner import PlanError, build_execution_order
 from .safe_eval import EvalError, eval_expr
 
+_ARTIFACT_PRIMITIVE_TYPES = {
+    "any",
+    "bool",
+    "dict",
+    "float",
+    "int",
+    "list",
+    "none",
+    "null",
+    "number",
+    "str",
+}
+_ARTIFACT_TYPE_ALIASES = {
+    "array": "list",
+    "boolean": "bool",
+    "integer": "int",
+    "object": "dict",
+    "string": "str",
+}
+
 
 def validate_program(
     program: Program,
@@ -49,8 +69,31 @@ def validate_program(
                     f"line {task.line}: task '{task.name}' requires missing "
                     f"capabilities: {', '.join(missing)}"
                 )
+        for artifact, type_token in task.consumes_types.items():
+            if artifact not in task.consumes:
+                errors.append(
+                    f"line {task.line}: task '{task.name}' has typed consume artifact "
+                    f"'{artifact}' not present in consumes clause"
+                )
+            if _canonical_artifact_type(type_token, program) is None:
+                errors.append(
+                    f"line {task.line}: task '{task.name}' uses unknown consumes type "
+                    f"'{type_token}' for artifact '{artifact}'"
+                )
+        for artifact, type_token in task.produces_types.items():
+            if artifact not in task.produces:
+                errors.append(
+                    f"line {task.line}: task '{task.name}' has typed produce artifact "
+                    f"'{artifact}' not present in produces clause"
+                )
+            if _canonical_artifact_type(type_token, program) is None:
+                errors.append(
+                    f"line {task.line}: task '{task.name}' uses unknown produces type "
+                    f"'{type_token}' for artifact '{artifact}'"
+                )
 
     producer_by_artifact: dict[str, str] = {}
+    producer_type_by_artifact: dict[str, str] = {}
     for task in program.tasks:
         for artifact in task.produces:
             producer = producer_by_artifact.get(artifact)
@@ -61,6 +104,9 @@ def validate_program(
                 )
             else:
                 producer_by_artifact[artifact] = task.name
+                producer_type = task.produces_types.get(artifact)
+                if producer_type is not None:
+                    producer_type_by_artifact[artifact] = producer_type
         for artifact in task.consumes:
             if artifact in task.produces:
                 errors.append(
@@ -82,6 +128,21 @@ def validate_program(
                     f"line {task.line}: task '{task.name}' consumes artifact '{artifact}' "
                     f"from '{producer}' but has no dependency path to that producer"
                 )
+            consumer_type = task.consumes_types.get(artifact)
+            producer_type = producer_type_by_artifact.get(artifact)
+            if consumer_type is not None and producer_type is not None:
+                canonical_consumer = _canonical_artifact_type(consumer_type, program)
+                canonical_producer = _canonical_artifact_type(producer_type, program)
+                if (
+                    canonical_consumer is not None
+                    and canonical_producer is not None
+                    and canonical_consumer != canonical_producer
+                ):
+                    errors.append(
+                        f"line {task.line}: task '{task.name}' consumes artifact '{artifact}' "
+                        f"as '{consumer_type}' but producer '{producer}' declares "
+                        f"'{producer_type}'"
+                    )
 
     for check in program.verify:
         try:
@@ -134,3 +195,13 @@ def _build_ancestor_map(program: Program) -> dict[str, set[str]]:
         return out
 
     return {name: _ancestors(name) for name in task_by_name}
+
+
+def _canonical_artifact_type(type_token: str, program: Program) -> str | None:
+    if type_token in program.types:
+        return f"type:{type_token}"
+    token = type_token.strip().lower()
+    token = _ARTIFACT_TYPE_ALIASES.get(token, token)
+    if token in _ARTIFACT_PRIMITIVE_TYPES:
+        return f"primitive:{token}"
+    return None

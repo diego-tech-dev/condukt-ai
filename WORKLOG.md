@@ -22,3 +22,16 @@ Notes:
   - Added `verify_summary` diagnostics in trace output (counts + failed-check details).
   - Added `mgl validate` command with optional JSON output.
   - Added artifact-flow example (`release_artifacts.mgl`) with dedicated worker and end-to-end coverage.
+
+### Sprint: Autonomous backlog run
+
+Status: in_progress
+
+Milestone status:
+- `B1` Typed artifact payload contracts: completed
+- `B2` Policy enhancements (`retry_if`, jitter): pending
+- `B3` Rust runtime bootstrap: pending
+
+Notes:
+- Added typed artifact contracts (`artifact:type`) in `consumes`/`produces`.
+- Added static/runtime checks for artifact type compatibility.

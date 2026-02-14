@@ -17,6 +17,8 @@ from .planner import build_execution_levels
 from .safe_eval import EvalError, eval_expr
 from .spec import (
     ERROR_CODE_ARTIFACT_CONSUME_MISSING,
+    ERROR_CODE_ARTIFACT_CONTRACT_CONSUME_VIOLATION,
+    ERROR_CODE_ARTIFACT_CONTRACT_OUTPUT_VIOLATION,
     ERROR_CODE_ARTIFACT_OUTPUT_MISSING,
     ERROR_CODE_CONTRACT_INPUT_VIOLATION,
     ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
@@ -27,6 +29,26 @@ from .spec import (
     TRACE_VERSION,
 )
 from .validator import validate_program
+
+_ARTIFACT_PRIMITIVE_TYPES = {
+    "any",
+    "bool",
+    "dict",
+    "float",
+    "int",
+    "list",
+    "none",
+    "null",
+    "number",
+    "str",
+}
+_ARTIFACT_TYPE_ALIASES = {
+    "array": "list",
+    "boolean": "bool",
+    "integer": "int",
+    "object": "dict",
+    "string": "str",
+}
 
 
 class ExecutionError(RuntimeError):
@@ -71,6 +93,23 @@ def execute_program(
                     task=task,
                     base_dir=program.base_dir,
                     missing_artifacts=missing_artifacts,
+                )
+                task_results[task.name] = failure
+                trace_tasks.append(failure)
+                input_failed = True
+                break
+
+            consume_type_errors = _validate_consumed_artifacts(
+                task=task,
+                artifact_registry=artifact_registry,
+                program=program,
+            )
+            if consume_type_errors:
+                failure = _build_artifact_type_failure_result(
+                    task=task,
+                    base_dir=program.base_dir,
+                    stage="consume",
+                    errors=consume_type_errors,
                 )
                 task_results[task.name] = failure
                 trace_tasks.append(failure)
@@ -140,8 +179,22 @@ def execute_program(
                         + ", ".join(missing_output_artifacts),
                     )
                 else:
-                    for artifact in task.produces:
-                        artifact_registry[artifact] = result["output"][artifact]
+                    produce_type_errors = _validate_produced_artifacts(
+                        task=task,
+                        output=result["output"],
+                        program=program,
+                    )
+                    if produce_type_errors:
+                        result["status"] = "error"
+                        result["confidence"] = 0.0
+                        result["error_code"] = ERROR_CODE_ARTIFACT_CONTRACT_OUTPUT_VIOLATION
+                        result["error"] = _merge_error(
+                            result.get("error"),
+                            "artifact type violation: " + "; ".join(produce_type_errors),
+                        )
+                    else:
+                        for artifact in task.produces:
+                            artifact_registry[artifact] = result["output"][artifact]
 
             task_results[task.name] = result
             trace_tasks.append(result)
@@ -610,6 +663,31 @@ def _build_artifact_failure_result(
     }
 
 
+def _build_artifact_type_failure_result(
+    task: Task,
+    base_dir: Path,
+    stage: str,
+    errors: list[str],
+) -> dict[str, Any]:
+    now = _now()
+    return {
+        "task": task.name,
+        "worker": task.worker,
+        "status": "error",
+        "confidence": 0.0,
+        "output": {},
+        "error_code": ERROR_CODE_ARTIFACT_CONTRACT_CONSUME_VIOLATION,
+        "error": f"{stage} artifact type violation: {'; '.join(errors)}",
+        "started_at": now,
+        "finished_at": now,
+        "provenance": {
+            "worker": str(_resolve_worker_path(task.worker, base_dir)),
+            "artifact_stage": stage,
+            "artifact_only": True,
+        },
+    }
+
+
 def _build_runtime_failure_result(
     task: Task,
     base_dir: Path,
@@ -739,3 +817,91 @@ def _constraint_expression(constraint: Constraint) -> str:
 
 def _now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
+
+
+def _validate_consumed_artifacts(
+    task: Task,
+    artifact_registry: dict[str, Any],
+    program: Program,
+) -> list[str]:
+    errors: list[str] = []
+    for artifact in task.consumes:
+        type_token = task.consumes_types.get(artifact)
+        if type_token is None:
+            continue
+        value = artifact_registry.get(artifact)
+        errors.extend(
+            _validate_artifact_value(
+                artifact=artifact,
+                value=value,
+                type_token=type_token,
+                program=program,
+                stage="consume",
+            )
+        )
+    return errors
+
+
+def _validate_produced_artifacts(
+    task: Task,
+    output: dict[str, Any],
+    program: Program,
+) -> list[str]:
+    errors: list[str] = []
+    for artifact in task.produces:
+        type_token = task.produces_types.get(artifact)
+        if type_token is None:
+            continue
+        value = output.get(artifact)
+        errors.extend(
+            _validate_artifact_value(
+                artifact=artifact,
+                value=value,
+                type_token=type_token,
+                program=program,
+                stage="produce",
+            )
+        )
+    return errors
+
+
+def _validate_artifact_value(
+    artifact: str,
+    value: Any,
+    type_token: str,
+    program: Program,
+    stage: str,
+) -> list[str]:
+    normalized = _normalize_artifact_type(type_token, program)
+    if normalized is None:
+        return [f"{stage} artifact '{artifact}' uses unknown type '{type_token}'"]
+
+    kind, token = normalized
+    if kind == "primitive":
+        if not _matches_type(value, token):
+            return [
+                f"{stage} artifact '{artifact}' expected {token} but got {_value_type_name(value)}"
+            ]
+        return []
+
+    if not isinstance(value, dict):
+        return [
+            f"{stage} artifact '{artifact}' expected dict for type '{token}' "
+            f"but got {_value_type_name(value)}"
+        ]
+    schema = program.types[token]
+    return [
+        f"{stage} artifact '{artifact}': {error}" for error in _validate_schema(value, schema)
+    ]
+
+
+def _normalize_artifact_type(
+    type_token: str, program: Program
+) -> tuple[str, str] | None:
+    if type_token in program.types:
+        return ("named", type_token)
+    token = type_token.strip().lower()
+    token = _ARTIFACT_TYPE_ALIASES.get(token, token)
+    if token in _ARTIFACT_PRIMITIVE_TYPES:
+        return ("primitive", token)
+    return None
