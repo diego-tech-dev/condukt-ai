@@ -246,3 +246,10 @@ Status: accepted
 Decision: name the TypeScript runtime package `condukt`.
 Rationale: short, searchable, and aligned with the orchestration/conduct metaphor while avoiding saturated `agent/flow/graph` naming patterns.
 Consequences: TS package metadata and docs now use `condukt`; broader project naming remains Condukt for current Python/Rust references.
+
+## 2026-02-14
+
+Status: accepted
+Decision: prepare `condukt` for direct npm distribution with explicit export/file boundaries and release checks.
+Rationale: user adoption requires installable package ergonomics and reproducible pre-publish quality gates.
+Consequences: TS package now includes publish metadata (`repository`, `engines`, `exports`, `files`, `publishConfig`) and a `release:check` script plus publishing playbook.

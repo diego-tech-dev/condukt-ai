@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: completed
+Current sprint status: in_progress
 
 ## Autonomy Sprint (5 milestones)
 
@@ -92,3 +92,11 @@ Status: completed
 1. `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
 2. `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): completed
 3. `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): completed
+
+## Distribution Sprint (Autonomous)
+
+Status: in_progress
+
+1. `U1` TS package publish readiness (metadata/exports/files/release checks): completed
+2. `U2` CI + release automation for TS package quality gates: pending
+3. `U3` External trial instrumentation for time-to-diagnose metric capture: pending

@@ -10,6 +10,14 @@ Focus of this package:
 
 ## Install
 
+From npm:
+
+```bash
+pnpm add condukt zod
+```
+
+From source:
+
 ```bash
 cd ts
 pnpm install
@@ -21,6 +29,7 @@ pnpm install
 pnpm test
 pnpm check
 pnpm build
+pnpm release:check
 ```
 
 ## 10-minute quickstart

@@ -128,3 +128,19 @@ Notes:
 - Added TS quickstart demo (`pnpm quickstart` / `pnpm quickstart:broken`) that writes a trace and demonstrates boundary-failure diagnosis.
 - Added 10-minute walkthrough doc at `ts/docs/TRACE_WALKTHROUGH.md`.
 - Renamed TS package to `condukt`.
+
+### Sprint: Distribution run
+
+Status: in_progress
+
+Milestone status:
+- `U1` TS package publish readiness (metadata/exports/files/release checks): completed
+- `U2` CI + release automation for TS package quality gates: pending
+- `U3` External trial instrumentation for time-to-diagnose metric capture: pending
+
+Notes:
+- Started npm publish-readiness hardening for the `condukt` package.
+- Added publish metadata (`exports`, `files`, `repository`, `engines`, `publishConfig`) and release scripts (`release:check`, `prepack`) to `ts/package.json`.
+- Added package publishing runbook at `ts/docs/PUBLISHING.md`.
+- Added local `ts/LICENSE` to ensure packaged license inclusion.
+- Regenerated normalized trace goldens after canonical workspace path rename to keep conformance deterministic.

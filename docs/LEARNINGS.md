@@ -163,3 +163,18 @@ What changed:
 
 Guardrail:
 - Keep a credential-free broken demo path in-repo and ensure it remains runnable as part of onboarding updates.
+
+## 2026-02-14
+
+Context:
+- Began TS package distribution hardening.
+
+Learning:
+- Shipping confidence improves when pack-time boundaries are explicit (`exports` + `files`) and release checks run before version bumps.
+
+What changed:
+- Added npm metadata for publish-ready package surface.
+- Added `release:check` script and publishing runbook.
+
+Guardrail:
+- Any new public runtime surface must be reflected in `exports` and validated via `release:check` before publish.

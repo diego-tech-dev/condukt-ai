@@ -1,18 +1,57 @@
 {
   "name": "condukt",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "TypeScript contract-first pipeline runtime for Condukt",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diego-tech-dev/missiongraph.git",
+    "directory": "ts"
+  },
+  "homepage": "https://github.com/diego-tech-dev/missiongraph/tree/main/ts",
+  "bugs": {
+    "url": "https://github.com/diego-tech-dev/missiongraph/issues"
+  },
+  "keywords": [
+    "agent",
+    "orchestration",
+    "contracts",
+    "trace",
+    "standard-schema",
+    "llm"
+  ],
   "packageManager": "pnpm@10.6.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
+    "clean": "rm -rf dist",
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "tsx --test test/**/*.test.ts",
     "quickstart": "tsx examples/quickstart-debug.ts",
-    "quickstart:broken": "tsx examples/quickstart-debug.ts --broken"
+    "quickstart:broken": "tsx examples/quickstart-debug.ts --broken",
+    "release:check": "pnpm clean && pnpm check && pnpm test && pnpm build && npm pack --dry-run",
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@standard-schema/spec": "^1.0.0"

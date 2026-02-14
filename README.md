@@ -29,6 +29,8 @@ A TypeScript-first runtime prototype now lives in `ts/` with:
 
 Current TS package name: `condukt`.
 
+Package release runbook: `ts/docs/PUBLISHING.md`.
+
 Quick start:
 
 ```bash
