@@ -204,3 +204,10 @@ Status: accepted
 Decision: align Rust worker execution with policy-loop semantics (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`).
 Rationale: resilient execution behavior is a core runtime contract and must behave consistently across runtimes during migration.
 Consequences: Rust `run-task` and `run-plan` now execute per-attempt policy loops, emit retry attempt history in provenance, and map timeout failures to `WORKER_TIMEOUT`.
+
+## 2026-02-14
+
+Status: accepted
+Decision: assemble Rust `run-plan` trace diagnostics for `constraints`, `verify`, and `verify_summary`.
+Rationale: full-plan trace parity requires post-execution diagnostics, not only task-result emission.
+Consequences: Rust `run-plan` now evaluates constraint/verify expressions against runtime context, emits grouped verify failures, and factors diagnostics into overall trace status.

@@ -101,3 +101,18 @@ What changed:
 
 Guardrail:
 - Any future retry-policy change must include both `run-task` and `run-plan` behavior tests, plus explicit checks on provenance `attempts`.
+
+## 2026-02-14
+
+Context:
+- Added Rust trace diagnostics assembly (`constraints`, `verify`, `verify_summary`) in `run-plan`.
+
+Learning:
+- Diagnostics parity needs a stable evaluation context contract (`shared_context + task_results`) as much as task execution parity.
+
+What changed:
+- Rust run-plan now evaluates constraint and verify expressions post-execution, emits unresolved constraint reasons, and summarizes verify failures.
+- Added tests for success, failed verify summary, and unresolved-constraint semantics.
+
+Guardrail:
+- When adding new expression forms, add explicit evaluator tests and verify-summary expectations before changing parser or runtime behavior.

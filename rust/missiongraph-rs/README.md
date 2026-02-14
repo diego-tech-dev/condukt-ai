@@ -10,6 +10,7 @@ This prototype focuses on AST/trace contract handling:
 - execute a single dependency-free worker task (`run-task`, prototype)
 - execute full plans sequentially in dependency order (`run-plan`, prototype)
 - honor task execution policies from AST (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`)
+- emit full run-plan diagnostics (`constraints`, `verify`, `verify_summary`)
 
 ## Usage
 
@@ -44,6 +45,8 @@ Execute full plan sequentially (prototype):
 ```bash
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
 ```
+
+`run-plan` now includes evaluated constraint and verify diagnostics in the emitted trace payload.
 
 Run Rust tests:
 

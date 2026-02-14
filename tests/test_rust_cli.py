@@ -464,6 +464,125 @@ class RustCliTests(unittest.TestCase):
         self.assertEqual(len(payload["tasks"][0]["provenance"]["attempts"]), 2)
         self.assertEqual(payload["tasks"][1]["output"]["from_first"], 2)
 
+    def test_run_plan_emits_constraints_and_verify_summary(self) -> None:
+        ast_path = ROOT / "tests" / "golden" / "ship_release.ast.json"
+        proc = self._run(
+            "run-plan",
+            str(ast_path),
+            "--base-dir",
+            str(ROOT / "examples"),
+            "--json",
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr or proc.stdout)
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual(len(payload["constraints"]), 1)
+        self.assertTrue(payload["constraints"][0]["passed"])
+        self.assertEqual(payload["verify_summary"]["total"], 4)
+        self.assertEqual(payload["verify_summary"]["passed"], 4)
+        self.assertEqual(payload["verify_summary"]["failed"], 0)
+        self.assertEqual(payload["verify_summary"]["failures"], [])
+
+    def test_run_plan_reports_constraint_and_verify_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            worker_path = temp_root / "worker.py"
+            worker_path.write_text(
+                (
+                    "import json\n"
+                    "print(json.dumps({'status':'ok','confidence':1.0,'output':{'risk':0.5}}))\n"
+                ),
+                encoding="utf-8",
+            )
+            ast_path = temp_root / "constraint_verify.ast.json"
+            ast_path.write_text(
+                json.dumps(
+                    {
+                        "ast_version": AST_VERSION,
+                        "goal": "verify failure",
+                        "constraints": [
+                            {"key": "risk", "op": "<=", "value": 0.2, "line": 10}
+                        ],
+                        "verify": [
+                            {"line": 20, "expression": "producer.output.risk <= 0.2"},
+                            {"line": 21, "expression": "producer.status == \"ok\""},
+                        ],
+                        "tasks": [
+                            {
+                                "name": "producer",
+                                "worker": str(worker_path),
+                                "after": [],
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            proc = self._run(
+                "run-plan",
+                str(ast_path),
+                "--json",
+            )
+
+        self.assertNotEqual(proc.returncode, 0)
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["status"], "failed")
+        self.assertFalse(payload["constraints"][0]["passed"])
+        self.assertEqual(payload["verify_summary"]["total"], 2)
+        self.assertEqual(payload["verify_summary"]["passed"], 1)
+        self.assertEqual(payload["verify_summary"]["failed"], 1)
+        self.assertEqual(payload["verify_summary"]["failures"][0]["line"], 20)
+        self.assertEqual(
+            payload["verify_summary"]["failures"][0]["expression"],
+            "producer.output.risk <= 0.2",
+        )
+
+    def test_run_plan_unresolved_constraint_is_reported_with_null_passed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            worker_path = temp_root / "worker.py"
+            worker_path.write_text(
+                (
+                    "import json\n"
+                    "print(json.dumps({'status':'ok','confidence':1.0,'output':{}}))\n"
+                ),
+                encoding="utf-8",
+            )
+            ast_path = temp_root / "unresolved_constraint.ast.json"
+            ast_path.write_text(
+                json.dumps(
+                    {
+                        "ast_version": AST_VERSION,
+                        "goal": "unresolved constraint",
+                        "constraints": [
+                            {"key": "risk", "op": "<=", "value": 0.2, "line": 10}
+                        ],
+                        "verify": [],
+                        "tasks": [
+                            {
+                                "name": "producer",
+                                "worker": str(worker_path),
+                                "after": [],
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            proc = self._run(
+                "run-plan",
+                str(ast_path),
+                "--json",
+            )
+
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr or proc.stdout)
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["status"], "ok")
+        self.assertIsNone(payload["constraints"][0]["passed"])
+        self.assertIn("unresolved key", payload["constraints"][0]["reason"])
+
 
 if __name__ == "__main__":
     unittest.main()

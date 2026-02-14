@@ -90,12 +90,12 @@ Notes:
 
 ### Sprint: Autonomous execution run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `E1` Rust multi-task sequential execution (dependency order): completed
 - `E2` Rust retry/timeout policy loop parity for task execution: completed
-- `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending
+- `E3` Rust trace assembly for full-plan runs (tasks + verify summary): completed
 
 Notes:
 - Added `docs/FOUNDATIONS.md` to capture explicit language/runtime design baselines, tradeoffs, and migration paths across all core design dimensions.
@@ -104,3 +104,5 @@ Notes:
 - Added Rust CLI coverage for run-plan order semantics and fail-fast behavior.
 - Added Rust per-task execution policy parity (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`) across `run-task` and `run-plan`.
 - Added Rust CLI coverage for retry-to-success, timeout-only retry gating, and run-plan dependency execution after retries.
+- Added Rust run-plan diagnostics assembly for `constraints`, `verify`, and `verify_summary` fields.
+- Added Rust CLI coverage for successful verify summaries, explicit verify failures, and unresolved-constraint reporting (`passed: null`).

@@ -9,7 +9,31 @@ pub const TRACE_VERSION: &str = "1.1";
 pub struct Ast {
     pub ast_version: String,
     pub goal: String,
+    #[serde(default)]
+    pub constraints: Vec<AstConstraint>,
+    #[serde(default)]
+    pub verify: Vec<AstVerify>,
     pub tasks: Vec<AstTask>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AstConstraint {
+    #[serde(default)]
+    pub key: String,
+    #[serde(default)]
+    pub op: String,
+    #[serde(default)]
+    pub value: Value,
+    #[serde(default)]
+    pub line: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AstVerify {
+    #[serde(default)]
+    pub line: u32,
+    #[serde(default)]
+    pub expression: String,
 }
 
 #[derive(Debug, Deserialize)]

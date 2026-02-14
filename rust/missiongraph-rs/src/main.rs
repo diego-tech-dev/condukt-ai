@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use missiongraph_rs::{
-    build_dependency_levels, build_trace_skeleton, parse_ast, validate_ast, AstTask,
-    TRACE_VERSION,
+    build_dependency_levels, build_trace_skeleton, parse_ast, validate_ast, AstConstraint,
+    AstTask, AstVerify, TRACE_VERSION,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -435,6 +435,12 @@ fn run_plan(ast: PathBuf, base_dir: PathBuf, capabilities: Vec<String>, json: bo
 
     let started_at = now_timestamp();
     let mut task_values: BTreeMap<String, Value> = BTreeMap::new();
+    let mut shared_context: serde_json::Map<String, Value> = serde_json::Map::new();
+    let constraint_values = ast_doc
+        .constraints
+        .iter()
+        .map(constraint_to_value)
+        .collect::<Vec<_>>();
     let mut tasks: Vec<TraceTaskResult> = vec![];
 
     for task_name in &task_order {
@@ -452,14 +458,23 @@ fn run_plan(ast: PathBuf, base_dir: PathBuf, capabilities: Vec<String>, json: bo
         let payload = json!({
             "task": task.name,
             "goal": ast_doc.goal,
-            "constraints": [],
+            "constraints": constraint_values.clone(),
             "dependencies": dependencies,
-            "variables": {},
+            "variables": shared_context.clone(),
         });
 
         let report = execute_task_from_ast(task, &base_dir, payload, true);
         let trace_task = report_to_trace_task(&report);
         task_values.insert(task.name.clone(), trace_task_to_value(&trace_task));
+        if trace_task.status == "ok" {
+            if let Value::Object(output_map) = &trace_task.output {
+                for (key, value) in output_map {
+                    if !task_values.contains_key(key) {
+                        shared_context.insert(key.clone(), value.clone());
+                    }
+                }
+            }
+        }
         let failed = trace_task.status != "ok";
         tasks.push(trace_task);
         if failed {
@@ -467,10 +482,20 @@ fn run_plan(ast: PathBuf, base_dir: PathBuf, capabilities: Vec<String>, json: bo
         }
     }
 
+    let constraints_report = evaluate_constraints(&ast_doc.constraints, &shared_context);
+    let verify_report = evaluate_verify(&ast_doc.verify, &task_values, &shared_context);
+    let verify_summary = summarize_verify(&verify_report);
+    let task_status_ok = tasks.iter().all(|task| task.status == "ok");
+    let constraints_ok = constraints_report
+        .iter()
+        .all(|item| !report_value_is_false(item, "passed"));
+    let verify_ok = verify_summary.failed == 0;
+    let overall_ok = task_status_ok && constraints_ok && verify_ok;
+
     let trace = RunPlanTrace {
         trace_version: TRACE_VERSION.to_string(),
         goal: ast_doc.goal,
-        status: if tasks.len() == task_order.len() && tasks.iter().all(|t| t.status == "ok") {
+        status: if overall_ok {
             "ok".to_string()
         } else {
             "failed".to_string()
@@ -490,14 +515,9 @@ fn run_plan(ast: PathBuf, base_dir: PathBuf, capabilities: Vec<String>, json: bo
         },
         task_order,
         tasks,
-        constraints: vec![],
-        verify: vec![],
-        verify_summary: TraceVerifySummary {
-            total: 0,
-            passed: 0,
-            failed: 0,
-            failures: vec![],
-        },
+        constraints: constraints_report,
+        verify: verify_report,
+        verify_summary,
     };
 
     if json {
@@ -512,6 +532,276 @@ fn run_plan(ast: PathBuf, base_dir: PathBuf, capabilities: Vec<String>, json: bo
         println!("{}", trace.status);
     }
     if trace.status == "ok" { 0 } else { 1 }
+}
+
+fn constraint_to_value(constraint: &AstConstraint) -> Value {
+    json!({
+        "key": constraint.key.clone(),
+        "op": constraint.op.clone(),
+        "value": constraint.value.clone(),
+        "line": constraint.line,
+    })
+}
+
+fn constraint_expression(constraint: &AstConstraint) -> String {
+    let value_text =
+        serde_json::to_string(&constraint.value).unwrap_or_else(|_| "null".to_string());
+    format!("{} {} {}", constraint.key, constraint.op, value_text)
+}
+
+fn evaluate_constraints(
+    constraints: &[AstConstraint],
+    context: &serde_json::Map<String, Value>,
+) -> Vec<Value> {
+    constraints
+        .iter()
+        .map(|constraint| {
+            let expression = constraint_expression(constraint);
+            let left_value = match resolve_path(context, &constraint.key) {
+                Some(value) => value,
+                None => {
+                    return json!({
+                        "line": constraint.line,
+                        "expression": expression,
+                        "passed": Value::Null,
+                        "reason": format!("unresolved key: {}", constraint.key),
+                    });
+                }
+            };
+
+            match compare_values(&left_value, &constraint.value, constraint.op.as_str()) {
+                Ok(passed) => json!({
+                    "line": constraint.line,
+                    "expression": expression,
+                    "passed": passed,
+                }),
+                Err(reason) => json!({
+                    "line": constraint.line,
+                    "expression": expression,
+                    "passed": false,
+                    "reason": reason,
+                }),
+            }
+        })
+        .collect()
+}
+
+fn evaluate_verify(
+    checks: &[AstVerify],
+    task_values: &BTreeMap<String, Value>,
+    context: &serde_json::Map<String, Value>,
+) -> Vec<Value> {
+    let mut eval_context = context.clone();
+    for (task, value) in task_values {
+        eval_context.insert(task.clone(), value.clone());
+    }
+
+    checks
+        .iter()
+        .map(|check| match eval_boolean_expression(&check.expression, &eval_context) {
+            Ok(passed) => json!({
+                "line": check.line,
+                "expression": check.expression,
+                "passed": passed,
+            }),
+            Err(reason) => json!({
+                "line": check.line,
+                "expression": check.expression,
+                "passed": false,
+                "reason": reason,
+            }),
+        })
+        .collect()
+}
+
+fn summarize_verify(report: &[Value]) -> TraceVerifySummary {
+    let failures = report
+        .iter()
+        .filter(|item| report_value_is_false(item, "passed"))
+        .map(|item| {
+            let line = item
+                .as_object()
+                .and_then(|obj| obj.get("line"))
+                .and_then(|value| value.as_u64())
+                .unwrap_or(0);
+            let expression = item
+                .as_object()
+                .and_then(|obj| obj.get("expression"))
+                .and_then(|value| value.as_str())
+                .unwrap_or("");
+            let reason = item
+                .as_object()
+                .and_then(|obj| obj.get("reason"))
+                .cloned()
+                .unwrap_or(Value::Null);
+            json!({
+                "line": line,
+                "expression": expression,
+                "reason": reason,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    let total = report.len() as i32;
+    let failed = failures.len() as i32;
+    TraceVerifySummary {
+        total,
+        passed: total - failed,
+        failed,
+        failures,
+    }
+}
+
+fn report_value_is_false(item: &Value, key: &str) -> bool {
+    item.as_object()
+        .and_then(|obj| obj.get(key))
+        .and_then(|value| value.as_bool())
+        == Some(false)
+}
+
+fn eval_boolean_expression(
+    expression: &str,
+    context: &serde_json::Map<String, Value>,
+) -> Result<bool, String> {
+    let expr = expression.trim();
+    if expr.is_empty() {
+        return Err("empty expression".to_string());
+    }
+
+    if let Some((index, op)) = find_binary_operator(expr) {
+        let left = expr[..index].trim();
+        let right = expr[index + op.len()..].trim();
+        if left.is_empty() || right.is_empty() {
+            return Err(format!("invalid binary expression: {expr}"));
+        }
+        let left_value = resolve_operand(left, context)?;
+        let right_value = resolve_operand(right, context)?;
+        return compare_values(&left_value, &right_value, op);
+    }
+
+    let value = resolve_operand(expr, context)?;
+    value
+        .as_bool()
+        .ok_or_else(|| format!("expression did not resolve to bool: {expr}"))
+}
+
+fn find_binary_operator(expression: &str) -> Option<(usize, &'static str)> {
+    let bytes = expression.as_bytes();
+    let mut in_string = false;
+    let mut escaped = false;
+    let mut index = 0usize;
+
+    while index < bytes.len() {
+        let byte = bytes[index];
+
+        if in_string {
+            if escaped {
+                escaped = false;
+                index += 1;
+                continue;
+            }
+            if byte == b'\\' {
+                escaped = true;
+                index += 1;
+                continue;
+            }
+            if byte == b'"' {
+                in_string = false;
+            }
+            index += 1;
+            continue;
+        }
+
+        if byte == b'"' {
+            in_string = true;
+            index += 1;
+            continue;
+        }
+
+        for op in ["==", "!=", ">=", "<="] {
+            if expression[index..].starts_with(op) {
+                return Some((index, op));
+            }
+        }
+        if byte == b'>' {
+            return Some((index, ">"));
+        }
+        if byte == b'<' {
+            return Some((index, "<"));
+        }
+        index += 1;
+    }
+
+    None
+}
+
+fn resolve_operand(
+    token: &str,
+    context: &serde_json::Map<String, Value>,
+) -> Result<Value, String> {
+    if let Ok(value) = serde_json::from_str::<Value>(token) {
+        return Ok(value);
+    }
+    if let Some(value) = resolve_path(context, token) {
+        return Ok(value);
+    }
+    Err(format!("unresolved identifier: {token}"))
+}
+
+fn resolve_path(context: &serde_json::Map<String, Value>, path: &str) -> Option<Value> {
+    let mut parts = path.split('.');
+    let first = parts.next()?;
+    let mut current = context.get(first)?;
+    for part in parts {
+        let object = current.as_object()?;
+        current = object.get(part)?;
+    }
+    Some(current.clone())
+}
+
+fn compare_values(left: &Value, right: &Value, op: &str) -> Result<bool, String> {
+    match op {
+        "==" => Ok(left == right),
+        "!=" => Ok(left != right),
+        "<" | "<=" | ">" | ">=" => {
+            if let (Some(left_num), Some(right_num)) = (left.as_f64(), right.as_f64()) {
+                return Ok(match op {
+                    "<" => left_num < right_num,
+                    "<=" => left_num <= right_num,
+                    ">" => left_num > right_num,
+                    ">=" => left_num >= right_num,
+                    _ => false,
+                });
+            }
+            if let (Some(left_str), Some(right_str)) = (left.as_str(), right.as_str()) {
+                return Ok(match op {
+                    "<" => left_str < right_str,
+                    "<=" => left_str <= right_str,
+                    ">" => left_str > right_str,
+                    ">=" => left_str >= right_str,
+                    _ => false,
+                });
+            }
+            Err(format!(
+                "unsupported comparison: {} {} {}",
+                value_type_name(left),
+                op,
+                value_type_name(right)
+            ))
+        }
+        _ => Err(format!("unsupported operator: {op}")),
+    }
+}
+
+fn value_type_name(value: &Value) -> &'static str {
+    match value {
+        Value::Null => "null",
+        Value::Bool(_) => "bool",
+        Value::Number(_) => "number",
+        Value::String(_) => "string",
+        Value::Array(_) => "array",
+        Value::Object(_) => "object",
+    }
 }
 
 fn empty_run_task_report(task_name: &str) -> RunTaskReport {
