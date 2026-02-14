@@ -162,3 +162,10 @@ Status: accepted
 Decision: add Rust `run-task` as a single-task worker execution prototype.
 Rationale: begin migration beyond contract-only checks by exercising real worker invocation in Rust on a minimal, controlled slice.
 Consequences: `mgl-rs run-task` executes one dependency-free task with JSON input/output reporting; tests cover successful execution and dependency rejection behavior.
+
+## 2026-02-14
+
+Status: accepted
+Decision: shape Rust `run-task` output to align with MissionGraph task-result fields.
+Rationale: migration confidence improves when Rust execution surfaces (`status`, `error_code`, `provenance`, timestamps) follow the same contract language as Python traces.
+Consequences: Rust run-task now emits normalized `error_code`, `started_at`, `finished_at`, and merged provenance defaults; non-zero exits map to `WORKER_EXIT_NONZERO`.

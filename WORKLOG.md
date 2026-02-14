@@ -77,9 +77,11 @@ Status: in_progress
 
 Milestone status:
 - `F1` Rust worker execution prototype (single task path): completed
-- `F2` Rust task-result contract shaping (error_code/provenance): pending
+- `F2` Rust task-result contract shaping (error_code/provenance): completed
 - `F3` Cross-runtime parity matrix for resilient policies: pending
 
 Notes:
 - Added `mgl-rs run-task` prototype command for executing one dependency-free task worker from AST.
 - Added Rust CLI tests for successful worker execution and dependency-rejection behavior.
+- `run-task` now emits task-result style fields: `error_code`, `started_at`, `finished_at`, and merged provenance.
+- Added Rust CLI coverage for non-zero worker exit mapping to `WORKER_EXIT_NONZERO`.

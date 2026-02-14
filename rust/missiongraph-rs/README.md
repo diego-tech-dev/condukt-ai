@@ -35,6 +35,8 @@ Execute one dependency-free task (prototype):
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
 ```
 
+`run-task` reports contract-style fields including `status`, `error_code`, `started_at`, `finished_at`, and merged `provenance`.
+
 Run Rust tests:
 
 ```bash
