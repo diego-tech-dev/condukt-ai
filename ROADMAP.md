@@ -98,5 +98,5 @@ Status: completed
 Status: in_progress
 
 1. `U1` TS package publish readiness (metadata/exports/files/release checks): completed
-2. `U2` CI + release automation for TS package quality gates: pending
+2. `U2` CI + release automation for TS package quality gates: completed
 3. `U3` External trial instrumentation for time-to-diagnose metric capture: pending

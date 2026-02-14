@@ -253,3 +253,10 @@ Status: accepted
 Decision: prepare `condukt` for direct npm distribution with explicit export/file boundaries and release checks.
 Rationale: user adoption requires installable package ergonomics and reproducible pre-publish quality gates.
 Consequences: TS package now includes publish metadata (`repository`, `engines`, `exports`, `files`, `publishConfig`) and a `release:check` script plus publishing playbook.
+
+## 2026-02-14
+
+Status: accepted
+Decision: enforce TS package quality and publish flow through GitHub Actions workflows.
+Rationale: distribution reliability needs CI-enforced gates and repeatable publish mechanics beyond local developer runs.
+Consequences: added `ts-quality` workflow for push/PR checks and `ts-publish` manual workflow that validates release artifacts before publishing with `NPM_TOKEN`.

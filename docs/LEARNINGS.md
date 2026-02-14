@@ -178,3 +178,18 @@ What changed:
 
 Guardrail:
 - Any new public runtime surface must be reflected in `exports` and validated via `release:check` before publish.
+
+## 2026-02-14
+
+Context:
+- Added CI and release automation for TS package distribution.
+
+Learning:
+- Local release scripts reduce mistakes, but CI workflows make quality gates enforceable and audit-friendly across contributors.
+
+What changed:
+- Added `ts-quality` workflow for check/test/build/release-check.
+- Added manual `ts-publish` workflow with pre-publish validation and npm token auth.
+
+Guardrail:
+- Keep `ts-quality` and local `release:check` semantically aligned so CI and local release behavior do not drift.

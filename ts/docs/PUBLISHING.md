@@ -36,6 +36,10 @@ cd ts
 npm publish --access public
 ```
 
+Or use GitHub Actions manual workflow:
+- run `ts-publish`
+- ensure repo secret `NPM_TOKEN` is configured
+
 ## 4) Verify install
 
 ```bash

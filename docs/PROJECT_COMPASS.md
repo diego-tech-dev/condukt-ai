@@ -114,11 +114,12 @@ Rules for safe migration:
 - Added credential-free TS quickstart + broken-run walkthrough to demonstrate trace-based failure diagnosis in under 10 minutes.
 - Named the TypeScript package `condukt`.
 - Added npm publish-readiness metadata and release validation scripts for `condukt`.
+- Added TS quality and publish GitHub Actions workflows for reproducible CI/release gates.
 
 ## Near-Term Direction
 
-1. Add CI/release automation for TS package quality gates.
-2. Run external user trials and measure time-to-diagnose against current agent workflow baselines.
+1. Run external user trials and measure time-to-diagnose against current agent workflow baselines.
+2. Iterate TS API shape from trial feedback while preserving contract/trace core value.
 
 ## Resume Checklist
 
