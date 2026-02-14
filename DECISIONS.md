@@ -351,3 +351,10 @@ Status: accepted
 Decision: make provider/model-level type safety a first-class API contract in the TS runtime.
 Rationale: preventing model-setting mismatches at compile time improves workflow correctness and DX for multi-provider agent pipelines.
 Consequences: `LLMProvider` is now generic over model IDs and per-model settings maps, `llmTask` infers model-specific settings from the selected provider/model, and typecheck now includes dedicated compile-time provider typing fixtures.
+
+## 2026-02-14
+
+Status: accepted
+Decision: add typed dependency-context inference to pipeline composition via `Pipeline.addLLMTask`.
+Rationale: task authors should not need manual casts for dependency outputs; declared `after` dependencies should define the prompt-context type surface.
+Consequences: `TaskRuntimeContext`, `TaskDefinition`, and `LLMTaskDefinition` now carry dependency/output generics, examples/tests migrated to typed builder chaining, and compile-time fixtures assert dependency-key correctness.

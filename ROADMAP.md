@@ -140,3 +140,11 @@ Status: completed
 1. `L1` Introduce provider/model generic typing surface in runtime API: completed
 2. `L2` Enforce model-specific settings inference in `llmTask`: completed
 3. `L3` Add compile-time type fixtures for provider/model contract safety: completed
+
+## Typed Dependency Context Sprint (Autonomous)
+
+Status: completed
+
+1. `M1` Generic task/runtime context typing for dependency output inference: completed
+2. `M2` Add `Pipeline.addLLMTask` typed builder path and migrate examples: completed
+3. `M3` Add compile-time dependency-key fixtures and validate with release checks: completed

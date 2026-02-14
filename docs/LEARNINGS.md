@@ -50,6 +50,21 @@ Guardrail:
 ## 2026-02-14
 
 Context:
+- Extended type-safety from provider models into dependency-output typing during pipeline composition.
+
+Learning:
+- Mutating builder APIs only preserve evolving type maps when users chain/reassign; typed inference cannot retroactively narrow an already-declared variable type.
+
+What changed:
+- Added `Pipeline.addLLMTask` with output-map generic accumulation and dependency-key-aware task context typing.
+- Updated examples/tests to chain pipeline construction so inferred dependency output types remain precise.
+
+Guardrail:
+- For typed pipeline composition examples, prefer fluent chaining (or reassignment) to avoid falling back to initial pipeline type state.
+
+## 2026-02-14
+
+Context:
 - Added dual-runtime conformance and golden parity gates.
 
 Learning:

@@ -258,3 +258,18 @@ Notes:
 - Updated `llmTask` typing in `ts/src/pipeline.ts` so `modelSettings` are inferred from selected provider/model instead of generic untyped task-level knobs.
 - Added compile-time provider typing fixtures under `ts/typecheck/` and moved `pnpm typecheck` to `tsconfig.typecheck.json` to enforce these contracts.
 - Expanded provider runtime tests to validate request payload shaping for chat vs reasoning settings.
+
+### Sprint: Typed dependency context run
+
+Status: completed
+
+Milestone status:
+- `M1` Generic task/runtime context typing for dependency output inference: completed
+- `M2` Add `Pipeline.addLLMTask` typed builder path and migrate examples: completed
+- `M3` Add compile-time dependency-key fixtures and validate with release checks: completed
+
+Notes:
+- Refactored `TaskRuntimeContext`, `TaskDefinition`, and `LLMTaskDefinition` to carry output/dependency generics.
+- Added `Pipeline<TOutputs>` accumulation and `addLLMTask(...)` to make dependency outputs typed from declared `after` keys.
+- Migrated TS examples and core pipeline tests to builder chaining without manual `as` casts for dependency outputs.
+- Added compile-time dependency fixtures at `ts/typecheck/pipeline-dependencies.typecheck.ts`.

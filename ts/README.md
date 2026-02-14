@@ -7,6 +7,7 @@ Focus of this package:
 - structured execution traces for fast failure diagnosis
 - LLM task adapters for OpenAI and Anthropic JSON workflows
 - provider-model-aware typing (model IDs + settings inferred per provider/model)
+- typed dependency context via `pipeline.addLLMTask(...)` so `dependencyOutputs` matches declared `after` tasks
 - task-level retry policies (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces
 - Vitest-powered TypeScript test workflow
 
@@ -72,13 +73,11 @@ Trial protocol details: `docs/TRIALS.md`.
 
 ```ts
 import { z } from "zod";
-import { Pipeline, llmTask, createOpenAIProvider } from "condukt-ai";
+import { Pipeline, createOpenAIProvider } from "condukt-ai";
 
 const provider = createOpenAIProvider();
-const pipeline = new Pipeline("research-and-write");
 
-pipeline.addTask(
-  llmTask({
+const pipeline = new Pipeline("research-and-write").addLLMTask({
     id: "research",
     provider,
     model: "gpt-4.1-mini",
@@ -88,8 +87,7 @@ pipeline.addTask(
     },
     output: z.object({ topics: z.array(z.string()) }),
     prompt: () => "Return JSON with topics.",
-  }),
-);
+  });
 
 const trace = await pipeline.run();
 console.log(trace);

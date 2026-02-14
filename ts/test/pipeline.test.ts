@@ -55,10 +55,8 @@ test("runs an LLM pipeline with typed contracts and trace output", async () => {
     },
   });
 
-  const pipeline = new Pipeline("research-and-write");
-
-  pipeline.addTask(
-    llmTask({
+  const pipeline = new Pipeline("research-and-write")
+    .addLLMTask({
       id: "research",
       provider,
       model: "fake-model",
@@ -67,13 +65,10 @@ test("runs an LLM pipeline with typed contracts and trace output", async () => {
         sources: z.array(z.string()),
       }),
       prompt: () => "research:space elevators",
-    }),
-  );
-
-  pipeline.addTask(
-    llmTask({
+    })
+    .addLLMTask({
       id: "draft",
-      after: ["research"],
+      after: ["research"] as const,
       provider,
       model: "fake-model",
       output: z.object({
@@ -81,16 +76,13 @@ test("runs an LLM pipeline with typed contracts and trace output", async () => {
         claims: z.array(z.string()),
       }),
       prompt: ({ dependencyOutputs }) => {
-        const research = dependencyOutputs.research as { topics: string[] };
+        const research = dependencyOutputs.research;
         return `draft from ${research.topics.join(",")}`;
       },
-    }),
-  );
-
-  pipeline.addTask(
-    llmTask({
+    })
+    .addLLMTask({
       id: "verify",
-      after: ["draft"],
+      after: ["draft"] as const,
       provider,
       model: "fake-model",
       output: z.object({
@@ -98,11 +90,10 @@ test("runs an LLM pipeline with typed contracts and trace output", async () => {
         issues: z.array(z.string()),
       }),
       prompt: ({ dependencyOutputs }) => {
-        const draft = dependencyOutputs.draft as { claims: string[] };
+        const draft = dependencyOutputs.draft;
         return `verify claims count=${draft.claims.length}`;
       },
-    }),
-  );
+    });
 
   const trace = await pipeline.run();
 

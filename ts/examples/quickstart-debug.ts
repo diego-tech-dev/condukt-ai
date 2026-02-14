@@ -8,7 +8,6 @@ import {
   type LLMJsonRequest,
   type LLMJsonResponse,
   type LLMProvider,
-  llmTask,
 } from "../src/index.js";
 
 type DemoModel = "demo-model";
@@ -74,10 +73,8 @@ async function main(): Promise<void> {
   const broken = process.argv.includes("--broken");
   const provider = new DemoProvider(broken);
 
-  const pipeline = new Pipeline("quickstart-research-write");
-
-  pipeline.addTask(
-    llmTask({
+  const pipeline = new Pipeline("quickstart-research-write")
+    .addLLMTask({
       id: "research",
       provider,
       model: "demo-model",
@@ -86,13 +83,10 @@ async function main(): Promise<void> {
         sources: z.array(z.string()),
       }),
       prompt: () => "research:reusable-launch-vehicles",
-    }),
-  );
-
-  pipeline.addTask(
-    llmTask({
+    })
+    .addLLMTask({
       id: "draft",
-      after: ["research"],
+      after: ["research"] as const,
       provider,
       model: "demo-model",
       output: z.object({
@@ -100,16 +94,13 @@ async function main(): Promise<void> {
         claims: z.array(z.string()),
       }),
       prompt: ({ dependencyOutputs }) => {
-        const research = dependencyOutputs.research as { topics: string[] };
+        const research = dependencyOutputs.research;
         return `draft:${research.topics.join(",")}`;
       },
-    }),
-  );
-
-  pipeline.addTask(
-    llmTask({
+    })
+    .addLLMTask({
       id: "verify",
-      after: ["draft"],
+      after: ["draft"] as const,
       provider,
       model: "demo-model",
       output: z.object({
@@ -117,11 +108,10 @@ async function main(): Promise<void> {
         issues: z.array(z.string()),
       }),
       prompt: ({ dependencyOutputs }) => {
-        const draft = dependencyOutputs.draft as { claims: string[] };
+        const draft = dependencyOutputs.draft;
         return `verify:${draft.claims.length}`;
       },
-    }),
-  );
+    });
 
   const trace = await pipeline.run();
   const outputPath = resolve(process.cwd(), "trace.quickstart.json");

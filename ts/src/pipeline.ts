@@ -16,10 +16,21 @@ export interface TaskRetryPolicy {
   readonly retryIf?: "error" | "execution_error" | "contract_violation";
 }
 
-export interface TaskRuntimeContext {
-  readonly outputs: Readonly<Record<string, unknown>>;
+type TaskOutputMap = Record<string, unknown>;
+type TaskOutputKey<TOutputs extends TaskOutputMap> = Extract<keyof TOutputs, string>;
+type MergeTaskOutputs<
+  TOutputs extends TaskOutputMap,
+  TTaskId extends string,
+  TOutput,
+> = Omit<TOutputs, TTaskId> & Record<TTaskId, TOutput>;
+
+export interface TaskRuntimeContext<
+  TOutputs extends TaskOutputMap = TaskOutputMap,
+  TDependencies extends readonly TaskOutputKey<TOutputs>[] = readonly TaskOutputKey<TOutputs>[],
+> {
+  readonly outputs: Readonly<TOutputs>;
   readonly taskResults: Readonly<Record<string, TaskTrace>>;
-  readonly dependencyOutputs: Readonly<Record<string, unknown>>;
+  readonly dependencyOutputs: Readonly<Pick<TOutputs, TDependencies[number]>>;
 }
 
 export interface TaskExecutionResult {
@@ -29,13 +40,18 @@ export interface TaskExecutionResult {
   readonly meta?: Record<string, unknown>;
 }
 
-export interface TaskDefinition<TOutput = unknown> {
-  readonly id: string;
+export interface TaskDefinition<
+  TOutput = unknown,
+  TOutputs extends TaskOutputMap = TaskOutputMap,
+  TDependencies extends readonly TaskOutputKey<TOutputs>[] = readonly TaskOutputKey<TOutputs>[],
+  TTaskId extends string = string,
+> {
+  readonly id: TTaskId;
   readonly description?: string;
-  readonly after?: readonly string[];
+  readonly after?: TDependencies;
   readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
-  run(context: TaskRuntimeContext): Promise<TaskExecutionResult>;
+  run(context: TaskRuntimeContext<TOutputs, TDependencies>): Promise<TaskExecutionResult>;
 }
 
 export interface TaskAttemptTrace {
@@ -99,16 +115,21 @@ export type LLMTaskDefinition<
   TModel extends string = string,
   TSettingsByModel extends Record<TModel, object> = Record<TModel, Record<string, never>>,
   TSelectedModel extends TModel = TModel,
+  TOutputs extends TaskOutputMap = TaskOutputMap,
+  TDependencies extends readonly TaskOutputKey<TOutputs>[] = readonly TaskOutputKey<TOutputs>[],
+  TTaskId extends string = string,
 > = {
-  readonly id: string;
+  readonly id: TTaskId;
   readonly description?: string;
-  readonly after?: readonly string[];
+  readonly after?: TDependencies;
   readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
   readonly provider: LLMProvider<TModel, TSettingsByModel>;
   readonly model: TSelectedModel;
-  readonly prompt: (context: TaskRuntimeContext) => string | Promise<string>;
-  readonly system?: string | ((context: TaskRuntimeContext) => string | Promise<string>);
+  readonly prompt: (context: TaskRuntimeContext<TOutputs, TDependencies>) => string | Promise<string>;
+  readonly system?:
+    | string
+    | ((context: TaskRuntimeContext<TOutputs, TDependencies>) => string | Promise<string>);
 } & LLMTaskModelSettingsField<TSettingsByModel[TSelectedModel]>;
 
 export function llmTask<
@@ -116,9 +137,20 @@ export function llmTask<
   TModel extends string,
   TSettingsByModel extends Record<TModel, object>,
   TSelectedModel extends TModel,
+  TOutputs extends TaskOutputMap,
+  TDependencies extends readonly TaskOutputKey<TOutputs>[],
+  TTaskId extends string,
 >(
-  definition: LLMTaskDefinition<TOutput, TModel, TSettingsByModel, TSelectedModel>,
-): TaskDefinition<TOutput> {
+  definition: LLMTaskDefinition<
+    TOutput,
+    TModel,
+    TSettingsByModel,
+    TSelectedModel,
+    TOutputs,
+    TDependencies,
+    TTaskId
+  >,
+): TaskDefinition<TOutput, TOutputs, TDependencies, TTaskId> {
   return {
     id: definition.id,
     description: definition.description,
@@ -160,17 +192,46 @@ export function llmTask<
   };
 }
 
-export class Pipeline {
-  private readonly tasksById = new Map<string, TaskDefinition>();
+type RuntimeTaskDefinition = TaskDefinition<unknown, TaskOutputMap, readonly string[], string>;
+
+export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
+  private readonly tasksById = new Map<string, RuntimeTaskDefinition>();
 
   constructor(public readonly name: string) {}
 
-  addTask(task: TaskDefinition): this {
+  addTask<
+    TOutput,
+    TDependencies extends readonly TaskOutputKey<TOutputs>[],
+    TTaskId extends string,
+  >(
+    task: TaskDefinition<TOutput, TOutputs, TDependencies, TTaskId>,
+  ): Pipeline<MergeTaskOutputs<TOutputs, TTaskId, TOutput>> {
     if (this.tasksById.has(task.id)) {
       throw new Error(`duplicate task id '${task.id}'`);
     }
-    this.tasksById.set(task.id, task);
-    return this;
+    this.tasksById.set(task.id, task as unknown as RuntimeTaskDefinition);
+    return this as unknown as Pipeline<MergeTaskOutputs<TOutputs, TTaskId, TOutput>>;
+  }
+
+  addLLMTask<
+    TOutput,
+    TModel extends string,
+    TSettingsByModel extends Record<TModel, object>,
+    TSelectedModel extends TModel,
+    TDependencies extends readonly TaskOutputKey<TOutputs>[],
+    TTaskId extends string,
+  >(
+    definition: LLMTaskDefinition<
+      TOutput,
+      TModel,
+      TSettingsByModel,
+      TSelectedModel,
+      TOutputs,
+      TDependencies,
+      TTaskId
+    >,
+  ): Pipeline<MergeTaskOutputs<TOutputs, TTaskId, TOutput>> {
+    return this.addTask(llmTask(definition));
   }
 
   async run(): Promise<PipelineTrace> {
