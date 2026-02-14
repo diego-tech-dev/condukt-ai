@@ -930,6 +930,9 @@ def _normalize_trace(trace: dict) -> dict:
         task["finished_at"] = "<ts>"
         provenance = task.get("provenance", {})
         if isinstance(provenance, dict):
+            worker = provenance.get("worker")
+            if isinstance(worker, str):
+                provenance["worker"] = _normalize_worker_path(worker)
             if "command" in provenance:
                 provenance["command"] = "<cmd>"
             if "stdout_sha256" in provenance:
@@ -943,6 +946,15 @@ def _normalize_trace(trace: dict) -> dict:
                         if "finished_at" in attempt:
                             attempt["finished_at"] = "<ts>"
     return normalized
+
+
+def _normalize_worker_path(worker_path: str) -> str:
+    normalized = worker_path.replace("\\", "/")
+    marker = "/workers/"
+    marker_index = normalized.rfind(marker)
+    if marker_index >= 0:
+        return normalized[marker_index + 1 :]
+    return Path(normalized).name
 
 
 if __name__ == "__main__":

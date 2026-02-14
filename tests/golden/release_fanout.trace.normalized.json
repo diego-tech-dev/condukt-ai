@@ -43,7 +43,7 @@
       "started_at": "<ts>",
       "finished_at": "<ts>",
       "provenance": {
-        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/condukt-ai/workers/lint.py",
+        "worker": "workers/lint.py",
         "command": "<cmd>",
         "return_code": 0,
         "stdout_sha256": "<sha256>",
@@ -64,7 +64,7 @@
       "started_at": "<ts>",
       "finished_at": "<ts>",
       "provenance": {
-        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/condukt-ai/workers/test_suite.py",
+        "worker": "workers/test_suite.py",
         "command": "<cmd>",
         "return_code": 0,
         "stdout_sha256": "<sha256>",
@@ -86,7 +86,7 @@
       "started_at": "<ts>",
       "finished_at": "<ts>",
       "provenance": {
-        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/condukt-ai/workers/security_scan.py",
+        "worker": "workers/security_scan.py",
         "command": "<cmd>",
         "return_code": 0,
         "stdout_sha256": "<sha256>",
@@ -108,7 +108,7 @@
       "started_at": "<ts>",
       "finished_at": "<ts>",
       "provenance": {
-        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/condukt-ai/workers/deploy_prod.py",
+        "worker": "workers/deploy_prod.py",
         "command": "<cmd>",
         "return_code": 0,
         "stdout_sha256": "<sha256>",

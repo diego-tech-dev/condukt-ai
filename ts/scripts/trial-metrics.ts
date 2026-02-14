@@ -15,66 +15,92 @@ import {
   type TrialQualityGateResult,
   type TrialRecord,
   type TrialSession,
+  type TrialSummary,
 } from "../src/trials.js";
 
 const DEFAULT_TRIAL_DATA = "trials/diagnosis-metrics.jsonl";
 const DEFAULT_SESSION_DIR = "trials/sessions";
 
-async function main(): Promise<void> {
-  const [, , command, ...rest] = process.argv;
-  const args = parseArgs(rest);
+type TrialCommand = "start" | "finish" | "report";
+type FlagValue = string | true;
 
-  if (command === "start") {
-    await runStart(args);
-    return;
-  }
+type FlagMap = ReadonlyMap<string, FlagValue>;
 
-  if (command === "finish") {
-    await runFinish(args);
-    return;
-  }
-
-  if (command === "report") {
-    await runReport(args);
-    return;
-  }
-
-  printUsage();
-  process.exitCode = 1;
+interface ParsedCommand {
+  readonly command: TrialCommand;
+  readonly flags: Map<string, FlagValue>;
 }
 
-async function runStart(args: Map<string, string>): Promise<void> {
-  const participant = requiredArg(args, "participant");
-  const scenario = requiredArg(args, "scenario");
-  const rawMode = requiredArg(args, "mode");
-  const mode = normalizeTrialMode(rawMode) as TrialMode;
-  if (rawMode === "condukt") {
+interface StartOptions {
+  readonly participant: string;
+  readonly scenario: string;
+  readonly mode: TrialMode;
+  readonly rawMode: string;
+  readonly tracePath?: string;
+  readonly expectedTask?: string;
+  readonly expectedErrorCode?: string;
+  readonly expectedContractPaths: readonly string[];
+  readonly sessionOut?: string;
+}
+
+interface FinishOptions {
+  readonly sessionPath: string;
+  readonly outPath: string;
+  readonly diagnosedTask?: string;
+  readonly diagnosedErrorCode?: string;
+  readonly notes?: string;
+}
+
+interface ReportOptions {
+  readonly inputPath: string;
+  readonly json: boolean;
+  readonly markdownOut?: string;
+  readonly title?: string;
+  readonly maxPairs?: number;
+  readonly gate: TrialQualityGate;
+}
+
+async function main(): Promise<void> {
+  const parsed = parseCommand(process.argv.slice(2));
+
+  if (parsed.command === "start") {
+    await runStart(parseStartOptions(parsed.flags));
+    return;
+  }
+
+  if (parsed.command === "finish") {
+    await runFinish(parseFinishOptions(parsed.flags));
+    return;
+  }
+
+  await runReport(parseReportOptions(parsed.flags));
+}
+
+async function runStart(options: StartOptions): Promise<void> {
+  if (options.rawMode === "condukt") {
     console.log("Mode alias 'condukt' is deprecated; normalized to 'condukt-ai'.");
   }
 
-  const tracePath = args.get("trace");
-  const trace = tracePath ? await readJson<PipelineTrace>(tracePath) : undefined;
+  const trace = options.tracePath
+    ? await readJson<PipelineTrace>(resolve(process.cwd(), options.tracePath))
+    : undefined;
 
   const session = createTrialSession({
-    participant,
-    scenario,
-    mode,
+    participant: options.participant,
+    scenario: options.scenario,
+    mode: options.mode,
     trace,
     expected: {
-      task: args.get("expected-task"),
-      error_code: args.get("expected-error-code"),
-      contract_paths: splitList(args.get("expected-contract-paths")),
+      task: options.expectedTask,
+      error_code: options.expectedErrorCode,
+      contract_paths: options.expectedContractPaths,
     },
   });
 
-  const explicitOut = args.get("session-out");
-  const outputPath = explicitOut
-    ? resolve(process.cwd(), explicitOut)
-    : resolve(
-        process.cwd(),
-        DEFAULT_SESSION_DIR,
-        `${session.session_id}.session.json`,
-      );
+  const outputPath = options.sessionOut
+    ? resolve(process.cwd(), options.sessionOut)
+    : resolve(process.cwd(), DEFAULT_SESSION_DIR, `${session.session_id}.session.json`);
+
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, `${JSON.stringify(session, null, 2)}\n`, "utf-8");
 
@@ -84,20 +110,18 @@ async function runStart(args: Map<string, string>): Promise<void> {
   console.log(`Expected error code: ${session.expected.error_code ?? "<unspecified>"}`);
 }
 
-async function runFinish(args: Map<string, string>): Promise<void> {
-  const sessionPath = requiredArg(args, "session");
-  const outputPath = resolve(process.cwd(), args.get("out") ?? DEFAULT_TRIAL_DATA);
-
-  const session = await readJson<TrialSession>(sessionPath);
+async function runFinish(options: FinishOptions): Promise<void> {
+  const session = await readJson<TrialSession>(resolve(process.cwd(), options.sessionPath));
   const record = completeTrialSession({
     session,
     diagnosed: {
-      task: args.get("diagnosed-task"),
-      error_code: args.get("diagnosed-error-code"),
+      task: options.diagnosedTask,
+      error_code: options.diagnosedErrorCode,
     },
-    notes: args.get("notes"),
+    notes: options.notes,
   });
 
+  const outputPath = resolve(process.cwd(), options.outPath);
   await mkdir(dirname(outputPath), { recursive: true });
   await appendFile(outputPath, `${JSON.stringify(record)}\n`, "utf-8");
 
@@ -107,24 +131,23 @@ async function runFinish(args: Map<string, string>): Promise<void> {
   console.log(`Metrics file: ${outputPath}`);
 }
 
-async function runReport(args: Map<string, string>): Promise<void> {
-  const inputPath = resolve(process.cwd(), args.get("input") ?? DEFAULT_TRIAL_DATA);
+async function runReport(options: ReportOptions): Promise<void> {
+  const inputPath = resolve(process.cwd(), options.inputPath);
   const records = await readAndNormalizeTrialRecords(inputPath);
   const summary = summarizeTrialRecords(records);
-  const gate = parseTrialQualityGate(args);
-  const hasGate = hasGateConfiguration(gate);
-  const gateResult = hasGate ? evaluateTrialSummary(summary, gate) : undefined;
+  const hasGate = hasGateConfiguration(options.gate);
+  const gateResult = hasGate ? evaluateTrialSummary(summary, options.gate) : undefined;
 
-  await maybeWriteMarkdownReport(args, summary, gateResult);
+  await maybeWriteMarkdownReport(options, summary, gateResult);
 
-  if (args.has("json")) {
+  if (options.json) {
     if (hasGate) {
       console.log(
         JSON.stringify(
           {
             summary,
             gate: {
-              config: gate,
+              config: options.gate,
               result: gateResult ?? { pass: true, failures: [] },
             },
           },
@@ -172,42 +195,175 @@ async function runReport(args: Map<string, string>): Promise<void> {
   }
 }
 
-function parseArgs(args: readonly string[]): Map<string, string> {
-  const parsed = new Map<string, string>();
-  for (let index = 0; index < args.length; index += 1) {
-    const token = args[index];
-    if (!token?.startsWith("--")) {
-      continue;
+function parseCommand(argv: readonly string[]): ParsedCommand {
+  const commandToken = argv[0];
+  if (!commandToken || !isTrialCommand(commandToken)) {
+    printUsage();
+    throw new Error("missing command (expected: start, finish, report)");
+  }
+
+  const flags = parseFlags(argv.slice(1));
+  validateFlagsForCommand(commandToken, flags);
+  return {
+    command: commandToken,
+    flags,
+  };
+}
+
+function isTrialCommand(value: string): value is TrialCommand {
+  return value === "start" || value === "finish" || value === "report";
+}
+
+function parseFlags(tokens: readonly string[]): Map<string, FlagValue> {
+  const parsed = new Map<string, FlagValue>();
+
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    if (!token.startsWith("--")) {
+      throw new Error(`unexpected argument: ${token}`);
     }
 
     const key = token.slice(2);
-    const value = args[index + 1];
-    if (!value || value.startsWith("--")) {
-      parsed.set(key, "true");
+    if (!key) {
+      throw new Error("empty flag name is not allowed");
+    }
+
+    if (parsed.has(key)) {
+      throw new Error(`duplicate flag: --${key}`);
+    }
+
+    const nextToken = tokens[index + 1];
+    if (!nextToken || nextToken.startsWith("--")) {
+      parsed.set(key, true);
       continue;
     }
 
-    parsed.set(key, value);
+    parsed.set(key, nextToken);
     index += 1;
   }
+
   return parsed;
 }
 
-function requiredArg(args: Map<string, string>, key: string): string {
-  const value = args.get(key);
+function validateFlagsForCommand(command: TrialCommand, flags: FlagMap): void {
+  const allowedByCommand: Record<TrialCommand, readonly string[]> = {
+    start: [
+      "participant",
+      "scenario",
+      "mode",
+      "trace",
+      "expected-task",
+      "expected-error-code",
+      "expected-contract-paths",
+      "session-out",
+    ],
+    finish: ["session", "diagnosed-task", "diagnosed-error-code", "out", "notes"],
+    report: [
+      "input",
+      "json",
+      "markdown-out",
+      "title",
+      "max-pairs",
+      "min-records",
+      "min-accuracy",
+      "min-pairs",
+      "min-speedup",
+    ],
+  };
+
+  const allowed = new Set(allowedByCommand[command]);
+  for (const key of flags.keys()) {
+    if (!allowed.has(key)) {
+      throw new Error(`unknown --${key} for '${command}' command`);
+    }
+  }
+}
+
+function parseStartOptions(flags: FlagMap): StartOptions {
+  const rawMode = requiredStringFlag(flags, "mode");
+
+  return {
+    participant: requiredStringFlag(flags, "participant"),
+    scenario: requiredStringFlag(flags, "scenario"),
+    mode: normalizeTrialMode(rawMode),
+    rawMode,
+    tracePath: optionalStringFlag(flags, "trace"),
+    expectedTask: optionalStringFlag(flags, "expected-task"),
+    expectedErrorCode: optionalStringFlag(flags, "expected-error-code"),
+    expectedContractPaths: splitList(optionalStringFlag(flags, "expected-contract-paths")),
+    sessionOut: optionalStringFlag(flags, "session-out"),
+  };
+}
+
+function parseFinishOptions(flags: FlagMap): FinishOptions {
+  return {
+    sessionPath: requiredStringFlag(flags, "session"),
+    outPath: optionalStringFlag(flags, "out") ?? DEFAULT_TRIAL_DATA,
+    diagnosedTask: optionalStringFlag(flags, "diagnosed-task"),
+    diagnosedErrorCode: optionalStringFlag(flags, "diagnosed-error-code"),
+    notes: optionalStringFlag(flags, "notes"),
+  };
+}
+
+function parseReportOptions(flags: FlagMap): ReportOptions {
+  return {
+    inputPath: optionalStringFlag(flags, "input") ?? DEFAULT_TRIAL_DATA,
+    json: booleanFlag(flags, "json"),
+    markdownOut: optionalStringFlag(flags, "markdown-out"),
+    title: optionalStringFlag(flags, "title"),
+    maxPairs: parseOptionalInt(optionalStringFlag(flags, "max-pairs"), "max-pairs"),
+    gate: {
+      min_records: parseOptionalInt(optionalStringFlag(flags, "min-records"), "min-records"),
+      min_accuracy: parseOptionalRatio(
+        optionalStringFlag(flags, "min-accuracy"),
+        "min-accuracy",
+      ),
+      min_pairs: parseOptionalInt(optionalStringFlag(flags, "min-pairs"), "min-pairs"),
+      min_paired_speedup: parseOptionalFloat(
+        optionalStringFlag(flags, "min-speedup"),
+        "min-speedup",
+      ),
+    },
+  };
+}
+
+function requiredStringFlag(flags: FlagMap, key: string): string {
+  const value = optionalStringFlag(flags, key);
   if (!value) {
     throw new Error(`missing --${key}`);
   }
   return value;
 }
 
-function parseTrialQualityGate(args: Map<string, string>): TrialQualityGate {
-  return {
-    min_records: parseOptionalInt(args.get("min-records"), "min-records"),
-    min_accuracy: parseOptionalRatio(args.get("min-accuracy"), "min-accuracy"),
-    min_pairs: parseOptionalInt(args.get("min-pairs"), "min-pairs"),
-    min_paired_speedup: parseOptionalFloat(args.get("min-speedup"), "min-speedup"),
-  };
+function optionalStringFlag(flags: FlagMap, key: string): string | undefined {
+  const value = flags.get(key);
+  if (typeof value === "undefined") {
+    return undefined;
+  }
+
+  if (value === true) {
+    throw new Error(`missing value for --${key}`);
+  }
+
+  const normalized = value.trim();
+  if (!normalized) {
+    throw new Error(`empty value for --${key}`);
+  }
+
+  return normalized;
+}
+
+function booleanFlag(flags: FlagMap, key: string): boolean {
+  const value = flags.get(key);
+  if (typeof value === "undefined") {
+    return false;
+  }
+
+  if (value !== true) {
+    throw new Error(`--${key} does not accept a value`);
+  }
+
+  return true;
 }
 
 function hasGateConfiguration(gate: TrialQualityGate): boolean {
@@ -264,7 +420,7 @@ function splitList(value: string | undefined): readonly string[] {
 }
 
 async function readJson<T>(path: string): Promise<T> {
-  const content = await readFile(resolve(process.cwd(), path), "utf-8");
+  const content = await readFile(path, "utf-8");
   return JSON.parse(content) as T;
 }
 
@@ -290,21 +446,17 @@ async function readAndNormalizeTrialRecords(path: string): Promise<TrialRecord[]
 }
 
 async function maybeWriteMarkdownReport(
-  args: Map<string, string>,
-  summary: ReturnType<typeof summarizeTrialRecords>,
+  options: ReportOptions,
+  summary: TrialSummary,
   gateResult: TrialQualityGateResult | undefined,
 ): Promise<void> {
-  const markdownOut = args.get("markdown-out");
-  if (!markdownOut) {
+  if (!options.markdownOut) {
     return;
   }
 
-  const maxPairs = parseOptionalInt(args.get("max-pairs"), "max-pairs");
-  const title = args.get("title")?.trim();
-
   let markdown = renderTrialSummaryMarkdown(summary, {
-    ...(title ? { title } : {}),
-    ...(typeof maxPairs === "number" ? { max_pairs: maxPairs } : {}),
+    ...(options.title ? { title: options.title } : {}),
+    ...(typeof options.maxPairs === "number" ? { max_pairs: options.maxPairs } : {}),
   });
 
   if (gateResult) {
@@ -318,7 +470,7 @@ async function maybeWriteMarkdownReport(
     }
   }
 
-  const outputPath = resolve(process.cwd(), markdownOut);
+  const outputPath = resolve(process.cwd(), options.markdownOut);
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, markdown, "utf-8");
   console.log(`Markdown report: ${outputPath}`);
@@ -326,7 +478,7 @@ async function maybeWriteMarkdownReport(
 
 function printUsage(): void {
   console.log(
-      "Usage:\n" +
+    "Usage:\n" +
       "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt-ai|condukt|baseline> [--trace <trace.json>]\n" +
       "  trial-metrics.ts finish --session <session.json> [--diagnosed-task <id>] [--diagnosed-error-code <code>] [--out <metrics.jsonl>]\n" +
       "  trial-metrics.ts report [--input <metrics.jsonl>] [--json] [--markdown-out <file.md>] [--title <text>] [--max-pairs <int>] [--min-records <int>] [--min-accuracy <0..1>] [--min-pairs <int>] [--min-speedup <number>]",
@@ -334,6 +486,7 @@ function printUsage(): void {
 }
 
 main().catch((error) => {
+  printUsage();
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;
 });

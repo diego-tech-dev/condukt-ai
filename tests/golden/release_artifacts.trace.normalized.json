@@ -39,7 +39,7 @@
       "started_at": "<ts>",
       "finished_at": "<ts>",
       "provenance": {
-        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/condukt-ai/workers/test_suite.py",
+        "worker": "workers/test_suite.py",
         "command": "<cmd>",
         "return_code": 0,
         "stdout_sha256": "<sha256>",
@@ -63,7 +63,7 @@
       "started_at": "<ts>",
       "finished_at": "<ts>",
       "provenance": {
-        "worker": "/Users/diego.garciabrisa/Desktop/Projects/personal/condukt-ai/workers/publish_release.py",
+        "worker": "workers/publish_release.py",
         "command": "<cmd>",
         "return_code": 0,
         "stdout_sha256": "<sha256>",

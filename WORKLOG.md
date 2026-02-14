@@ -214,3 +214,18 @@ Notes:
 - Added strict trial-record input normalization for report ingestion with line-numbered validation errors.
 - Added release identity validator (`ts/src/release_identity.ts`) and CLI guard (`pnpm release:guard`).
 - Integrated release identity guard into `pnpm release:check` and added TS guard unit tests.
+
+### Sprint: Trial refactor run
+
+Status: completed
+
+Milestone status:
+- `J1` Trial module split (`types`/`normalization`/`session`/`summary`): completed
+- `J2` Strict command-scoped parsing and validation in `trial-metrics` CLI: completed
+- `J3` Path-agnostic trace goldens + CLI integration coverage: completed
+
+Notes:
+- Split `ts/src/trials.ts` into focused modules under `ts/src/trials/` while preserving public API exports.
+- Hardened `ts/scripts/trial-metrics.ts` parser with explicit command/flag validation, typed option parsing, and early failures for malformed flags.
+- Added end-to-end CLI integration coverage in `ts/test/trial-metrics-cli.test.ts` for `start`/`finish`/`report` workflow plus boolean-flag validation.
+- Normalized golden trace worker provenance to `workers/<file>` and updated Python trace normalization to remove machine-specific path prefixes.

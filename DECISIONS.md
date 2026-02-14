@@ -323,3 +323,17 @@ Status: accepted
 Decision: enforce a release identity guard for `condukt-ai` metadata and docs before packaging.
 Rationale: rename regressions are easy to miss across docs and package metadata; automated guardrails reduce publish risk.
 Consequences: added `pnpm release:guard` and integrated it into `pnpm release:check`, with failing checks for legacy-name drift.
+
+## 2026-02-14
+
+Status: accepted
+Decision: split trial instrumentation into focused modules and enforce strict command-scoped trial CLI flag parsing.
+Rationale: the single trial module and permissive flag parsing were growing brittle as trial features expanded, making it harder to evolve safely.
+Consequences: trial logic now lives in dedicated modules (`types`, `normalization`, `session`, `summary`), CLI rejects unknown/malformed flags early, and trial report ingestion remains backward-compatible via explicit mode normalization.
+
+## 2026-02-14
+
+Status: accepted
+Decision: normalize worker provenance paths in golden trace comparisons.
+Rationale: absolute local workspace paths created false golden diffs when repos were moved or renamed.
+Consequences: golden traces now store `workers/<file>` paths and end-to-end normalization strips machine-specific prefixes before comparison.

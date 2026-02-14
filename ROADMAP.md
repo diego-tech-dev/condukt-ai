@@ -116,3 +116,11 @@ Status: completed
 1. `I1` Align package/repo/docs identity to `condukt-ai`: completed
 2. `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: completed
 3. `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): completed
+
+## Trial Refactor Sprint (Autonomous)
+
+Status: completed
+
+1. `J1` Trial module split (`types`/`normalization`/`session`/`summary`): completed
+2. `J2` Strict command-scoped parsing and validation in `trial-metrics` CLI: completed
+3. `J3` Path-agnostic trace goldens + CLI integration coverage: completed
