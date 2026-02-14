@@ -74,7 +74,7 @@ def parse_file(path: str | Path) -> Program:
     if file_path.suffix.lower() != ".mgl":
         raise ParseError(
             f"{file_path}: unsupported extension '{file_path.suffix}'. "
-            "MissionGraph programs must use .mgl files"
+            "Condukt programs must use .mgl files"
         )
     text = file_path.read_text(encoding="utf-8")
     program = parse_program(text, source=str(file_path))

@@ -8,12 +8,12 @@ import unittest
 from pathlib import Path
 from typing import Any
 
-from missiongraph.spec import AST_VERSION, TRACE_VERSION
+from condukt.spec import AST_VERSION, TRACE_VERSION
 
 
 ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = ROOT / "tests" / "golden"
-RUST_MANIFEST = ROOT / "rust" / "missiongraph-rs" / "Cargo.toml"
+RUST_MANIFEST = ROOT / "rust" / "condukt-rs" / "Cargo.toml"
 GOLDEN_CASES = [
     "ship_release",
     "release_artifacts",

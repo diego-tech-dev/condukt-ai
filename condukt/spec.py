@@ -1,4 +1,4 @@
-"""Stable version and error-code constants for MissionGraph contracts."""
+"""Stable version and error-code constants for Condukt contracts."""
 
 from __future__ import annotations
 

@@ -7,11 +7,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from missiongraph.spec import AST_VERSION
+from condukt.spec import AST_VERSION
 
 
 ROOT = Path(__file__).resolve().parent.parent
-RUST_MANIFEST = ROOT / "rust" / "missiongraph-rs" / "Cargo.toml"
+RUST_MANIFEST = ROOT / "rust" / "condukt-rs" / "Cargo.toml"
 
 
 @unittest.skipUnless(shutil.which("cargo"), "cargo is required for rust CLI tests")

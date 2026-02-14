@@ -13,9 +13,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from missiongraph.parser import parse_file
-from missiongraph.serialization import program_to_ast
-from missiongraph.spec import AST_VERSION, TRACE_VERSION
+from condukt.parser import parse_file
+from condukt.serialization import program_to_ast
+from condukt.spec import AST_VERSION, TRACE_VERSION
 
 
 DEFAULT_PROGRAMS = [
@@ -28,7 +28,7 @@ DEFAULT_PROGRAMS = [
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run MissionGraph Python/Rust contract conformance checks."
+        description="Run Condukt Python/Rust contract conformance checks."
     )
     parser.add_argument(
         "--program",
@@ -39,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--rust-manifest",
         type=str,
-        default="rust/missiongraph-rs/Cargo.toml",
+        default="rust/condukt-rs/Cargo.toml",
         help="Path to rust bootstrap Cargo.toml",
     )
     parser.add_argument(
@@ -163,7 +163,7 @@ def run_case(
     with tempfile.NamedTemporaryFile(
         mode="w",
         suffix=".ast.json",
-        prefix="missiongraph-",
+        prefix="condukt-",
         encoding="utf-8",
         delete=False,
     ) as handle:

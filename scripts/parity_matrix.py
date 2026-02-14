@@ -19,7 +19,7 @@ FEATURE_BY_STEM = {
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Build cross-runtime parity matrix from MissionGraph conformance checks."
+        description="Build cross-runtime parity matrix from Condukt conformance checks."
     )
     parser.add_argument(
         "--program",
@@ -30,7 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--rust-manifest",
         type=str,
-        default="rust/missiongraph-rs/Cargo.toml",
+        default="rust/condukt-rs/Cargo.toml",
         help="Path to rust bootstrap Cargo.toml",
     )
     parser.add_argument(

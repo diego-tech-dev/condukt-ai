@@ -1,4 +1,4 @@
-"""MissionGraph prototype package."""
+"""Condukt prototype package."""
 
 from .executor import execute_program
 from .parser import parse_file, parse_program

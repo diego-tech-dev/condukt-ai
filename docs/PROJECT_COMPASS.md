@@ -1,6 +1,6 @@
-# MissionGraph Project Compass
+# Condukt Project Compass
 
-This document is the durable context for MissionGraph. It is the first file to read when resuming work.
+This document is the durable context for Condukt. It is the first file to read when resuming work.
 
 Companion docs:
 - `AGENTS.md` for agent entrypoint and execution workflow.
@@ -10,7 +10,7 @@ Companion docs:
 
 ## Purpose
 
-MissionGraph is an intent-first orchestration language for agents.
+Condukt is an intent-first orchestration language for agents.
 
 It exists to make multi-agent work:
 - explicit (`goal`, `constraints`, `plan`, `contracts`, `verify`)
@@ -49,19 +49,19 @@ These should not be changed without a deliberate version bump:
 - `.mgl` is the only accepted program extension.
 - `spec/ast-v1.schema.json` is the AST contract.
 - `spec/trace-v1.schema.json` is the trace contract.
-- Error codes in `missiongraph/spec.py` are stable API surface.
+- Error codes in `condukt/spec.py` are stable API surface.
 - Golden outputs in `tests/golden/` define expected behavior.
 
 ## Architecture Snapshot
 
-- Parser: `missiongraph/parser.py`
-- AST serializer: `missiongraph/serialization.py`
-- Planner: `missiongraph/planner.py`
-- Executor: `missiongraph/executor.py`
-- CLI: `missiongraph/cli.py`
+- Parser: `condukt/parser.py`
+- AST serializer: `condukt/serialization.py`
+- Planner: `condukt/planner.py`
+- Executor: `condukt/executor.py`
+- CLI: `condukt/cli.py`
 - TypeScript runtime: `ts/src/pipeline.ts`
 - TypeScript providers: `ts/src/providers.ts`
-- Spec constants: `missiongraph/spec.py`
+- Spec constants: `condukt/spec.py`
 - Schemas: `spec/ast-v1.schema.json`, `spec/trace-v1.schema.json`
 - Conformance tests: `tests/test_end_to_end.py`, `tests/golden/*`
 
@@ -80,7 +80,7 @@ Rules for safe migration:
 
 ### 2026-02-13
 
-- Language renamed to MissionGraph.
+- Language renamed to Condukt.
 - Primary extension set to `.mgl`.
 - Legacy compatibility surface removed (no `agentlang`, no `.apl`).
 - Added versioned contracts (`ast_version`, `trace_version`).
@@ -94,7 +94,7 @@ Rules for safe migration:
 - Added artifact-flow runnable example coverage (`examples/release_artifacts.mgl`).
 - Added typed artifact contracts (`artifact:type`) for `consumes`/`produces`.
 - Added retry policy controls (`retry_if`, jitter) in task execution policy.
-- Added Rust bootstrap runtime (`rust/missiongraph-rs`) for contract-level conformance checks.
+- Added Rust bootstrap runtime (`rust/condukt-rs`) for contract-level conformance checks.
 - Added deterministic retry seeding (`--retry-seed`) for reproducible retry behavior.
 - Added multi-runtime conformance harness (`scripts/conformance.py`).
 - Bumped v1 contracts to `ast_version = 1.1` and `trace_version = 1.1`.
@@ -128,8 +128,8 @@ When picking up work:
 3. Read `docs/LEARNINGS.md`.
 4. Run:
    - `python3 -m unittest discover -s tests -p "test_*.py"`
-   - `python3 -m missiongraph parse examples/ship_release.mgl`
-   - `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
+   - `python3 -m condukt parse examples/ship_release.mgl`
+   - `python3 -m condukt run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
    - `python3 scripts/conformance.py --json`
    - `python3 scripts/conformance.py --json --require-goldens`
    - `python3 scripts/parity_matrix.py --json`

@@ -1,4 +1,4 @@
-# MissionGraph Prototype
+# Condukt Prototype
 
 Minimal intent-first language prototype for agent orchestration.
 
@@ -84,7 +84,7 @@ verify {
 ## Run the demo
 
 ```bash
-python3 -m missiongraph run examples/ship_release.mgl \
+python3 -m condukt run examples/ship_release.mgl \
   --capability ci \
   --capability prod_access \
   --retry-seed 42 \
@@ -94,7 +94,7 @@ python3 -m missiongraph run examples/ship_release.mgl \
 Run fan-out demo with parallel execution:
 
 ```bash
-python3 -m missiongraph run examples/release_fanout.mgl \
+python3 -m condukt run examples/release_fanout.mgl \
   --capability ci \
   --capability prod_access \
   --max-parallel 8
@@ -103,7 +103,7 @@ python3 -m missiongraph run examples/release_fanout.mgl \
 Run resilient policy demo (timeouts + retries + backoff):
 
 ```bash
-python3 -m missiongraph run examples/release_resilient.mgl \
+python3 -m condukt run examples/release_resilient.mgl \
   --capability ci \
   --capability prod_access \
   --max-parallel 8
@@ -112,7 +112,7 @@ python3 -m missiongraph run examples/release_resilient.mgl \
 Run explicit artifact-flow demo (`produces`/`consumes`):
 
 ```bash
-python3 -m missiongraph run examples/release_artifacts.mgl \
+python3 -m condukt run examples/release_artifacts.mgl \
   --capability ci \
   --capability prod_access \
   --sequential
@@ -121,10 +121,10 @@ python3 -m missiongraph run examples/release_artifacts.mgl \
 Parse, inspect levels, and render graph:
 
 ```bash
-python3 -m missiongraph parse examples/ship_release.mgl
-python3 -m missiongraph validate examples/ship_release.mgl --capability ci --capability prod_access
-python3 -m missiongraph plan examples/ship_release.mgl --capability ci --capability prod_access
-python3 -m missiongraph graph examples/release_fanout.mgl
+python3 -m condukt parse examples/ship_release.mgl
+python3 -m condukt validate examples/ship_release.mgl --capability ci --capability prod_access
+python3 -m condukt plan examples/ship_release.mgl --capability ci --capability prod_access
+python3 -m condukt graph examples/release_fanout.mgl
 ```
 
 ## Worker contract
@@ -245,9 +245,9 @@ Plan output includes both flattened `task_order` and per-level structure.
 
 ## Portability contracts
 
-- Primary language name: `MissionGraph`
+- Primary language name: `Condukt`
 - Primary extension: `.mgl`
-- Preferred CLI: `mgl` (when installed) or `python3 -m missiongraph`
+- Preferred CLI: `mgl` (when installed) or `python3 -m condukt`
 - `parse_file` rejects non-`.mgl` extensions.
 - `parse` output includes `ast_version` for stable AST interoperability.
 - `run` output includes `trace_version` and normalized `error_code` fields.
@@ -257,14 +257,14 @@ Plan output includes both flattened `task_order` and per-level structure.
 
 ## Rust Bootstrap
 
-Rust bootstrap runtime is available at `rust/missiongraph-rs`.
+Rust bootstrap runtime is available at `rust/condukt-rs`.
 
 ```bash
-python3 -m missiongraph parse examples/ship_release.mgl > /tmp/ship_release.ast.json
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
+python3 -m condukt parse examples/ship_release.mgl > /tmp/ship_release.ast.json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
 ```
 
 ## Multi-Runtime Conformance

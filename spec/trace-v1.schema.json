@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://missiongraph.dev/spec/trace-v1.schema.json",
-  "title": "MissionGraph Trace v1",
+  "$id": "https://condukt.dev/spec/trace-v1.schema.json",
+  "title": "Condukt Trace v1",
   "type": "object",
   "additionalProperties": false,
   "required": [

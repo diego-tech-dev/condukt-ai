@@ -7,7 +7,7 @@ import sys
 import unittest
 from pathlib import Path
 
-from missiongraph.spec import AST_VERSION, TRACE_VERSION
+from condukt.spec import AST_VERSION, TRACE_VERSION
 
 
 ROOT = Path(__file__).resolve().parent.parent

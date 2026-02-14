@@ -1,6 +1,6 @@
-# MissionGraph Contract Versioning
+# Condukt Contract Versioning
 
-This document defines contract-version rules for MissionGraph AST/trace interoperability.
+This document defines contract-version rules for Condukt AST/trace interoperability.
 
 ## Current Contract Version
 
@@ -24,7 +24,7 @@ The schema file names (`ast-v1.schema.json`, `trace-v1.schema.json`) track the m
 - require major bump (`v2` schemas + new major contract version)
 
 3. Change discipline:
-- update `missiongraph/spec.py`
+- update `condukt/spec.py`
 - update JSON schema `const` values
 - update conformance tests/goldens
 - update Rust bootstrap constants

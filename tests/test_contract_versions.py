@@ -5,7 +5,7 @@ import re
 import unittest
 from pathlib import Path
 
-from missiongraph.spec import AST_VERSION, TRACE_VERSION
+from condukt.spec import AST_VERSION, TRACE_VERSION
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,7 +45,7 @@ class ContractVersionTests(unittest.TestCase):
             )
 
     def test_rust_bootstrap_constants_match_runtime_constants(self) -> None:
-        lib_rs = (ROOT / "rust" / "missiongraph-rs" / "src" / "lib.rs").read_text(
+        lib_rs = (ROOT / "rust" / "condukt-rs" / "src" / "lib.rs").read_text(
             encoding="utf-8"
         )
         ast_match = re.search(r'pub const AST_VERSION: &str = "([^"]+)";', lib_rs)

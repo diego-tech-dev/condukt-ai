@@ -1,6 +1,6 @@
 # DECISIONS.md
 
-Decision log for MissionGraph.
+Decision log for Condukt.
 
 Format:
 - `Date`
@@ -12,9 +12,9 @@ Format:
 ## 2026-02-13
 
 Status: accepted
-Decision: rename language and runtime project to MissionGraph.
+Decision: rename language and runtime project to Condukt.
 Rationale: align naming with mission orchestration + DAG semantics.
-Consequences: package name `missiongraph`, CLI `mgl`, docs/examples updated.
+Consequences: package name `condukt`, CLI `mgl`, docs/examples updated.
 
 ## 2026-02-13
 
@@ -112,7 +112,7 @@ Consequences: `with` supports `retry_if` and `jitter`; executor retries conditio
 Status: accepted
 Decision: bootstrap a Rust reference runtime focused on AST/trace contract conformance.
 Rationale: de-risk multi-runtime migration by validating shared contracts before full executor parity.
-Consequences: `rust/missiongraph-rs` provides AST checks and trace-skeleton emission against v1 contracts.
+Consequences: `rust/condukt-rs` provides AST checks and trace-skeleton emission against v1 contracts.
 
 ## 2026-02-13
 
@@ -166,7 +166,7 @@ Consequences: `mgl-rs run-task` executes one dependency-free task with JSON inpu
 ## 2026-02-14
 
 Status: accepted
-Decision: shape Rust `run-task` output to align with MissionGraph task-result fields.
+Decision: shape Rust `run-task` output to align with Condukt task-result fields.
 Rationale: migration confidence improves when Rust execution surfaces (`status`, `error_code`, `provenance`, timestamps) follow the same contract language as Python traces.
 Consequences: Rust run-task now emits normalized `error_code`, `started_at`, `finished_at`, and merged provenance defaults; non-zero exits map to `WORKER_EXIT_NONZERO`.
 
@@ -245,4 +245,4 @@ Consequences: added `pnpm quickstart` and `pnpm quickstart:broken`, plus `ts/doc
 Status: accepted
 Decision: name the TypeScript runtime package `condukt`.
 Rationale: short, searchable, and aligned with the orchestration/conduct metaphor while avoiding saturated `agent/flow/graph` naming patterns.
-Consequences: TS package metadata and docs now use `condukt`; broader project naming remains MissionGraph for current Python/Rust references.
+Consequences: TS package metadata and docs now use `condukt`; broader project naming remains Condukt for current Python/Rust references.

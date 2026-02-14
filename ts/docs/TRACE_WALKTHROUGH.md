@@ -50,4 +50,4 @@ The diagnosis path is deterministic:
 2. Read `error_code` and `contract_issues`.
 3. Fix that task boundary contract mismatch.
 
-This is the core MissionGraph TS value proposition: contract failures are explicit and traceable at the exact task boundary.
+This is the core Condukt TS value proposition: contract failures are explicit and traceable at the exact task boundary.

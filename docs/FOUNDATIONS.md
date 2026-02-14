@@ -1,4 +1,4 @@
-# MissionGraph Foundations
+# Condukt Foundations
 
 Last updated: 2026-02-14
 
@@ -51,7 +51,7 @@ Decision:
 - Thread safety for task internals is delegated to workers.
 
 Rationale:
-- MissionGraph orchestrates processes/tasks, not in-process memory mutation.
+- Condukt orchestrates processes/tasks, not in-process memory mutation.
 - Serialized boundaries align with sandboxed/stateless execution.
 
 Tradeoffs:

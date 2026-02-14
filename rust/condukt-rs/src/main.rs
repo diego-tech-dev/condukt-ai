@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use missiongraph_rs::{
+use condukt_rs::{
     build_dependency_levels, build_trace_skeleton, parse_ast, validate_ast, AstConstraint,
     AstTask, AstVerify, TRACE_VERSION,
 };
@@ -50,7 +50,7 @@ impl TaskPolicy {
 
 #[derive(Debug, Parser)]
 #[command(name = "mgl-rs")]
-#[command(about = "MissionGraph Rust runtime bootstrap CLI", long_about = None)]
+#[command(about = "Condukt Rust runtime bootstrap CLI", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -58,7 +58,7 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    /// Validate a MissionGraph AST JSON document against bootstrap checks.
+    /// Validate a Condukt AST JSON document against bootstrap checks.
     CheckAst {
         /// Path to AST JSON file (for example output of `mgl parse`).
         ast: PathBuf,
@@ -66,7 +66,7 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Emit a trace skeleton from a MissionGraph AST JSON document.
+    /// Emit a trace skeleton from a Condukt AST JSON document.
     TraceSkeleton {
         /// Path to AST JSON file (for example output of `mgl parse`).
         ast: PathBuf,

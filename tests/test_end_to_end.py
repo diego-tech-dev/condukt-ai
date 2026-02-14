@@ -12,12 +12,12 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
-from missiongraph.cli import main as cli_main
-from missiongraph.executor import ExecutionError, execute_program
-from missiongraph.parser import ParseError, parse_file, parse_program
-from missiongraph.planner import build_mermaid_graph
-from missiongraph.serialization import program_to_ast
-from missiongraph.spec import (
+from condukt.cli import main as cli_main
+from condukt.executor import ExecutionError, execute_program
+from condukt.parser import ParseError, parse_file, parse_program
+from condukt.planner import build_mermaid_graph
+from condukt.serialization import program_to_ast
+from condukt.spec import (
     ERROR_CODE_ARTIFACT_CONSUME_MISSING,
     ERROR_CODE_ARTIFACT_CONTRACT_CONSUME_VIOLATION,
     ERROR_CODE_ARTIFACT_CONTRACT_OUTPUT_VIOLATION,
@@ -63,7 +63,7 @@ GOLDEN_CASES = [
 ]
 
 
-class MissionGraphEndToEndTests(unittest.TestCase):
+class ConduktEndToEndTests(unittest.TestCase):
     def test_demo_program_executes(self) -> None:
         program = parse_file(ROOT / "examples" / "ship_release.mgl")
         trace = execute_program(
@@ -266,7 +266,7 @@ plan {{
                 "provenance": {},
             }
 
-        with patch("missiongraph.executor._run_task", side_effect=fake_run_task):
+        with patch("condukt.executor._run_task", side_effect=fake_run_task):
             trace_parallel = execute_program(
                 program,
                 capabilities={"ci"},
@@ -280,7 +280,7 @@ plan {{
 
         active = 0
         max_active = 0
-        with patch("missiongraph.executor._run_task", side_effect=fake_run_task):
+        with patch("condukt.executor._run_task", side_effect=fake_run_task):
             trace_sequential = execute_program(
                 program,
                 capabilities={"ci"},
@@ -379,7 +379,7 @@ plan {{
                 "provenance": {},
             }
 
-        with patch("missiongraph.executor._run_task", side_effect=fake_run_task):
+        with patch("condukt.executor._run_task", side_effect=fake_run_task):
             trace = execute_program(
                 program,
                 capabilities={"ci", "prod_access"},
@@ -510,7 +510,7 @@ plan {{
 }}
 """.strip()
         )
-        with patch("missiongraph.executor.validate_program", return_value=[]):
+        with patch("condukt.executor.validate_program", return_value=[]):
             trace = execute_program(
                 program,
                 capabilities={"ci", "prod_access"},
@@ -562,7 +562,7 @@ plan {{
             }
 
         with patch(
-            "missiongraph.executor._run_task_attempt",
+            "condukt.executor._run_task_attempt",
             side_effect=fake_run_task_attempt,
         ):
             trace = execute_program(program, capabilities={"ci"}, parallel=False)
@@ -604,7 +604,7 @@ plan {{
             }
 
         with patch(
-            "missiongraph.executor._run_task_attempt",
+            "condukt.executor._run_task_attempt",
             side_effect=fake_run_task_attempt,
         ):
             trace = execute_program(program, capabilities={"ci"}, parallel=False)
@@ -654,7 +654,7 @@ plan {{
             }
 
         with patch(
-            "missiongraph.executor._run_task_attempt",
+            "condukt.executor._run_task_attempt",
             side_effect=fake_run_task_attempt,
         ):
             trace = execute_program(program, capabilities={"ci"}, parallel=False)
@@ -701,10 +701,10 @@ plan {{
             }
 
         with patch(
-            "missiongraph.executor._run_task_attempt",
+            "condukt.executor._run_task_attempt",
             side_effect=fake_run_task_attempt,
-        ), patch("missiongraph.executor.random.uniform", return_value=0.25), patch(
-            "missiongraph.executor.time.sleep"
+        ), patch("condukt.executor.random.uniform", return_value=0.25), patch(
+            "condukt.executor.time.sleep"
         ) as sleep_mock:
             trace = execute_program(program, capabilities={"ci"}, parallel=False)
 
@@ -750,9 +750,9 @@ plan {{
             }
 
         with patch(
-            "missiongraph.executor._run_task_attempt",
+            "condukt.executor._run_task_attempt",
             side_effect=fake_run_task_attempt,
-        ), patch("missiongraph.executor.time.sleep") as sleep_mock_1:
+        ), patch("condukt.executor.time.sleep") as sleep_mock_1:
             trace_1 = execute_program(
                 program,
                 capabilities={"ci"},
@@ -760,9 +760,9 @@ plan {{
                 retry_seed=7,
             )
         with patch(
-            "missiongraph.executor._run_task_attempt",
+            "condukt.executor._run_task_attempt",
             side_effect=fake_run_task_attempt,
-        ), patch("missiongraph.executor.time.sleep") as sleep_mock_2:
+        ), patch("condukt.executor.time.sleep") as sleep_mock_2:
             trace_2 = execute_program(
                 program,
                 capabilities={"ci"},
@@ -824,7 +824,7 @@ plan {{
             stderr="timed out",
         )
         with patch(
-            "missiongraph.executor.subprocess.run",
+            "condukt.executor.subprocess.run",
             side_effect=[timeout_1, timeout_2],
         ):
             trace = execute_program(program, capabilities={"ci"}, parallel=False)

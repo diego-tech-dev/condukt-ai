@@ -1,6 +1,6 @@
-# missiongraph-rs (bootstrap)
+# condukt-rs (bootstrap)
 
-Rust bootstrap runtime for MissionGraph contract conformance.
+Rust bootstrap runtime for Condukt contract conformance.
 
 This prototype focuses on AST/trace contract handling:
 
@@ -17,25 +17,25 @@ This prototype focuses on AST/trace contract handling:
 Generate AST from the Python reference runtime:
 
 ```bash
-python3 -m missiongraph parse examples/ship_release.mgl > /tmp/ship_release.ast.json
+python3 -m condukt parse examples/ship_release.mgl > /tmp/ship_release.ast.json
 ```
 
 Validate AST with Rust bootstrap:
 
 ```bash
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
 ```
 
 Emit trace skeleton:
 
 ```bash
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
 ```
 
 Execute one dependency-free task (prototype):
 
 ```bash
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
 ```
 
 `run-task` reports contract-style fields including `status`, `error_code`, `started_at`, `finished_at`, and merged `provenance` (including retry attempt history when retries are configured).
@@ -43,7 +43,7 @@ cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_
 Execute full plan sequentially (prototype):
 
 ```bash
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
+cargo run --manifest-path rust/condukt-rs/Cargo.toml -- run-plan /tmp/ship_release.ast.json --base-dir examples --capability ci --capability prod_access --json
 ```
 
 `run-plan` now includes evaluated constraint and verify diagnostics in the emitted trace payload.
@@ -51,5 +51,5 @@ cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-plan /tmp/ship_
 Run Rust tests:
 
 ```bash
-cargo test --manifest-path rust/missiongraph-rs/Cargo.toml
+cargo test --manifest-path rust/condukt-rs/Cargo.toml
 ```

@@ -1,4 +1,4 @@
-# MissionGraph Worklog
+# Condukt Worklog
 
 ## 2026-02-13
 
@@ -36,7 +36,7 @@ Notes:
 - Added typed artifact contracts (`artifact:type`) in `consumes`/`produces`.
 - Added static/runtime checks for artifact type compatibility.
 - Added `retry_if` strategy and retry jitter controls in `with` task policies.
-- Added `rust/missiongraph-rs` bootstrap CLI (`check-ast`, `trace-skeleton`) with Rust tests.
+- Added `rust/condukt-rs` bootstrap CLI (`check-ast`, `trace-skeleton`) with Rust tests.
 
 ### Sprint: Autonomous quality run
 
