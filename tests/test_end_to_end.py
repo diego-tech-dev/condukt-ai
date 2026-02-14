@@ -31,6 +31,18 @@ from missiongraph.spec import (
 
 ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = ROOT / "tests" / "golden"
+GOLDEN_CASES = [
+    (
+        "ship_release",
+        ROOT / "examples" / "ship_release.mgl",
+        {"ci", "prod_access"},
+    ),
+    (
+        "release_artifacts",
+        ROOT / "examples" / "release_artifacts.mgl",
+        {"ci", "prod_access"},
+    ),
+]
 
 
 class MissionGraphEndToEndTests(unittest.TestCase):
@@ -861,21 +873,27 @@ plan {{
             temp_path.unlink(missing_ok=True)
 
     def test_ast_golden_conformance(self) -> None:
-        program = parse_file(ROOT / "examples" / "ship_release.mgl")
-        actual = program_to_ast(program)
-        expected = _read_json(GOLDEN_DIR / "ship_release.ast.json")
-        self.assertEqual(actual, expected)
+        for case_name, program_path, _capabilities in GOLDEN_CASES:
+            with self.subTest(case=case_name):
+                program = parse_file(program_path)
+                actual = program_to_ast(program)
+                expected = _read_json(GOLDEN_DIR / f"{case_name}.ast.json")
+                self.assertEqual(actual, expected)
 
     def test_trace_golden_conformance(self) -> None:
-        program = parse_file(ROOT / "examples" / "ship_release.mgl")
-        trace = execute_program(
-            program,
-            capabilities={"ci", "prod_access"},
-            parallel=False,
-        )
-        actual = _normalize_trace(trace)
-        expected = _read_json(GOLDEN_DIR / "ship_release.trace.normalized.json")
-        self.assertEqual(actual, expected)
+        for case_name, program_path, capabilities in GOLDEN_CASES:
+            with self.subTest(case=case_name):
+                program = parse_file(program_path)
+                trace = execute_program(
+                    program,
+                    capabilities=capabilities,
+                    parallel=False,
+                )
+                actual = _normalize_trace(trace)
+                expected = _read_json(
+                    GOLDEN_DIR / f"{case_name}.trace.normalized.json"
+                )
+                self.assertEqual(actual, expected)
 
 
 def _read_json(path: Path) -> dict:

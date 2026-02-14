@@ -45,6 +45,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Emit machine-readable summary",
     )
+    parser.add_argument(
+        "--require-goldens",
+        action="store_true",
+        help="Require matching golden AST/trace contract projections for each program.",
+    )
     args = parser.parse_args(argv)
 
     root = ROOT
@@ -55,6 +60,7 @@ def main(argv: list[str] | None = None) -> int:
         root=root,
         programs=programs,
         rust_manifest=rust_manifest,
+        require_goldens=args.require_goldens,
     )
 
     if args.json:
@@ -68,6 +74,7 @@ def run_conformance_suite(
     root: Path,
     programs: list[str],
     rust_manifest: Path,
+    require_goldens: bool,
 ) -> dict[str, Any]:
     cases: list[dict[str, Any]] = []
     for program in programs:
@@ -76,6 +83,7 @@ def run_conformance_suite(
                 root=root,
                 program_path=Path(program),
                 rust_manifest=rust_manifest,
+                require_goldens=require_goldens,
             )
         )
 
@@ -90,6 +98,7 @@ def run_case(
     root: Path,
     program_path: Path,
     rust_manifest: Path,
+    require_goldens: bool,
 ) -> dict[str, Any]:
     resolved_program = (root / program_path).resolve()
     case: dict[str, Any] = {
@@ -117,6 +126,26 @@ def run_case(
             f"python AST version mismatch: {ast.get('ast_version')} != {AST_VERSION}"
         )
         return case
+
+    if require_goldens:
+        ast_golden_path, trace_golden_path = _golden_paths_for_program(
+            root, resolved_program
+        )
+        if not ast_golden_path.exists():
+            case["errors"].append(f"missing AST golden: {ast_golden_path}")
+            return case
+        if not trace_golden_path.exists():
+            case["errors"].append(f"missing trace golden: {trace_golden_path}")
+            return case
+        try:
+            ast_golden = json.loads(ast_golden_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            case["errors"].append(f"invalid AST golden JSON ({ast_golden_path}): {exc}")
+            return case
+        case["golden_ast_match"] = ast == ast_golden
+        if ast != ast_golden:
+            case["errors"].append("python AST does not match golden AST")
+            return case
 
     try:
         expected_levels = _build_levels(ast.get("tasks", []))
@@ -229,6 +258,16 @@ def run_case(
                 "rust execution.max_parallel mismatch: "
                 f"{execution.get('max_parallel')} != {expected_max_parallel}"
             )
+        if require_goldens:
+            trace_golden = json.loads(trace_golden_path.read_text(encoding="utf-8"))
+            case["golden_trace_contract_match"] = (
+                _trace_contract_projection(rust_trace)
+                == _trace_contract_projection(trace_golden)
+            )
+            if not case["golden_trace_contract_match"]:
+                case["errors"].append(
+                    "rust trace contract projection does not match golden trace"
+                )
     finally:
         ast_file.unlink(missing_ok=True)
 
@@ -309,6 +348,24 @@ def _build_levels(tasks: list[dict[str, Any]]) -> list[list[str]]:
         unresolved = [name for name in names if in_degree[name] > 0]
         raise ValueError(f"cycle detected in plan: {', '.join(unresolved)}")
     return levels
+
+
+def _golden_paths_for_program(root: Path, program_path: Path) -> tuple[Path, Path]:
+    stem = program_path.stem
+    golden_dir = root / "tests" / "golden"
+    return (
+        golden_dir / f"{stem}.ast.json",
+        golden_dir / f"{stem}.trace.normalized.json",
+    )
+
+
+def _trace_contract_projection(trace: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "trace_version": trace.get("trace_version"),
+        "goal": trace.get("goal"),
+        "execution": trace.get("execution"),
+        "task_order": trace.get("task_order"),
+    }
 
 
 if __name__ == "__main__":

@@ -63,8 +63,16 @@ Status: completed
 
 ## Next Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `N1` Rust contract CLI parity hardening: completed
 2. `N2` Rust trace semantics expansion: completed
-3. `N3` Dual-runtime golden conformance gate: pending
+3. `N3` Dual-runtime golden conformance gate: completed
+
+## Follow-up Sprint (Autonomous)
+
+Status: in_progress
+
+1. `F1` Rust worker execution prototype (single task path): pending
+2. `F2` Rust task-result contract shaping (error_code/provenance): pending
+3. `F3` Cross-runtime parity matrix for resilient policies: pending

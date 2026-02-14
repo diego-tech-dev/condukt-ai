@@ -23,6 +23,7 @@ class ConformanceHarnessTests(unittest.TestCase):
                 "--program",
                 "examples/ship_release.mgl",
                 "--json",
+                "--require-goldens",
             ],
             cwd=ROOT,
             capture_output=True,
@@ -44,6 +45,8 @@ class ConformanceHarnessTests(unittest.TestCase):
             case["rust_execution_levels"],
             [["test_suite"], ["deploy_prod"]],
         )
+        self.assertTrue(case["golden_ast_match"])
+        self.assertTrue(case["golden_trace_contract_match"])
 
 
 if __name__ == "__main__":

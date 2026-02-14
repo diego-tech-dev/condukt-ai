@@ -148,3 +148,10 @@ Status: accepted
 Decision: make Rust trace-skeleton execution metadata dependency-aware.
 Rationale: contract conformance is stronger when Rust emits execution levels/order derived from AST dependencies instead of source-order placeholders.
 Consequences: Rust trace skeleton now computes topological levels/mode/max parallel; conformance harness validates these fields against Python-derived expectations.
+
+## 2026-02-14
+
+Status: accepted
+Decision: enforce dual-runtime golden conformance as a first-class gate.
+Rationale: conformance checks should be anchored to durable fixtures, not only ad-hoc example runs.
+Consequences: added `release_artifacts` AST/trace goldens, expanded golden tests, and added `scripts/conformance.py --require-goldens` gate to assert Python AST + Rust trace contract parity against goldens.

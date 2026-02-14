@@ -38,6 +38,7 @@ Read first for deeper context:
 - Rust bootstrap tests: `cargo test --manifest-path rust/missiongraph-rs/Cargo.toml`
 - Rust AST contract check (JSON): `cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json`
 - Multi-runtime conformance: `python3 scripts/conformance.py --json`
+- Dual-runtime golden gate: `python3 scripts/conformance.py --json --require-goldens`
 
 ## Hard Invariants
 
@@ -61,4 +62,5 @@ Read first for deeper context:
 
 - Code compiles/runs locally.
 - `python3 -m unittest discover -s tests -p "test_*.py"` passes.
+- `python3 scripts/conformance.py --json --require-goldens` passes.
 - Docs reflect the behavior you changed.

@@ -26,18 +26,23 @@ class ContractVersionTests(unittest.TestCase):
         )
 
     def test_golden_contract_versions_match_runtime_constants(self) -> None:
-        ast_golden = json.loads(
-            (ROOT / "tests" / "golden" / "ship_release.ast.json").read_text(
-                encoding="utf-8"
+        golden_dir = ROOT / "tests" / "golden"
+        ast_files = sorted(golden_dir.glob("*.ast.json"))
+        trace_files = sorted(golden_dir.glob("*.trace.normalized.json"))
+        self.assertGreaterEqual(len(ast_files), 1)
+        self.assertGreaterEqual(len(trace_files), 1)
+
+        for ast_path in ast_files:
+            ast_golden = json.loads(ast_path.read_text(encoding="utf-8"))
+            self.assertEqual(ast_golden["ast_version"], AST_VERSION, msg=str(ast_path))
+
+        for trace_path in trace_files:
+            trace_golden = json.loads(trace_path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                trace_golden["trace_version"],
+                TRACE_VERSION,
+                msg=str(trace_path),
             )
-        )
-        trace_golden = json.loads(
-            (
-                ROOT / "tests" / "golden" / "ship_release.trace.normalized.json"
-            ).read_text(encoding="utf-8")
-        )
-        self.assertEqual(ast_golden["ast_version"], AST_VERSION)
-        self.assertEqual(trace_golden["trace_version"], TRACE_VERSION)
 
     def test_rust_bootstrap_constants_match_runtime_constants(self) -> None:
         lib_rs = (ROOT / "rust" / "missiongraph-rs" / "src" / "lib.rs").read_text(

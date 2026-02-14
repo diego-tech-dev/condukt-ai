@@ -55,12 +55,12 @@ Notes:
 
 ### Sprint: Autonomous next run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `N1` Rust contract CLI parity hardening: completed
 - `N2` Rust trace semantics expansion: completed
-- `N3` Dual-runtime golden conformance gate: pending
+- `N3` Dual-runtime golden conformance gate: completed
 
 Notes:
 - Rust bootstrap validator now detects dependency cycles (`cycle detected in plan`).
@@ -68,3 +68,14 @@ Notes:
 - Python conformance harness now consumes Rust `check-ast --json` output for stronger contract assertions.
 - Rust trace skeleton now computes dependency levels, execution mode, and max parallel width from AST dependencies.
 - Conformance harness now checks Rust execution metadata (`execution.levels`, `mode`, `max_parallel`) against Python-derived expectations.
+- Added `release_artifacts` AST/trace golden fixtures.
+- Added dual-runtime golden gate (`python3 scripts/conformance.py --json --require-goldens`) and test coverage for Rust-vs-golden contract projection parity.
+
+### Sprint: Autonomous follow-up run
+
+Status: in_progress
+
+Milestone status:
+- `F1` Rust worker execution prototype (single task path): pending
+- `F2` Rust task-result contract shaping (error_code/provenance): pending
+- `F3` Cross-runtime parity matrix for resilient policies: pending

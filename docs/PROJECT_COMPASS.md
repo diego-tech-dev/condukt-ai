@@ -94,11 +94,12 @@ Rules for safe migration:
 - Added explicit contract version governance in `spec/VERSIONING.md` with consistency tests.
 - Hardened Rust `check-ast` with DAG cycle detection and `--json` machine-readable reporting.
 - Expanded Rust trace skeleton semantics to emit dependency-aware execution levels/mode/max parallel.
+- Added dual-runtime golden conformance gate over `ship_release` + `release_artifacts` fixtures.
 
 ## Near-Term Direction
 
-1. Add dual-runtime golden conformance gate beyond bootstrap checks.
-2. Expand Rust runtime from contract bootstrap toward task execution parity.
+1. Expand Rust runtime from contract bootstrap toward task execution parity.
+2. Extend cross-runtime parity coverage for resilient execution policies.
 
 ## Resume Checklist
 
@@ -110,6 +111,7 @@ When picking up work:
    - `python3 -m missiongraph parse examples/ship_release.mgl`
    - `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
    - `python3 scripts/conformance.py --json`
+   - `python3 scripts/conformance.py --json --require-goldens`
 3. Confirm no schema/golden drift unless intentional.
 
 ## Update Protocol

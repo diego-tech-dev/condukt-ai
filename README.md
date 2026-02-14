@@ -239,9 +239,10 @@ Run Python vs Rust contract conformance checks:
 
 ```bash
 python3 scripts/conformance.py --json
+python3 scripts/conformance.py --json --require-goldens
 ```
 
-This validates AST/trace versions, task order, and dependency-level execution metadata.
+This validates AST/trace versions, task order, dependency-level execution metadata, and optionally golden parity.
 
 ## Tests
 
