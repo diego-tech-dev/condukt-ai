@@ -72,6 +72,7 @@ export interface TrialSummary {
   readonly p90_elapsed_ms: number | null;
   readonly by_mode: Record<TrialMode, TrialModeSummary>;
   readonly condukt_vs_baseline_speedup: number | null;
+  readonly paired: TrialPairSummary;
 }
 
 export interface TrialModeSummary {
@@ -80,6 +81,23 @@ export interface TrialModeSummary {
   readonly accuracy: number;
   readonly median_elapsed_ms: number | null;
   readonly p90_elapsed_ms: number | null;
+}
+
+export interface TrialPair {
+  readonly participant: string;
+  readonly scenario: string;
+  readonly baseline_elapsed_ms: number;
+  readonly condukt_elapsed_ms: number;
+  readonly speedup: number;
+  readonly baseline_correct: boolean;
+  readonly condukt_correct: boolean;
+}
+
+export interface TrialPairSummary {
+  readonly total_pairs: number;
+  readonly median_speedup: number | null;
+  readonly p90_speedup: number | null;
+  readonly pairs: readonly TrialPair[];
 }
 
 export function createTrialSession(input: CreateTrialSessionInput): TrialSession {
@@ -153,6 +171,7 @@ export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSum
   const conduktSummary = summarizeMode(byMode.condukt);
   const baselineSummary = summarizeMode(byMode.baseline);
   const overall = summarizeMode(records);
+  const paired = summarizePairs(records);
 
   return {
     ...overall,
@@ -164,6 +183,7 @@ export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSum
       baselineSummary.median_elapsed_ms !== null && conduktSummary.median_elapsed_ms !== null
         ? baselineSummary.median_elapsed_ms / conduktSummary.median_elapsed_ms
         : null,
+    paired,
   };
 }
 
@@ -201,6 +221,87 @@ function summarizeMode(records: readonly TrialRecord[]): TrialModeSummary {
     median_elapsed_ms: quantile(elapsed, 0.5),
     p90_elapsed_ms: quantile(elapsed, 0.9),
   };
+}
+
+function summarizePairs(records: readonly TrialRecord[]): TrialPairSummary {
+  const pairs = buildPairs(records);
+  const speedups = pairs.map((pair) => pair.speedup).sort((left, right) => left - right);
+
+  return {
+    total_pairs: pairs.length,
+    median_speedup: quantile(speedups, 0.5),
+    p90_speedup: quantile(speedups, 0.9),
+    pairs,
+  };
+}
+
+function buildPairs(records: readonly TrialRecord[]): TrialPair[] {
+  interface PairBucket {
+    baseline?: TrialRecord;
+    condukt?: TrialRecord;
+  }
+
+  const buckets = new Map<string, PairBucket>();
+  for (const record of records) {
+    const key = `${record.participant}::${record.scenario}`;
+    const bucket = buckets.get(key) ?? {};
+
+    if (record.mode === "baseline") {
+      bucket.baseline = pickLatestRecord(bucket.baseline, record);
+    } else {
+      bucket.condukt = pickLatestRecord(bucket.condukt, record);
+    }
+
+    buckets.set(key, bucket);
+  }
+
+  const pairs: TrialPair[] = [];
+  for (const [key, bucket] of buckets.entries()) {
+    if (!bucket.baseline || !bucket.condukt) {
+      continue;
+    }
+
+    if (bucket.condukt.elapsed_ms <= 0) {
+      continue;
+    }
+
+    const [participant, scenario] = splitPairKey(key);
+    pairs.push({
+      participant,
+      scenario,
+      baseline_elapsed_ms: bucket.baseline.elapsed_ms,
+      condukt_elapsed_ms: bucket.condukt.elapsed_ms,
+      speedup: bucket.baseline.elapsed_ms / bucket.condukt.elapsed_ms,
+      baseline_correct: bucket.baseline.diagnosis_correct,
+      condukt_correct: bucket.condukt.diagnosis_correct,
+    });
+  }
+
+  return pairs.sort((left, right) => {
+    if (left.participant !== right.participant) {
+      return left.participant.localeCompare(right.participant);
+    }
+    return left.scenario.localeCompare(right.scenario);
+  });
+}
+
+function pickLatestRecord(current: TrialRecord | undefined, next: TrialRecord): TrialRecord {
+  if (!current) {
+    return next;
+  }
+
+  const currentMs = new Date(current.finished_at).getTime();
+  const nextMs = new Date(next.finished_at).getTime();
+  return nextMs >= currentMs ? next : current;
+}
+
+function splitPairKey(key: string): [string, string] {
+  const separator = key.indexOf("::");
+  if (separator < 0) {
+    return [key, ""];
+  }
+
+  return [key.slice(0, separator), key.slice(separator + 2)];
 }
 
 function quantile(sortedValues: readonly number[], q: number): number | null {

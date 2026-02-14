@@ -47,6 +47,8 @@ export type {
   CreateTrialSessionInput,
   TrialExpectation,
   TrialMode,
+  TrialPair,
+  TrialPairSummary,
   TrialModeSummary,
   TrialRecord,
   TrialSession,

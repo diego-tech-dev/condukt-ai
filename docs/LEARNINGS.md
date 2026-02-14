@@ -239,3 +239,18 @@ What changed:
 
 Guardrail:
 - Keep `pnpm test` in CI and local release checks as the single source of truth for TS test execution.
+
+## 2026-02-14
+
+Context:
+- Improved trial analytics to better reflect real baseline-vs-Condukt comparisons.
+
+Learning:
+- Speedup claims are stronger when they are computed on paired participant/scenario samples instead of only comparing mode-level medians.
+
+What changed:
+- Added paired trial summary metrics and pair-level records in TS trial analytics.
+- Added tests for pair construction and latest-run selection semantics.
+
+Guardrail:
+- Any public claim about trial speedup should cite paired metrics when paired samples are available.

@@ -118,6 +118,7 @@ Rules for safe migration:
 - Added TS trace-diagnosis and external-trial metric instrumentation (session start/finish/report with JSONL records).
 - Added TS Biome lint/format baseline and pnpm-only package workflow enforcement.
 - Migrated TS tests to Vitest while keeping non-Vite build/runtime tooling.
+- Added paired trial analytics (participant+scenario matching) for stronger speedup measurement.
 
 ## Near-Term Direction
 

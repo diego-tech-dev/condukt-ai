@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: completed
+Current sprint status: in_progress
 
 ## Autonomy Sprint (5 milestones)
 
@@ -100,3 +100,11 @@ Status: completed
 1. `U1` TS package publish readiness (metadata/exports/files/release checks): completed
 2. `U2` CI + release automation for TS package quality gates: completed
 3. `U3` External trial instrumentation for time-to-diagnose metric capture: completed
+
+## Trial Evidence Sprint (Autonomous)
+
+Status: in_progress
+
+1. `R1` Paired trial analytics by participant/scenario: completed
+2. `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): pending
+3. `R3` Shareable markdown summary output + documentation refresh: pending

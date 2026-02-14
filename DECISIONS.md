@@ -281,3 +281,10 @@ Status: accepted
 Decision: adopt Vitest as the TypeScript test runner while keeping the existing non-Vite library build path.
 Rationale: Vitest provides faster feedback and stronger test ergonomics for mocks, watch mode, and future coverage without requiring a Vite app/tooling migration.
 Consequences: TS test scripts now use Vitest (`pnpm test`, `pnpm test:watch`) and TS test files use Vitest assertions.
+
+## 2026-02-14
+
+Status: accepted
+Decision: compute trial speedup with participant+scenario paired analysis in addition to global mode medians.
+Rationale: unpaired aggregate medians can distort diagnosis-speed claims when baseline and condukt samples come from different cohorts.
+Consequences: TS trial summaries now include a `paired` section with pair count, pair-level entries, and paired median/p90 speedup metrics.

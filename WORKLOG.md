@@ -169,3 +169,17 @@ Notes:
 - Migrated TS tests from `tsx --test` to Vitest (`pnpm test`, `pnpm test:watch`).
 - Updated TS test files to Vitest assertions/imports.
 - Kept runtime/build path unchanged (`tsc` + `tsx` for scripts), no Vite bundler integration required.
+
+### Sprint: Trial evidence run
+
+Status: in_progress
+
+Milestone status:
+- `R1` Paired trial analytics by participant/scenario: completed
+- `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): pending
+- `R3` Shareable markdown summary output + documentation refresh: pending
+
+Notes:
+- Added paired trial analysis in TS summary output (`paired` block with pair-level speedup stats).
+- Updated trial report output to include paired sample count and median paired speedup.
+- Added TS unit coverage for pairing logic and latest-run selection.

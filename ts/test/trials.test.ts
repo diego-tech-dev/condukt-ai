@@ -113,7 +113,7 @@ test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
     },
     {
       session_id: "s2",
-      participant: "p2",
+      participant: "p1",
       scenario: "quickstart-broken",
       mode: "baseline",
       started_at: "2026-02-14T10:00:00.000Z",
@@ -139,4 +139,113 @@ test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
   expect(summary.by_mode.condukt.total).toBe(1);
   expect(summary.by_mode.baseline.total).toBe(1);
   expect(summary.condukt_vs_baseline_speedup).toBe(4);
+  expect(summary.paired.total_pairs).toBe(1);
+  expect(summary.paired.median_speedup).toBe(4);
+  expect(summary.paired.p90_speedup).toBe(4);
+  expect(summary.paired.pairs).toEqual([
+    {
+      participant: "p1",
+      scenario: "quickstart-broken",
+      baseline_elapsed_ms: 80_000,
+      condukt_elapsed_ms: 20_000,
+      speedup: 4,
+      baseline_correct: true,
+      condukt_correct: true,
+    },
+  ]);
+});
+
+test("summarizeTrialRecords pairs by participant and scenario using latest runs", () => {
+  const records = [
+    {
+      session_id: "old-baseline",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "baseline",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:30.000Z",
+      elapsed_ms: 30_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+    {
+      session_id: "new-baseline",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "baseline",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:01:00.000Z",
+      elapsed_ms: 60_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+    {
+      session_id: "condukt",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "condukt",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:20.000Z",
+      elapsed_ms: 20_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+    {
+      session_id: "unpaired",
+      participant: "p2",
+      scenario: "quickstart-broken",
+      mode: "condukt",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:40.000Z",
+      elapsed_ms: 40_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+  ];
+
+  const summary = summarizeTrialRecords(records);
+  expect(summary.paired.total_pairs).toBe(1);
+  expect(summary.paired.median_speedup).toBe(3);
+  expect(summary.paired.pairs[0]?.baseline_elapsed_ms).toBe(60_000);
+  expect(summary.paired.pairs[0]?.condukt_elapsed_ms).toBe(20_000);
 });

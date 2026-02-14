@@ -123,6 +123,12 @@ async function runReport(args: Map<string, string>): Promise<void> {
         : "n/a"
     }`,
   );
+  console.log(`Paired samples: ${summary.paired.total_pairs}`);
+  console.log(
+    `Paired speedup (median): ${
+      summary.paired.median_speedup ? `${summary.paired.median_speedup.toFixed(2)}x` : "n/a"
+    }`,
+  );
 }
 
 function parseArgs(args: readonly string[]): Map<string, string> {
