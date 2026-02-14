@@ -73,15 +73,26 @@ Notes:
 
 ### Sprint: Autonomous follow-up run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `F1` Rust worker execution prototype (single task path): completed
 - `F2` Rust task-result contract shaping (error_code/provenance): completed
-- `F3` Cross-runtime parity matrix for resilient policies: pending
+- `F3` Cross-runtime parity matrix for resilient policies: completed
 
 Notes:
 - Added `mgl-rs run-task` prototype command for executing one dependency-free task worker from AST.
 - Added Rust CLI tests for successful worker execution and dependency-rejection behavior.
 - `run-task` now emits task-result style fields: `error_code`, `started_at`, `finished_at`, and merged provenance.
 - Added Rust CLI coverage for non-zero worker exit mapping to `WORKER_EXIT_NONZERO`.
+- Expanded conformance defaults and dual-runtime goldens to include `release_fanout` and `release_resilient`.
+- Added `scripts/parity_matrix.py` and parity-matrix tests to make resilient-policy coverage explicit.
+
+### Sprint: Autonomous execution run
+
+Status: in_progress
+
+Milestone status:
+- `E1` Rust multi-task sequential execution (dependency order): pending
+- `E2` Rust retry/timeout policy loop parity for task execution: pending
+- `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending

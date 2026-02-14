@@ -21,6 +21,8 @@ from missiongraph.spec import AST_VERSION, TRACE_VERSION
 DEFAULT_PROGRAMS = [
     "examples/ship_release.mgl",
     "examples/release_artifacts.mgl",
+    "examples/release_fanout.mgl",
+    "examples/release_resilient.mgl",
 ]
 
 

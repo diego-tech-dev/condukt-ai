@@ -169,3 +169,10 @@ Status: accepted
 Decision: shape Rust `run-task` output to align with MissionGraph task-result fields.
 Rationale: migration confidence improves when Rust execution surfaces (`status`, `error_code`, `provenance`, timestamps) follow the same contract language as Python traces.
 Consequences: Rust run-task now emits normalized `error_code`, `started_at`, `finished_at`, and merged provenance defaults; non-zero exits map to `WORKER_EXIT_NONZERO`.
+
+## 2026-02-14
+
+Status: accepted
+Decision: make resilient-policy scenarios part of the cross-runtime parity matrix and conformance defaults.
+Rationale: parity claims should explicitly cover fanout and retry/backoff policy programs, not only basic sequential cases.
+Consequences: added `release_fanout` and `release_resilient` goldens, expanded conformance defaults, added `scripts/parity_matrix.py`, and test-gated resilient/fanout parity rows.

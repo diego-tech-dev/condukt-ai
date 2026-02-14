@@ -14,7 +14,12 @@ from missiongraph.spec import AST_VERSION, TRACE_VERSION
 ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = ROOT / "tests" / "golden"
 RUST_MANIFEST = ROOT / "rust" / "missiongraph-rs" / "Cargo.toml"
-GOLDEN_CASES = ["ship_release", "release_artifacts"]
+GOLDEN_CASES = [
+    "ship_release",
+    "release_artifacts",
+    "release_fanout",
+    "release_resilient",
+]
 
 
 @unittest.skipUnless(shutil.which("cargo"), "cargo is required for dual-runtime tests")

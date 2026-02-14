@@ -32,16 +32,34 @@ from missiongraph.spec import (
 ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = ROOT / "tests" / "golden"
 GOLDEN_CASES = [
-    (
-        "ship_release",
-        ROOT / "examples" / "ship_release.mgl",
-        {"ci", "prod_access"},
-    ),
-    (
-        "release_artifacts",
-        ROOT / "examples" / "release_artifacts.mgl",
-        {"ci", "prod_access"},
-    ),
+    {
+        "name": "ship_release",
+        "program": ROOT / "examples" / "ship_release.mgl",
+        "capabilities": {"ci", "prod_access"},
+        "parallel": False,
+        "max_parallel": 1,
+    },
+    {
+        "name": "release_artifacts",
+        "program": ROOT / "examples" / "release_artifacts.mgl",
+        "capabilities": {"ci", "prod_access"},
+        "parallel": False,
+        "max_parallel": 1,
+    },
+    {
+        "name": "release_fanout",
+        "program": ROOT / "examples" / "release_fanout.mgl",
+        "capabilities": {"ci", "prod_access"},
+        "parallel": True,
+        "max_parallel": 3,
+    },
+    {
+        "name": "release_resilient",
+        "program": ROOT / "examples" / "release_resilient.mgl",
+        "capabilities": {"ci", "prod_access"},
+        "parallel": True,
+        "max_parallel": 3,
+    },
 ]
 
 
@@ -873,21 +891,24 @@ plan {{
             temp_path.unlink(missing_ok=True)
 
     def test_ast_golden_conformance(self) -> None:
-        for case_name, program_path, _capabilities in GOLDEN_CASES:
+        for case in GOLDEN_CASES:
+            case_name = case["name"]
             with self.subTest(case=case_name):
-                program = parse_file(program_path)
+                program = parse_file(case["program"])
                 actual = program_to_ast(program)
                 expected = _read_json(GOLDEN_DIR / f"{case_name}.ast.json")
                 self.assertEqual(actual, expected)
 
     def test_trace_golden_conformance(self) -> None:
-        for case_name, program_path, capabilities in GOLDEN_CASES:
+        for case in GOLDEN_CASES:
+            case_name = case["name"]
             with self.subTest(case=case_name):
-                program = parse_file(program_path)
+                program = parse_file(case["program"])
                 trace = execute_program(
                     program,
-                    capabilities=capabilities,
-                    parallel=False,
+                    capabilities=case["capabilities"],
+                    parallel=case["parallel"],
+                    max_parallel=case["max_parallel"],
                 )
                 actual = _normalize_trace(trace)
                 expected = _read_json(
@@ -913,6 +934,14 @@ def _normalize_trace(trace: dict) -> dict:
                 provenance["command"] = "<cmd>"
             if "stdout_sha256" in provenance:
                 provenance["stdout_sha256"] = "<sha256>"
+            attempts = provenance.get("attempts")
+            if isinstance(attempts, list):
+                for attempt in attempts:
+                    if isinstance(attempt, dict):
+                        if "started_at" in attempt:
+                            attempt["started_at"] = "<ts>"
+                        if "finished_at" in attempt:
+                            attempt["finished_at"] = "<ts>"
     return normalized
 
 

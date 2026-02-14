@@ -71,8 +71,16 @@ Status: completed
 
 ## Follow-up Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `F1` Rust worker execution prototype (single task path): completed
 2. `F2` Rust task-result contract shaping (error_code/provenance): completed
-3. `F3` Cross-runtime parity matrix for resilient policies: pending
+3. `F3` Cross-runtime parity matrix for resilient policies: completed
+
+## Execution Sprint (Autonomous)
+
+Status: in_progress
+
+1. `E1` Rust multi-task sequential execution (dependency order): pending
+2. `E2` Rust retry/timeout policy loop parity for task execution: pending
+3. `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending

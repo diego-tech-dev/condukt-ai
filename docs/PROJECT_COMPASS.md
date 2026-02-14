@@ -97,11 +97,12 @@ Rules for safe migration:
 - Added dual-runtime golden conformance gate over `ship_release` + `release_artifacts` fixtures.
 - Added Rust `run-task` prototype for single dependency-free worker execution.
 - Aligned Rust `run-task` result shape with contract-style error/provenance/timestamp fields.
+- Expanded parity matrix coverage to `release_fanout` and `release_resilient` with dedicated matrix tooling.
 
 ## Near-Term Direction
 
-1. Extend cross-runtime parity coverage for resilient execution policies.
-2. Expand Rust runtime from single-task prototype to multi-task execution flow.
+1. Expand Rust runtime from single-task prototype to multi-task execution flow.
+2. Implement Rust retry/timeout loop parity and full trace assembly.
 
 ## Resume Checklist
 
@@ -114,6 +115,7 @@ When picking up work:
    - `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
    - `python3 scripts/conformance.py --json`
    - `python3 scripts/conformance.py --json --require-goldens`
+   - `python3 scripts/parity_matrix.py --json`
 3. Confirm no schema/golden drift unless intentional.
 
 ## Update Protocol

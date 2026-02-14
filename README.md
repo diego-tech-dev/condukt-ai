@@ -245,6 +245,12 @@ python3 scripts/conformance.py --json --require-goldens
 
 This validates AST/trace versions, task order, dependency-level execution metadata, and optionally golden parity.
 
+Cross-runtime parity matrix (including resilient-policy coverage):
+
+```bash
+python3 scripts/parity_matrix.py --json
+```
+
 ## Tests
 
 ```bash

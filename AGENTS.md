@@ -40,6 +40,7 @@ Read first for deeper context:
 - Rust single-task worker prototype: `cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json`
 - Multi-runtime conformance: `python3 scripts/conformance.py --json`
 - Dual-runtime golden gate: `python3 scripts/conformance.py --json --require-goldens`
+- Parity matrix: `python3 scripts/parity_matrix.py --json`
 
 ## Hard Invariants
 
@@ -64,4 +65,5 @@ Read first for deeper context:
 - Code compiles/runs locally.
 - `python3 -m unittest discover -s tests -p "test_*.py"` passes.
 - `python3 scripts/conformance.py --json --require-goldens` passes.
+- `python3 scripts/parity_matrix.py --json` passes.
 - Docs reflect the behavior you changed.
