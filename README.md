@@ -5,6 +5,7 @@ Minimal intent-first language prototype for agent orchestration.
 Project context and direction:
 - Agent entrypoint: `AGENTS.md`
 - See `docs/PROJECT_COMPASS.md` before making design changes.
+- Foundational architecture decisions: `docs/FOUNDATIONS.md`
 - Decision log: `DECISIONS.md`
 
 This MVP includes:

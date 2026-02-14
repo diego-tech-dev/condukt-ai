@@ -4,6 +4,7 @@ This document is the durable context for MissionGraph. It is the first file to r
 
 Companion docs:
 - `AGENTS.md` for agent entrypoint and execution workflow.
+- `FOUNDATIONS.md` for language/runtime design baselines.
 - `DECISIONS.md` for decision history.
 
 ## Purpose
@@ -98,6 +99,7 @@ Rules for safe migration:
 - Added Rust `run-task` prototype for single dependency-free worker execution.
 - Aligned Rust `run-task` result shape with contract-style error/provenance/timestamp fields.
 - Expanded parity matrix coverage to `release_fanout` and `release_resilient` with dedicated matrix tooling.
+- Added `FOUNDATIONS.md` with explicit decisions/tradeoffs/migration paths across core language dimensions.
 
 ## Near-Term Direction
 
@@ -109,14 +111,15 @@ Rules for safe migration:
 When picking up work:
 
 1. Read this file.
-2. Run:
+2. Read `docs/FOUNDATIONS.md`.
+3. Run:
    - `python3 -m unittest discover -s tests -p "test_*.py"`
    - `python3 -m missiongraph parse examples/ship_release.mgl`
    - `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
    - `python3 scripts/conformance.py --json`
    - `python3 scripts/conformance.py --json --require-goldens`
    - `python3 scripts/parity_matrix.py --json`
-3. Confirm no schema/golden drift unless intentional.
+4. Confirm no schema/golden drift unless intentional.
 
 ## Update Protocol
 

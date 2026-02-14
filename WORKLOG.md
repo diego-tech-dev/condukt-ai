@@ -96,3 +96,6 @@ Milestone status:
 - `E1` Rust multi-task sequential execution (dependency order): pending
 - `E2` Rust retry/timeout policy loop parity for task execution: pending
 - `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending
+
+Notes:
+- Added `docs/FOUNDATIONS.md` to capture explicit language/runtime design baselines, tradeoffs, and migration paths across all core design dimensions.

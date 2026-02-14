@@ -176,3 +176,10 @@ Status: accepted
 Decision: make resilient-policy scenarios part of the cross-runtime parity matrix and conformance defaults.
 Rationale: parity claims should explicitly cover fanout and retry/backoff policy programs, not only basic sequential cases.
 Consequences: added `release_fanout` and `release_resilient` goldens, expanded conformance defaults, added `scripts/parity_matrix.py`, and test-gated resilient/fanout parity rows.
+
+## 2026-02-14
+
+Status: accepted
+Decision: publish explicit foundations baseline in `docs/FOUNDATIONS.md`.
+Rationale: core language/runtime choices (including open decisions) should be durable, reviewable, and resumable without relying on chat context.
+Consequences: each major design dimension now records decision state, rationale, tradeoffs, migration path, and agent-specific constraints.

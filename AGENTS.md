@@ -12,6 +12,7 @@ Core objective:
 
 Read first for deeper context:
 - `docs/PROJECT_COMPASS.md`
+- `docs/FOUNDATIONS.md`
 - `DECISIONS.md`
 
 ## Repository Map
