@@ -50,6 +50,9 @@
     "test": "tsx --test test/**/*.test.ts",
     "quickstart": "tsx examples/quickstart-debug.ts",
     "quickstart:broken": "tsx examples/quickstart-debug.ts --broken",
+    "trial:start": "tsx scripts/trial-metrics.ts start",
+    "trial:finish": "tsx scripts/trial-metrics.ts finish",
+    "trial:report": "tsx scripts/trial-metrics.ts report",
     "release:check": "pnpm clean && pnpm check && pnpm test && pnpm build && npm pack --dry-run",
     "prepack": "pnpm build"
   },

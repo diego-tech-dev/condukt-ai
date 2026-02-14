@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: in_progress
+Current sprint status: completed
 
 ## Autonomy Sprint (5 milestones)
 
@@ -95,8 +95,8 @@ Status: completed
 
 ## Distribution Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `U1` TS package publish readiness (metadata/exports/files/release checks): completed
 2. `U2` CI + release automation for TS package quality gates: completed
-3. `U3` External trial instrumentation for time-to-diagnose metric capture: pending
+3. `U3` External trial instrumentation for time-to-diagnose metric capture: completed

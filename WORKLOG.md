@@ -131,12 +131,12 @@ Notes:
 
 ### Sprint: Distribution run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `U1` TS package publish readiness (metadata/exports/files/release checks): completed
 - `U2` CI + release automation for TS package quality gates: completed
-- `U3` External trial instrumentation for time-to-diagnose metric capture: pending
+- `U3` External trial instrumentation for time-to-diagnose metric capture: completed
 
 Notes:
 - Started npm publish-readiness hardening for the `condukt` package.
@@ -146,3 +146,6 @@ Notes:
 - Regenerated normalized trace goldens after canonical workspace path rename to keep conformance deterministic.
 - Added GitHub Actions quality workflow (`.github/workflows/ts-quality.yml`) for TS typecheck/tests/build/release-check gates on push/PR.
 - Added GitHub Actions manual publish workflow (`.github/workflows/ts-publish.yml`) using `NPM_TOKEN`.
+- Added trace diagnosis helpers (`diagnoseFailure`) and trial instrumentation utilities (`createTrialSession`, `completeTrialSession`, `summarizeTrialRecords`) in TS runtime.
+- Added trial metrics CLI (`ts/scripts/trial-metrics.ts`) with start/finish/report commands writing JSONL records.
+- Added trial instrumentation docs (`ts/docs/TRIALS.md`) and TS test coverage for diagnosis/trial metrics behavior.

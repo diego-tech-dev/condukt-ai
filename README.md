@@ -43,6 +43,7 @@ pnpm quickstart:broken
 ```
 
 Walkthrough: `ts/docs/TRACE_WALKTHROUGH.md`.
+External trial metrics: `ts/docs/TRIALS.md`.
 
 Example pipeline:
 

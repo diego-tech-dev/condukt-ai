@@ -193,3 +193,19 @@ What changed:
 
 Guardrail:
 - Keep `ts-quality` and local `release:check` semantically aligned so CI and local release behavior do not drift.
+
+## 2026-02-14
+
+Context:
+- Added external trial instrumentation for time-to-diagnose metrics.
+
+Learning:
+- Trial outcomes are only decision-grade when diagnosis correctness and elapsed time are captured together with a consistent expected failure boundary.
+
+What changed:
+- Added trace diagnosis helper (`diagnoseFailure`) and trial session/summary utilities in TS runtime.
+- Added `ts/scripts/trial-metrics.ts` to persist trial records in JSONL and compute baseline-vs-Condukt summary stats.
+- Added `ts/docs/TRIALS.md` protocol for repeatable external studies.
+
+Guardrail:
+- Do not record elapsed diagnosis time without expected diagnosis fields (`task` and/or `error_code`), or speed claims become unauditable.

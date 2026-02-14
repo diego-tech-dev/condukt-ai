@@ -48,6 +48,18 @@ pnpm quickstart:broken
 
 Both commands write `trace.quickstart.json`. Follow `docs/TRACE_WALKTHROUGH.md` to diagnose the broken run from trace data.
 
+## External trial instrumentation
+
+Capture diagnosis-time metrics for external users:
+
+```bash
+pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt --trace trace.quickstart.json
+pnpm trial:finish --session trials/sessions/<session-id>.session.json --diagnosed-task draft --diagnosed-error-code CONTRACT_OUTPUT_VIOLATION
+pnpm trial:report
+```
+
+Trial protocol details: `docs/TRIALS.md`.
+
 ## Minimal usage
 
 ```ts

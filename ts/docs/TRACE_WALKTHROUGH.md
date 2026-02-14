@@ -51,3 +51,9 @@ The diagnosis path is deterministic:
 3. Fix that task boundary contract mismatch.
 
 This is the core Condukt TS value proposition: contract failures are explicit and traceable at the exact task boundary.
+
+To capture trial metrics for this run, feed the same trace into:
+
+```bash
+pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt --trace trace.quickstart.json
+```

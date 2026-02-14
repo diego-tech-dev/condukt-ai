@@ -33,3 +33,22 @@ export type {
 
 export { validateContract } from "./contracts.js";
 export type { ContractIssue, ContractValidationResult } from "./contracts.js";
+
+export { diagnoseFailure } from "./diagnostics.js";
+export type { FailureDiagnosis } from "./diagnostics.js";
+
+export {
+  completeTrialSession,
+  createTrialSession,
+  summarizeTrialRecords,
+} from "./trials.js";
+export type {
+  CompleteTrialSessionInput,
+  CreateTrialSessionInput,
+  TrialExpectation,
+  TrialMode,
+  TrialModeSummary,
+  TrialRecord,
+  TrialSession,
+  TrialSummary,
+} from "./trials.js";

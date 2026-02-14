@@ -260,3 +260,10 @@ Status: accepted
 Decision: enforce TS package quality and publish flow through GitHub Actions workflows.
 Rationale: distribution reliability needs CI-enforced gates and repeatable publish mechanics beyond local developer runs.
 Consequences: added `ts-quality` workflow for push/PR checks and `ts-publish` manual workflow that validates release artifacts before publishing with `NPM_TOKEN`.
+
+## 2026-02-14
+
+Status: accepted
+Decision: instrument external time-to-diagnose trials with trace-derived expectations and JSONL metric records.
+Rationale: proving the core value proposition requires measurable diagnosis speed/accuracy data across baseline vs Condukt workflows.
+Consequences: TS runtime now includes diagnosis/trial helpers, a trial metrics CLI (`start`/`finish`/`report`), and documentation for repeatable external trial execution.
