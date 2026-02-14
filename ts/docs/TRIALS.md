@@ -69,6 +69,43 @@ Report includes:
 - accuracy
 - median and p90 elapsed diagnosis times
 - median speedup ratio (`baseline / condukt`)
+- paired sample count and paired speedup metrics
+
+## 5) Apply quality gates (recommended)
+
+Use explicit thresholds to fail reports that are too weak for decisions:
+
+```bash
+cd ts
+pnpm trial:report -- \
+  --min-records 6 \
+  --min-accuracy 0.75 \
+  --min-pairs 3 \
+  --min-speedup 1.5
+```
+
+Gate behavior:
+- exits non-zero when any threshold is not met
+- prints exact gate failure reasons
+
+## 6) Export markdown for sharing
+
+```bash
+cd ts
+pnpm trial:report -- \
+  --markdown-out trials/report.md \
+  --title "Condukt Trial Report" \
+  --max-pairs 20 \
+  --min-records 6 \
+  --min-pairs 3 \
+  --min-speedup 1.5
+```
+
+This writes a shareable markdown report with:
+- overview metrics
+- by-mode table
+- paired sample table
+- gate status and reasons (when gates are configured)
 
 ## Suggested 2-week target
 

@@ -6,9 +6,11 @@ import {
   completeTrialSession,
   createTrialSession,
   evaluateTrialSummary,
+  renderTrialSummaryMarkdown,
   summarizeTrialRecords,
   type TrialMode,
   type TrialQualityGate,
+  type TrialQualityGateResult,
   type TrialRecord,
   type TrialSession,
 } from "../src/trials.js";
@@ -109,24 +111,26 @@ async function runReport(args: Map<string, string>): Promise<void> {
   const summary = summarizeTrialRecords(records);
   const gate = parseTrialQualityGate(args);
   const hasGate = hasGateConfiguration(gate);
+  const gateResult = hasGate ? evaluateTrialSummary(summary, gate) : undefined;
+
+  await maybeWriteMarkdownReport(args, summary, gateResult);
 
   if (args.has("json")) {
     if (hasGate) {
-      const gateResult = evaluateTrialSummary(summary, gate);
       console.log(
         JSON.stringify(
           {
             summary,
             gate: {
               config: gate,
-              result: gateResult,
+              result: gateResult ?? { pass: true, failures: [] },
             },
           },
           null,
           2,
         ),
       );
-      if (!gateResult.pass) {
+      if (gateResult && !gateResult.pass) {
         process.exitCode = 1;
       }
       return;
@@ -156,12 +160,11 @@ async function runReport(args: Map<string, string>): Promise<void> {
   );
 
   if (hasGate) {
-    const gateResult = evaluateTrialSummary(summary, gate);
-    console.log(`Gate status: ${gateResult.pass ? "PASS" : "FAIL"}`);
-    for (const failure of gateResult.failures) {
+    console.log(`Gate status: ${gateResult?.pass ? "PASS" : "FAIL"}`);
+    for (const failure of gateResult?.failures ?? []) {
       console.log(`- ${failure}`);
     }
-    if (!gateResult.pass) {
+    if (gateResult && !gateResult.pass) {
       process.exitCode = 1;
     }
   }
@@ -272,12 +275,47 @@ async function readJsonLines<T>(path: string): Promise<T[]> {
     .map((line) => JSON.parse(line) as T);
 }
 
+async function maybeWriteMarkdownReport(
+  args: Map<string, string>,
+  summary: ReturnType<typeof summarizeTrialRecords>,
+  gateResult: TrialQualityGateResult | undefined,
+): Promise<void> {
+  const markdownOut = args.get("markdown-out");
+  if (!markdownOut) {
+    return;
+  }
+
+  const maxPairs = parseOptionalInt(args.get("max-pairs"), "max-pairs");
+  const title = args.get("title")?.trim();
+
+  let markdown = renderTrialSummaryMarkdown(summary, {
+    ...(title ? { title } : {}),
+    ...(typeof maxPairs === "number" ? { max_pairs: maxPairs } : {}),
+  });
+
+  if (gateResult) {
+    markdown += "\n## Gate\n\n";
+    markdown += `- Status: ${gateResult.pass ? "PASS" : "FAIL"}\n`;
+    if (gateResult.failures.length > 0) {
+      markdown += "\n";
+      for (const failure of gateResult.failures) {
+        markdown += `- ${failure}\n`;
+      }
+    }
+  }
+
+  const outputPath = resolve(process.cwd(), markdownOut);
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, markdown, "utf-8");
+  console.log(`Markdown report: ${outputPath}`);
+}
+
 function printUsage(): void {
   console.log(
     "Usage:\n" +
       "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt|baseline> [--trace <trace.json>]\n" +
       "  trial-metrics.ts finish --session <session.json> [--diagnosed-task <id>] [--diagnosed-error-code <code>] [--out <metrics.jsonl>]\n" +
-      "  trial-metrics.ts report [--input <metrics.jsonl>] [--json] [--min-records <int>] [--min-accuracy <0..1>] [--min-pairs <int>] [--min-speedup <number>]",
+      "  trial-metrics.ts report [--input <metrics.jsonl>] [--json] [--markdown-out <file.md>] [--title <text>] [--max-pairs <int>] [--min-records <int>] [--min-accuracy <0..1>] [--min-pairs <int>] [--min-speedup <number>]",
   );
 }
 

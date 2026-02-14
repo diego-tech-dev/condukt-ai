@@ -112,6 +112,11 @@ export interface TrialQualityGateResult {
   readonly failures: readonly string[];
 }
 
+export interface TrialSummaryMarkdownOptions {
+  readonly title?: string;
+  readonly max_pairs?: number;
+}
+
 export function createTrialSession(input: CreateTrialSessionInput): TrialSession {
   const expectedFromTrace = input.trace ? expectationFromTrace(input.trace) : undefined;
   const expected: TrialExpectation = {
@@ -235,6 +240,62 @@ export function evaluateTrialSummary(
   };
 }
 
+export function renderTrialSummaryMarkdown(
+  summary: TrialSummary,
+  options: TrialSummaryMarkdownOptions = {},
+): string {
+  const title = options.title ?? "Condukt Trial Report";
+  const maxPairs = Math.max(1, Math.floor(options.max_pairs ?? 20));
+  const visiblePairs = summary.paired.pairs.slice(0, maxPairs);
+
+  const lines: string[] = [
+    `# ${title}`,
+    "",
+    "## Overview",
+    "",
+    `- Records: ${summary.total}`,
+    `- Accuracy: ${formatPercent(summary.accuracy)}`,
+    `- Median elapsed: ${formatMilliseconds(summary.median_elapsed_ms)}`,
+    `- P90 elapsed: ${formatMilliseconds(summary.p90_elapsed_ms)}`,
+    `- Global speedup (mode medians): ${formatSpeedup(summary.condukt_vs_baseline_speedup)}`,
+    `- Paired samples: ${summary.paired.total_pairs}`,
+    `- Paired median speedup: ${formatSpeedup(summary.paired.median_speedup)}`,
+    `- Paired p90 speedup: ${formatSpeedup(summary.paired.p90_speedup)}`,
+    "",
+    "## By Mode",
+    "",
+    "| Mode | Records | Accuracy | Median elapsed | P90 elapsed |",
+    "| --- | ---: | ---: | ---: | ---: |",
+    modeRow("condukt", summary.by_mode.condukt),
+    modeRow("baseline", summary.by_mode.baseline),
+  ];
+
+  if (visiblePairs.length > 0) {
+    lines.push(
+      "",
+      "## Paired Samples",
+      "",
+      "| Participant | Scenario | Baseline elapsed | Condukt elapsed | Speedup |",
+      "| --- | --- | ---: | ---: | ---: |",
+      ...visiblePairs.map((pair) =>
+        `| ${pair.participant} | ${pair.scenario} | ${pair.baseline_elapsed_ms} ms | ${pair.condukt_elapsed_ms} ms | ${pair.speedup.toFixed(2)}x |`
+      ),
+    );
+
+    if (summary.paired.pairs.length > visiblePairs.length) {
+      lines.push(
+        "",
+        `... ${summary.paired.pairs.length - visiblePairs.length} more pair(s) omitted.`,
+      );
+    }
+  } else {
+    lines.push("", "## Paired Samples", "", "_No paired samples available._");
+  }
+
+  lines.push("");
+  return lines.join("\n");
+}
+
 function expectationFromTrace(trace: PipelineTrace): TrialExpectation {
   const diagnosis = diagnoseFailure(trace);
   if (!diagnosis.failed) {
@@ -350,6 +411,28 @@ function splitPairKey(key: string): [string, string] {
   }
 
   return [key.slice(0, separator), key.slice(separator + 2)];
+}
+
+function modeRow(mode: TrialMode, summary: TrialModeSummary): string {
+  return `| ${mode} | ${summary.total} | ${formatPercent(summary.accuracy)} | ${formatMilliseconds(summary.median_elapsed_ms)} | ${formatMilliseconds(summary.p90_elapsed_ms)} |`;
+}
+
+function formatPercent(value: number): string {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+function formatMilliseconds(value: number | null): string {
+  if (value === null) {
+    return "n/a";
+  }
+  return `${value} ms`;
+}
+
+function formatSpeedup(value: number | null): string {
+  if (value === null) {
+    return "n/a";
+  }
+  return `${value.toFixed(2)}x`;
 }
 
 function quantile(sortedValues: readonly number[], q: number): number | null {

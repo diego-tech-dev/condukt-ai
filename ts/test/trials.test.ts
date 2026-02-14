@@ -4,6 +4,7 @@ import {
   completeTrialSession,
   createTrialSession,
   evaluateTrialSummary,
+  renderTrialSummaryMarkdown,
   summarizeTrialRecords,
   type PipelineTrace,
 } from "../src/index.js";
@@ -347,4 +348,62 @@ test("evaluateTrialSummary fails with actionable reasons", () => {
     "paired samples 0 < required 1",
     "paired median speedup unavailable",
   ]);
+});
+
+test("renderTrialSummaryMarkdown includes summary and paired table", () => {
+  const summary = summarizeTrialRecords([
+    {
+      session_id: "s1",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "condukt",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:20.000Z",
+      elapsed_ms: 20_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+    {
+      session_id: "s2",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "baseline",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:01:20.000Z",
+      elapsed_ms: 80_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+  ]);
+
+  const markdown = renderTrialSummaryMarkdown(summary, {
+    title: "Trial Snapshot",
+    max_pairs: 10,
+  });
+
+  expect(markdown).toContain("# Trial Snapshot");
+  expect(markdown).toContain("## Overview");
+  expect(markdown).toContain("- Paired samples: 1");
+  expect(markdown).toContain("## Paired Samples");
+  expect(markdown).toContain("| p1 | quickstart-broken | 80000 ms | 20000 ms | 4.00x |");
 });

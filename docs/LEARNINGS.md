@@ -269,3 +269,18 @@ What changed:
 
 Guardrail:
 - Treat gate thresholds as part of experiment design, not post-hoc tuning after seeing results.
+
+## 2026-02-14
+
+Context:
+- Added markdown export for trial summaries.
+
+Learning:
+- Decision velocity increases when trial reports can be exported in a single deterministic command instead of manual spreadsheet/doc stitching.
+
+What changed:
+- Added markdown renderer for trial summaries and CLI export options (`--markdown-out`, `--title`, `--max-pairs`).
+- Included gate status/failures in markdown output when thresholds are configured.
+
+Guardrail:
+- Keep markdown report structure stable so downstream sharing/review workflows remain predictable.

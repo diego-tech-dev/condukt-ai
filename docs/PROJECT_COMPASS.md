@@ -120,10 +120,11 @@ Rules for safe migration:
 - Migrated TS tests to Vitest while keeping non-Vite build/runtime tooling.
 - Added paired trial analytics (participant+scenario matching) for stronger speedup measurement.
 - Added trial report quality gates for speedup/accuracy/sample-threshold evaluation.
+- Added markdown trial reporting output for shareable experiment artifacts.
 
 ## Near-Term Direction
 
-1. Run external user trials with `ts/docs/TRIALS.md` protocol and collect baseline-vs-Condukt diagnosis metrics.
+1. Run external user trials with `ts/docs/TRIALS.md` protocol, quality gates, and markdown exports for decision-ready baseline-vs-Condukt metrics.
 2. Iterate TS API shape from trial feedback while preserving contract/trace core value.
 
 ## Resume Checklist

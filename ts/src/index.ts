@@ -41,6 +41,7 @@ export {
   completeTrialSession,
   createTrialSession,
   evaluateTrialSummary,
+  renderTrialSummaryMarkdown,
   summarizeTrialRecords,
 } from "./trials.js";
 export type {
@@ -52,6 +53,7 @@ export type {
   TrialPairSummary,
   TrialQualityGate,
   TrialQualityGateResult,
+  TrialSummaryMarkdownOptions,
   TrialModeSummary,
   TrialRecord,
   TrialSession,

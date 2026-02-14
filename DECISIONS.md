@@ -295,3 +295,10 @@ Status: accepted
 Decision: enforce configurable trial quality gates at report time.
 Rationale: external trials need objective pass/fail criteria to avoid subjective interpretation of small or low-quality datasets.
 Consequences: trial reporting now supports threshold gates for record count, accuracy, paired sample count, and paired speedup, with non-zero exit code when thresholds are not met.
+
+## 2026-02-14
+
+Status: accepted
+Decision: generate shareable markdown trial reports directly from the trial CLI.
+Rationale: trial outcomes need a portable artifact for async review and decision-making without requiring custom post-processing.
+Consequences: trial reporting now supports `--markdown-out`, optional title/pair limits, and includes gate status in the exported markdown when thresholds are configured.

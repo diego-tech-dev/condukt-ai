@@ -60,6 +60,8 @@ Capture diagnosis-time metrics for external users:
 pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt --trace trace.quickstart.json
 pnpm trial:finish --session trials/sessions/<session-id>.session.json --diagnosed-task draft --diagnosed-error-code CONTRACT_OUTPUT_VIOLATION
 pnpm trial:report
+pnpm trial:report -- --min-records 6 --min-accuracy 0.75 --min-pairs 3 --min-speedup 1.5
+pnpm trial:report -- --markdown-out trials/report.md --title "Condukt Trial Report"
 ```
 
 Trial protocol details: `docs/TRIALS.md`.
