@@ -95,10 +95,11 @@ Rules for safe migration:
 - Hardened Rust `check-ast` with DAG cycle detection and `--json` machine-readable reporting.
 - Expanded Rust trace skeleton semantics to emit dependency-aware execution levels/mode/max parallel.
 - Added dual-runtime golden conformance gate over `ship_release` + `release_artifacts` fixtures.
+- Added Rust `run-task` prototype for single dependency-free worker execution.
 
 ## Near-Term Direction
 
-1. Expand Rust runtime from contract bootstrap toward task execution parity.
+1. Shape Rust task-result outputs toward Python trace contract parity.
 2. Extend cross-runtime parity coverage for resilient execution policies.
 
 ## Resume Checklist

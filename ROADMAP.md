@@ -73,6 +73,6 @@ Status: completed
 
 Status: in_progress
 
-1. `F1` Rust worker execution prototype (single task path): pending
+1. `F1` Rust worker execution prototype (single task path): completed
 2. `F2` Rust task-result contract shaping (error_code/provenance): pending
 3. `F3` Cross-runtime parity matrix for resilient policies: pending

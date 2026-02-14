@@ -76,6 +76,10 @@ Notes:
 Status: in_progress
 
 Milestone status:
-- `F1` Rust worker execution prototype (single task path): pending
+- `F1` Rust worker execution prototype (single task path): completed
 - `F2` Rust task-result contract shaping (error_code/provenance): pending
 - `F3` Cross-runtime parity matrix for resilient policies: pending
+
+Notes:
+- Added `mgl-rs run-task` prototype command for executing one dependency-free task worker from AST.
+- Added Rust CLI tests for successful worker execution and dependency-rejection behavior.

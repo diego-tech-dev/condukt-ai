@@ -155,3 +155,10 @@ Status: accepted
 Decision: enforce dual-runtime golden conformance as a first-class gate.
 Rationale: conformance checks should be anchored to durable fixtures, not only ad-hoc example runs.
 Consequences: added `release_artifacts` AST/trace goldens, expanded golden tests, and added `scripts/conformance.py --require-goldens` gate to assert Python AST + Rust trace contract parity against goldens.
+
+## 2026-02-14
+
+Status: accepted
+Decision: add Rust `run-task` as a single-task worker execution prototype.
+Rationale: begin migration beyond contract-only checks by exercising real worker invocation in Rust on a minimal, controlled slice.
+Consequences: `mgl-rs run-task` executes one dependency-free task with JSON input/output reporting; tests cover successful execution and dependency rejection behavior.

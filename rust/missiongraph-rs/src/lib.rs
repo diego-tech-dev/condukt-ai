@@ -16,6 +16,8 @@ pub struct Ast {
 pub struct AstTask {
     pub name: String,
     #[serde(default)]
+    pub worker: String,
+    #[serde(default)]
     pub after: Vec<String>,
 }
 

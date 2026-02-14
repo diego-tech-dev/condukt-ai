@@ -73,6 +73,40 @@ class RustCliTests(unittest.TestCase):
         self.assertFalse(payload["ok"])
         self.assertIn("cycle detected in plan", " ".join(payload["errors"]))
 
+    def test_run_task_executes_dependency_free_worker(self) -> None:
+        ast_path = ROOT / "tests" / "golden" / "ship_release.ast.json"
+        proc = self._run(
+            "run-task",
+            str(ast_path),
+            "--task",
+            "test_suite",
+            "--base-dir",
+            str(ROOT / "examples"),
+            "--json",
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr or proc.stdout)
+        payload = json.loads(proc.stdout)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["task"], "test_suite")
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual(payload["output"]["tests_passed"], 128)
+
+    def test_run_task_rejects_tasks_with_dependencies(self) -> None:
+        ast_path = ROOT / "tests" / "golden" / "ship_release.ast.json"
+        proc = self._run(
+            "run-task",
+            str(ast_path),
+            "--task",
+            "deploy_prod",
+            "--base-dir",
+            str(ROOT / "examples"),
+            "--json",
+        )
+        self.assertNotEqual(proc.returncode, 0)
+        payload = json.loads(proc.stdout)
+        self.assertFalse(payload["ok"])
+        self.assertIn("dependency-free tasks", payload["error"])
+
 
 if __name__ == "__main__":
     unittest.main()

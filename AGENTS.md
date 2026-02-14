@@ -37,6 +37,7 @@ Read first for deeper context:
 - Test suite: `python3 -m unittest discover -s tests -p "test_*.py"`
 - Rust bootstrap tests: `cargo test --manifest-path rust/missiongraph-rs/Cargo.toml`
 - Rust AST contract check (JSON): `cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json`
+- Rust single-task worker prototype: `cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json`
 - Multi-runtime conformance: `python3 scripts/conformance.py --json`
 - Dual-runtime golden gate: `python3 scripts/conformance.py --json --require-goldens`
 
