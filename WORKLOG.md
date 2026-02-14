@@ -196,3 +196,17 @@ Notes:
 - Renamed external TS package identity to `condukt-ai` and aligned docs/examples accordingly.
 - Updated trial mode labels and report fields from `condukt` to `condukt-ai`.
 - Updated repository metadata links to `github.com/diego-tech-dev/condukt-ai`.
+
+### Sprint: Identity alignment run
+
+Status: in_progress
+
+Milestone status:
+- `I1` Align package/repo/docs identity to `condukt-ai`: completed
+- `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: pending
+- `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): pending
+
+Notes:
+- Renamed GitHub repository to `diego-tech-dev/condukt-ai`.
+- Updated TS package metadata, trial mode labels, and docs/examples to `condukt-ai`.
+- Updated normalized trace goldens for canonical workspace rename (`condukt` -> `condukt-ai` path segment).

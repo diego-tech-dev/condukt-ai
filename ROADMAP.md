@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: completed
+Current sprint status: in_progress
 
 ## Autonomy Sprint (5 milestones)
 
@@ -108,3 +108,11 @@ Status: completed
 1. `R1` Paired trial analytics by participant/scenario: completed
 2. `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): completed
 3. `R3` Shareable markdown summary output + documentation refresh: completed
+
+## Identity Alignment Sprint (Autonomous)
+
+Status: in_progress
+
+1. `I1` Align package/repo/docs identity to `condukt-ai`: completed
+2. `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: pending
+3. `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): pending
