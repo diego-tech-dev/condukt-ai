@@ -94,7 +94,7 @@ Status: in_progress
 
 Milestone status:
 - `E1` Rust multi-task sequential execution (dependency order): completed
-- `E2` Rust retry/timeout policy loop parity for task execution: pending
+- `E2` Rust retry/timeout policy loop parity for task execution: completed
 - `E3` Rust trace assembly for full-plan runs (tasks + verify summary): pending
 
 Notes:
@@ -102,3 +102,5 @@ Notes:
 - Added `docs/LEARNINGS.md` as a persistent memory track for implementation lessons and guardrails.
 - Added Rust `run-plan` command for sequential dependency-order task execution from AST.
 - Added Rust CLI coverage for run-plan order semantics and fail-fast behavior.
+- Added Rust per-task execution policy parity (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`) across `run-task` and `run-plan`.
+- Added Rust CLI coverage for retry-to-success, timeout-only retry gating, and run-plan dependency execution after retries.

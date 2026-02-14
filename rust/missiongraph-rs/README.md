@@ -9,6 +9,7 @@ This prototype focuses on AST/trace contract handling:
 - derive dependency-aware execution metadata (`execution.levels`, `mode`, `max_parallel`)
 - execute a single dependency-free worker task (`run-task`, prototype)
 - execute full plans sequentially in dependency order (`run-plan`, prototype)
+- honor task execution policies from AST (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`)
 
 ## Usage
 
@@ -36,7 +37,7 @@ Execute one dependency-free task (prototype):
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- run-task /tmp/ship_release.ast.json --task test_suite --base-dir examples --json
 ```
 
-`run-task` reports contract-style fields including `status`, `error_code`, `started_at`, `finished_at`, and merged `provenance`.
+`run-task` reports contract-style fields including `status`, `error_code`, `started_at`, `finished_at`, and merged `provenance` (including retry attempt history when retries are configured).
 
 Execute full plan sequentially (prototype):
 

@@ -4,19 +4,49 @@ use missiongraph_rs::{
     TRACE_VERSION,
 };
 use serde::Serialize;
-use serde_json::Value;
 use serde_json::json;
+use serde_json::Value;
+use std::collections::BTreeMap;
 use std::fs;
 use std::io::Write;
-use std::collections::BTreeMap;
 use std::path::Path;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::process::{Child, Command, Output, Stdio};
+use std::thread::sleep;
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 const ERROR_CODE_RUNTIME_EXECUTION_FAILURE: &str = "RUNTIME_EXECUTION_FAILURE";
 const ERROR_CODE_WORKER_OUTPUT_JSON_INVALID: &str = "WORKER_OUTPUT_JSON_INVALID";
 const ERROR_CODE_WORKER_EXIT_NONZERO: &str = "WORKER_EXIT_NONZERO";
+const ERROR_CODE_WORKER_TIMEOUT: &str = "WORKER_TIMEOUT";
+
+#[derive(Debug, Clone)]
+struct TaskPolicy {
+    timeout_seconds: Option<f64>,
+    retries: u32,
+    retry_if: String,
+    backoff_seconds: f64,
+    jitter_seconds: f64,
+}
+
+impl TaskPolicy {
+    fn from_task(task: &AstTask) -> Self {
+        Self {
+            timeout_seconds: task.timeout_seconds,
+            retries: task.retries.unwrap_or(0),
+            retry_if: task
+                .retry_if
+                .clone()
+                .unwrap_or_else(|| "error".to_string()),
+            backoff_seconds: task.backoff_seconds.unwrap_or(0.0),
+            jitter_seconds: task.jitter_seconds.unwrap_or(0.0),
+        }
+    }
+
+    fn max_attempts(&self) -> u32 {
+        self.retries.saturating_add(1)
+    }
+}
 
 #[derive(Debug, Parser)]
 #[command(name = "mgl-rs")]
@@ -543,11 +573,75 @@ fn execute_task_from_ast(
             return report;
         }
     };
+    let policy = TaskPolicy::from_task(ast_task);
+    let max_attempts = policy.max_attempts();
+    let mut attempt_history: Vec<Value> = vec![];
+    let mut last_report: Option<RunTaskReport> = None;
 
+    for attempt in 1..=max_attempts {
+        let attempt_report = execute_task_attempt(
+            ast_task,
+            &worker_path,
+            &payload_text,
+            &policy,
+            attempt,
+            max_attempts,
+        );
+
+        attempt_history.push(json!({
+            "attempt": attempt,
+            "status": attempt_report.status,
+            "error_code": attempt_report.error_code,
+            "error": attempt_report.error,
+            "started_at": attempt_report.started_at,
+            "finished_at": attempt_report.finished_at,
+        }));
+
+        let is_ok = attempt_report.status.as_deref() == Some("ok");
+        let should_retry_attempt = should_retry(&policy, &attempt_report);
+        let is_last_attempt = attempt == max_attempts;
+        last_report = Some(attempt_report);
+        if is_ok || !should_retry_attempt || is_last_attempt {
+            break;
+        }
+
+        let delay_seconds = retry_delay_seconds(
+            policy.backoff_seconds,
+            attempt,
+            policy.jitter_seconds,
+        );
+        if delay_seconds > 0.0 {
+            sleep(Duration::from_secs_f64(delay_seconds));
+        }
+    }
+
+    let mut final_report = last_report.unwrap_or(report);
+    if max_attempts > 1 {
+        let mut provenance = match final_report.provenance.take() {
+            Some(Value::Object(map)) => map,
+            _ => serde_json::Map::new(),
+        };
+        provenance.insert("attempts".to_string(), Value::Array(attempt_history));
+        final_report.provenance = Some(Value::Object(provenance));
+    }
+    final_report
+}
+
+fn execute_task_attempt(
+    ast_task: &AstTask,
+    worker_path: &Path,
+    payload_text: &str,
+    policy: &TaskPolicy,
+    attempt: u32,
+    max_attempts: u32,
+) -> RunTaskReport {
+    let mut report = empty_run_task_report(&ast_task.name);
+    report.worker = Some(ast_task.worker.clone());
+    report.worker_path = Some(worker_path.display().to_string());
     report.started_at = Some(now_timestamp());
 
     let mut child = match Command::new("python3")
-        .arg(&worker_path)
+        .arg(worker_path)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -557,8 +651,20 @@ fn execute_task_from_ast(
         Err(err) => {
             report.error = Some(format!("failed to launch worker: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            report.status = Some("error".to_string());
+            report.confidence = Some(0.0);
+            report.output = Some(Value::Object(serde_json::Map::new()));
             report.finished_at = Some(now_timestamp());
-            return report;
+            report.provenance = Some(default_provenance(
+                worker_path,
+                None,
+                &ast_task.worker,
+                policy,
+                attempt,
+                max_attempts,
+                None,
+            ));
+            return finalize_run_task_report(report);
         }
     };
 
@@ -566,119 +672,263 @@ fn execute_task_from_ast(
         if let Err(err) = stdin.write_all(payload_text.as_bytes()) {
             report.error = Some(format!("failed to write worker stdin: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            report.status = Some("error".to_string());
+            report.confidence = Some(0.0);
+            report.output = Some(Value::Object(serde_json::Map::new()));
             report.finished_at = Some(now_timestamp());
-            return report;
+            report.provenance = Some(default_provenance(
+                worker_path,
+                None,
+                &ast_task.worker,
+                policy,
+                attempt,
+                max_attempts,
+                None,
+            ));
+            return finalize_run_task_report(report);
         }
     }
 
-    let output = match child.wait_with_output() {
+    let (output, timed_out) = match wait_with_timeout(child, policy.timeout_seconds) {
         Ok(result) => result,
         Err(err) => {
             report.error = Some(format!("failed waiting for worker process: {err}"));
             report.error_code = Some(ERROR_CODE_RUNTIME_EXECUTION_FAILURE.to_string());
+            report.status = Some("error".to_string());
+            report.confidence = Some(0.0);
+            report.output = Some(Value::Object(serde_json::Map::new()));
             report.finished_at = Some(now_timestamp());
-            return report;
+            report.provenance = Some(default_provenance(
+                worker_path,
+                None,
+                &ast_task.worker,
+                policy,
+                attempt,
+                max_attempts,
+                None,
+            ));
+            return finalize_run_task_report(report);
         }
     };
     report.finished_at = Some(now_timestamp());
-    report.exit_code = output.status.code();
+    report.exit_code = if timed_out { None } else { output.status.code() };
 
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
     if !stderr.is_empty() {
         report.stderr = Some(stderr);
     }
-    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    if stdout.is_empty() {
-        report.error = Some("worker returned empty stdout".to_string());
-        report.error_code = Some(if !output.status.success() {
-            ERROR_CODE_WORKER_EXIT_NONZERO.to_string()
-        } else {
-            ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string()
-        });
+    if timed_out {
         report.status = Some("error".to_string());
         report.confidence = Some(0.0);
         report.output = Some(Value::Object(serde_json::Map::new()));
+        report.error_code = Some(ERROR_CODE_WORKER_TIMEOUT.to_string());
+        report.error = Some(format!(
+            "worker timed out after {}s",
+            format_seconds(policy.timeout_seconds.unwrap_or(0.0))
+        ));
         report.provenance = Some(default_provenance(
-            &worker_path,
-            report.exit_code,
+            worker_path,
+            None,
             &ast_task.worker,
+            policy,
+            attempt,
+            max_attempts,
             None,
         ));
         return finalize_run_task_report(report);
     }
 
-    let worker_payload = match serde_json::from_str::<Value>(&stdout) {
-        Ok(value) => value,
-        Err(err) => {
-            report.error = Some(format!("worker stdout is not valid JSON: {err}"));
-            report.error_code = Some(ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string());
-            report.status = Some("error".to_string());
-            report.confidence = Some(0.0);
-            report.output = Some(Value::Object(serde_json::Map::new()));
-            report.provenance = Some(default_provenance(
-                &worker_path,
-                report.exit_code,
-                &ast_task.worker,
-                None,
-            ));
-            return finalize_run_task_report(report);
-        }
-    };
-    let worker_object = match worker_payload.as_object() {
-        Some(obj) => obj,
-        None => {
-            report.error = Some("worker output must be a JSON object".to_string());
-            report.error_code = Some(ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string());
-            report.status = Some("error".to_string());
-            report.confidence = Some(0.0);
-            report.output = Some(Value::Object(serde_json::Map::new()));
-            report.provenance = Some(default_provenance(
-                &worker_path,
-                report.exit_code,
-                &ast_task.worker,
-                None,
-            ));
-            return finalize_run_task_report(report);
-        }
-    };
+    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    let mut worker_provenance: Option<Value> = None;
+    if stdout.is_empty() {
+        report.status = Some(if report.exit_code == Some(0) {
+            "ok".to_string()
+        } else {
+            "error".to_string()
+        });
+        report.confidence = Some(if report.exit_code == Some(0) { 0.5 } else { 0.0 });
+        report.output = Some(Value::Object(serde_json::Map::new()));
+    } else {
+        let worker_payload = match serde_json::from_str::<Value>(&stdout) {
+            Ok(value) => value,
+            Err(err) => {
+                report.error = Some(format!("worker output is not valid JSON: {err}"));
+                report.error_code = Some(ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string());
+                report.status = Some("error".to_string());
+                report.confidence = Some(0.0);
+                report.output = Some(Value::Object(serde_json::Map::new()));
+                report.provenance = Some(default_provenance(
+                    worker_path,
+                    report.exit_code,
+                    &ast_task.worker,
+                    policy,
+                    attempt,
+                    max_attempts,
+                    None,
+                ));
+                return finalize_run_task_report(report);
+            }
+        };
 
-    report.status = worker_object
-        .get("status")
-        .and_then(|value| value.as_str())
-        .map(str::to_string);
-    report.confidence = worker_object
-        .get("confidence")
-        .and_then(|value| value.as_f64());
-    report.error = worker_object
-        .get("error")
-        .and_then(|value| value.as_str())
-        .map(str::to_string);
-    report.error_code = worker_object
-        .get("error_code")
-        .and_then(|value| value.as_str())
-        .map(str::to_string);
+        let worker_object = match worker_payload.as_object() {
+            Some(obj) => obj,
+            None => {
+                report.error = Some("worker output must be a JSON object".to_string());
+                report.error_code = Some(ERROR_CODE_WORKER_OUTPUT_JSON_INVALID.to_string());
+                report.status = Some("error".to_string());
+                report.confidence = Some(0.0);
+                report.output = Some(Value::Object(serde_json::Map::new()));
+                report.provenance = Some(default_provenance(
+                    worker_path,
+                    report.exit_code,
+                    &ast_task.worker,
+                    policy,
+                    attempt,
+                    max_attempts,
+                    None,
+                ));
+                return finalize_run_task_report(report);
+            }
+        };
 
-    let output_value = worker_object
-        .get("output")
-        .cloned()
-        .unwrap_or_else(|| Value::Object(serde_json::Map::new()));
-    report.output = Some(match output_value {
-        Value::Object(_) => output_value,
-        other => {
-            let mut wrapped = serde_json::Map::new();
-            wrapped.insert("value".to_string(), other);
-            Value::Object(wrapped)
-        }
-    });
+        report.status = worker_object
+            .get("status")
+            .and_then(|value| value.as_str())
+            .map(str::to_string);
+        report.confidence = worker_object
+            .get("confidence")
+            .and_then(|value| value.as_f64());
+        report.error = worker_object
+            .get("error")
+            .and_then(|value| value.as_str())
+            .map(str::to_string);
+        report.error_code = worker_object
+            .get("error_code")
+            .and_then(|value| value.as_str())
+            .map(str::to_string);
+
+        let output_value = worker_object
+            .get("output")
+            .cloned()
+            .unwrap_or_else(|| Value::Object(serde_json::Map::new()));
+        report.output = Some(match output_value {
+            Value::Object(_) => output_value,
+            other => {
+                let mut wrapped = serde_json::Map::new();
+                wrapped.insert("value".to_string(), other);
+                Value::Object(wrapped)
+            }
+        });
+        worker_provenance = worker_object.get("provenance").cloned();
+    }
 
     report.provenance = Some(default_provenance(
-        &worker_path,
+        worker_path,
         report.exit_code,
         &ast_task.worker,
-        worker_object.get("provenance").cloned(),
+        policy,
+        attempt,
+        max_attempts,
+        worker_provenance,
     ));
 
     finalize_run_task_report(report)
+}
+
+fn wait_with_timeout(mut child: Child, timeout_seconds: Option<f64>) -> Result<(Output, bool), String> {
+    let timeout = timeout_seconds
+        .filter(|seconds| *seconds > 0.0)
+        .map(Duration::from_secs_f64);
+    if let Some(limit) = timeout {
+        let start = Instant::now();
+        loop {
+            match child.try_wait() {
+                Ok(Some(_)) => {
+                    let output = child
+                        .wait_with_output()
+                        .map_err(|err| format!("failed collecting worker output: {err}"))?;
+                    return Ok((output, false));
+                }
+                Ok(None) => {
+                    if start.elapsed() >= limit {
+                        let _ = child.kill();
+                        let output = child
+                            .wait_with_output()
+                            .map_err(|err| format!("failed collecting timed-out worker output: {err}"))?;
+                        return Ok((output, true));
+                    }
+                    sleep(Duration::from_millis(10));
+                }
+                Err(err) => {
+                    return Err(format!("failed while polling worker status: {err}"));
+                }
+            }
+        }
+    }
+
+    let output = child
+        .wait_with_output()
+        .map_err(|err| format!("failed waiting for worker process: {err}"))?;
+    Ok((output, false))
+}
+
+fn retry_delay_seconds(backoff_seconds: f64, attempt: u32, jitter_seconds: f64) -> f64 {
+    let mut base = 0.0;
+    if backoff_seconds > 0.0 {
+        base = backoff_seconds * f64::from(2u32.saturating_pow(attempt.saturating_sub(1)));
+    }
+
+    let mut jitter = 0.0;
+    if jitter_seconds > 0.0 {
+        jitter = random_jitter_fraction() * jitter_seconds;
+    }
+    base + jitter
+}
+
+fn random_jitter_fraction() -> f64 {
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .subsec_nanos();
+    f64::from(nanos) / 1_000_000_000.0
+}
+
+fn should_retry(policy: &TaskPolicy, report: &RunTaskReport) -> bool {
+    if policy.retries == 0 {
+        return false;
+    }
+    if report.status.as_deref() == Some("ok") {
+        return false;
+    }
+
+    let error_code = report.error_code.as_deref();
+    match policy.retry_if.as_str() {
+        "error" => true,
+        "timeout" => error_code == Some(ERROR_CODE_WORKER_TIMEOUT),
+        "worker_failure" => matches!(
+            error_code,
+            Some(
+                ERROR_CODE_WORKER_TIMEOUT
+                    | ERROR_CODE_WORKER_EXIT_NONZERO
+                    | ERROR_CODE_WORKER_OUTPUT_JSON_INVALID
+                    | ERROR_CODE_RUNTIME_EXECUTION_FAILURE
+            )
+        ),
+        _ => false,
+    }
+}
+
+fn format_seconds(seconds: f64) -> String {
+    let mut text = format!("{seconds}");
+    if text.contains('.') {
+        while text.ends_with('0') {
+            text.pop();
+        }
+        if text.ends_with('.') {
+            text.pop();
+        }
+    }
+    text
 }
 
 fn finalize_run_task_report(mut report: RunTaskReport) -> RunTaskReport {
@@ -697,26 +947,28 @@ fn finalize_run_task_report(mut report: RunTaskReport) -> RunTaskReport {
         });
     }
 
-    if report.exit_code != Some(0) {
-        if report.status.as_deref() == Some("ok") {
-            report.status = Some("error".to_string());
-        }
-        if report.error_code.is_none() {
-            report.error_code = Some(ERROR_CODE_WORKER_EXIT_NONZERO.to_string());
-        }
-        if report.error.is_none() {
-            report.error = Some(format!(
-                "worker exited with return code {}",
-                report
-                    .exit_code
-                    .map(|code| code.to_string())
-                    .unwrap_or_else(|| "unknown".to_string())
-            ));
-        }
+    if report.exit_code != Some(0) && report.status.as_deref() == Some("ok") {
+        let exit_label = report
+            .exit_code
+            .map(|code| code.to_string())
+            .unwrap_or_else(|| "unknown".to_string());
+        report.status = Some("error".to_string());
+        report.error_code = Some(ERROR_CODE_WORKER_EXIT_NONZERO.to_string());
+        report.error = Some(merge_error(
+            report.error.as_deref(),
+            &format!("worker exited with return code {exit_label}"),
+        ));
     }
 
     report.ok = report.status.as_deref() == Some("ok");
     report
+}
+
+fn merge_error(existing: Option<&str>, new_message: &str) -> String {
+    match existing {
+        Some(value) if !value.trim().is_empty() => format!("{value}; {new_message}"),
+        _ => new_message.to_string(),
+    }
 }
 
 fn report_to_trace_task(report: &RunTaskReport) -> TraceTaskResult {
@@ -793,6 +1045,9 @@ fn default_provenance(
     worker_path: &Path,
     exit_code: Option<i32>,
     worker_ref: &str,
+    policy: &TaskPolicy,
+    attempt: u32,
+    max_attempts: u32,
     worker_provenance: Option<Value>,
 ) -> Value {
     let mut provenance = serde_json::Map::new();
@@ -815,6 +1070,28 @@ fn default_provenance(
             None => Value::Null,
         },
     );
+    if max_attempts > 1 {
+        provenance.insert("attempt".to_string(), Value::from(attempt));
+        provenance.insert("max_attempts".to_string(), Value::from(max_attempts));
+    }
+    if let Some(timeout_seconds) = policy.timeout_seconds {
+        provenance.insert("timeout_seconds".to_string(), Value::from(timeout_seconds));
+    }
+    if policy.retries > 0 {
+        provenance.insert("retries".to_string(), Value::from(policy.retries));
+    }
+    if policy.retry_if != "error" {
+        provenance.insert("retry_if".to_string(), Value::String(policy.retry_if.clone()));
+    }
+    if policy.backoff_seconds > 0.0 {
+        provenance.insert(
+            "backoff_seconds".to_string(),
+            Value::from(policy.backoff_seconds),
+        );
+    }
+    if policy.jitter_seconds > 0.0 {
+        provenance.insert("jitter_seconds".to_string(), Value::from(policy.jitter_seconds));
+    }
 
     if let Some(Value::Object(custom)) = worker_provenance {
         for (key, value) in custom {

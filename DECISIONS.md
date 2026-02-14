@@ -197,3 +197,10 @@ Status: accepted
 Decision: add Rust `run-plan` command for sequential dependency-order execution.
 Rationale: migration needs a full-plan execution slice beyond single-task prototypes to validate end-to-end task ordering and fail-fast behavior.
 Consequences: Rust CLI now executes plan DAGs sequentially with dependency payload wiring and emits trace-shaped outputs with executed task results.
+
+## 2026-02-14
+
+Status: accepted
+Decision: align Rust worker execution with policy-loop semantics (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`).
+Rationale: resilient execution behavior is a core runtime contract and must behave consistently across runtimes during migration.
+Consequences: Rust `run-task` and `run-plan` now execute per-attempt policy loops, emit retry attempt history in provenance, and map timeout failures to `WORKER_TIMEOUT`.

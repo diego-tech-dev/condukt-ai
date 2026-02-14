@@ -86,3 +86,18 @@ What changed:
 
 Guardrail:
 - Any new language feature should add at least one representative parity row and golden pair.
+
+## 2026-02-14
+
+Context:
+- Implemented Rust retry/timeout policy-loop behavior for worker execution.
+
+Learning:
+- Retry semantics depend on both status and `error_code`; preserving Python's `retry_if` gating logic avoids accidental over-retries.
+
+What changed:
+- Rust `run-task`/`run-plan` now run per-attempt loops with timeout kill handling, retry delay calculation, and provenance attempt history.
+- Added CLI tests for retry success path, timeout-only retry mode, and dependency execution after retried tasks.
+
+Guardrail:
+- Any future retry-policy change must include both `run-task` and `run-plan` behavior tests, plus explicit checks on provenance `attempts`.

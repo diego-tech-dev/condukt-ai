@@ -102,11 +102,12 @@ Rules for safe migration:
 - Expanded parity matrix coverage to `release_fanout` and `release_resilient` with dedicated matrix tooling.
 - Added `FOUNDATIONS.md` with explicit decisions/tradeoffs/migration paths across core language dimensions.
 - Added Rust `run-plan` prototype with sequential dependency-order task execution and fail-fast semantics.
+- Added Rust retry/timeout policy-loop parity (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`) for both `run-task` and `run-plan`.
 
 ## Near-Term Direction
 
-1. Implement Rust retry/timeout loop parity for both `run-task` and `run-plan`.
-2. Assemble full Rust `run-plan` trace fields for constraints/verify diagnostics parity.
+1. Assemble full Rust `run-plan` trace fields for constraints/verify diagnostics parity.
+2. Expand parity/conformance checks to assert Rust full-plan trace diagnostics against Python outputs.
 
 ## Resume Checklist
 

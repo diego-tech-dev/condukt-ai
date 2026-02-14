@@ -236,6 +236,234 @@ class RustCliTests(unittest.TestCase):
         self.assertEqual(payload["tasks"][0]["task"], "first")
         self.assertFalse(marker.exists())
 
+    def test_run_task_retries_and_succeeds(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            counter_path = temp_root / "counter.txt"
+            worker_path = temp_root / "flaky_worker.py"
+            worker_path.write_text(
+                (
+                    "import json\n"
+                    "from pathlib import Path\n"
+                    f"counter = Path(r'{counter_path}')\n"
+                    "attempt = int(counter.read_text(encoding='utf-8')) if counter.exists() else 0\n"
+                    "attempt += 1\n"
+                    "counter.write_text(str(attempt), encoding='utf-8')\n"
+                    "payload = {'status':'ok','confidence':1.0,'output':{'attempt': attempt}}\n"
+                    "print(json.dumps(payload))\n"
+                    "raise SystemExit(1 if attempt == 1 else 0)\n"
+                ),
+                encoding="utf-8",
+            )
+            ast_path = temp_root / "retry.ast.json"
+            ast_path.write_text(
+                json.dumps(
+                    {
+                        "ast_version": AST_VERSION,
+                        "goal": "retry success",
+                        "tasks": [
+                            {
+                                "name": "flaky",
+                                "worker": str(worker_path),
+                                "after": [],
+                                "retries": 1,
+                                "backoff_seconds": 0.0,
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            proc = self._run(
+                "run-task",
+                str(ast_path),
+                "--task",
+                "flaky",
+                "--json",
+            )
+
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr or proc.stdout)
+        payload = json.loads(proc.stdout)
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual(payload["output"]["attempt"], 2)
+        self.assertEqual(payload["provenance"]["attempt"], 2)
+        self.assertEqual(payload["provenance"]["max_attempts"], 2)
+        self.assertEqual(payload["provenance"]["retries"], 1)
+        self.assertEqual(len(payload["provenance"]["attempts"]), 2)
+        self.assertEqual(payload["provenance"]["attempts"][0]["status"], "error")
+        self.assertEqual(payload["provenance"]["attempts"][1]["status"], "ok")
+
+    def test_run_task_retry_if_timeout_retries_timeout_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            worker_path = temp_root / "slow_worker.py"
+            worker_path.write_text(
+                (
+                    "import json\n"
+                    "import time\n"
+                    "time.sleep(0.20)\n"
+                    "print(json.dumps({'status':'ok','confidence':1.0,'output':{}}))\n"
+                ),
+                encoding="utf-8",
+            )
+            ast_path = temp_root / "timeout_retry.ast.json"
+            ast_path.write_text(
+                json.dumps(
+                    {
+                        "ast_version": AST_VERSION,
+                        "goal": "timeout retries",
+                        "tasks": [
+                            {
+                                "name": "slow",
+                                "worker": str(worker_path),
+                                "after": [],
+                                "timeout_seconds": 0.05,
+                                "retries": 1,
+                                "retry_if": "timeout",
+                                "backoff_seconds": 0.0,
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            proc = self._run(
+                "run-task",
+                str(ast_path),
+                "--task",
+                "slow",
+                "--json",
+            )
+
+        self.assertNotEqual(proc.returncode, 0)
+        payload = json.loads(proc.stdout)
+        self.assertFalse(payload["ok"])
+        self.assertEqual(payload["error_code"], "WORKER_TIMEOUT")
+        self.assertEqual(payload["provenance"]["attempt"], 2)
+        self.assertEqual(len(payload["provenance"]["attempts"]), 2)
+        self.assertTrue(payload["error"].startswith("worker timed out after"))
+
+    def test_run_task_retry_if_timeout_does_not_retry_other_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            worker_path = temp_root / "fast_fail_worker.py"
+            worker_path.write_text(
+                (
+                    "import json\n"
+                    "print(json.dumps({'status':'error','confidence':0.0,'error_code':'WORKER_OUTPUT_JSON_INVALID','error':'bad output','output':{}}))\n"
+                    "raise SystemExit(1)\n"
+                ),
+                encoding="utf-8",
+            )
+            ast_path = temp_root / "timeout_filter.ast.json"
+            ast_path.write_text(
+                json.dumps(
+                    {
+                        "ast_version": AST_VERSION,
+                        "goal": "timeout filter",
+                        "tasks": [
+                            {
+                                "name": "fast_fail",
+                                "worker": str(worker_path),
+                                "after": [],
+                                "retries": 2,
+                                "retry_if": "timeout",
+                                "backoff_seconds": 0.0,
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            proc = self._run(
+                "run-task",
+                str(ast_path),
+                "--task",
+                "fast_fail",
+                "--json",
+            )
+
+        self.assertNotEqual(proc.returncode, 0)
+        payload = json.loads(proc.stdout)
+        self.assertFalse(payload["ok"])
+        self.assertEqual(payload["status"], "error")
+        self.assertEqual(payload["error_code"], "WORKER_OUTPUT_JSON_INVALID")
+        self.assertEqual(payload["provenance"]["attempt"], 1)
+        self.assertEqual(payload["provenance"]["max_attempts"], 3)
+        self.assertEqual(len(payload["provenance"]["attempts"]), 1)
+
+    def test_run_plan_honors_retry_policy_before_dependent_task(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_root = Path(tmp_dir)
+            counter_path = temp_root / "counter.txt"
+            flaky_worker = temp_root / "flaky_worker.py"
+            downstream_worker = temp_root / "downstream_worker.py"
+            flaky_worker.write_text(
+                (
+                    "import json\n"
+                    "from pathlib import Path\n"
+                    f"counter = Path(r'{counter_path}')\n"
+                    "attempt = int(counter.read_text(encoding='utf-8')) if counter.exists() else 0\n"
+                    "attempt += 1\n"
+                    "counter.write_text(str(attempt), encoding='utf-8')\n"
+                    "print(json.dumps({'status':'ok','confidence':1.0,'output':{'attempt': attempt}}))\n"
+                    "raise SystemExit(1 if attempt == 1 else 0)\n"
+                ),
+                encoding="utf-8",
+            )
+            downstream_worker.write_text(
+                (
+                    "import json\n"
+                    "import sys\n"
+                    "payload = json.loads(sys.stdin.read() or '{}')\n"
+                    "attempt = payload['dependencies']['flaky']['output']['attempt']\n"
+                    "print(json.dumps({'status':'ok','confidence':1.0,'output':{'from_first': attempt}}))\n"
+                ),
+                encoding="utf-8",
+            )
+            ast_path = temp_root / "plan_retry.ast.json"
+            ast_path.write_text(
+                json.dumps(
+                    {
+                        "ast_version": AST_VERSION,
+                        "goal": "plan retries",
+                        "tasks": [
+                            {
+                                "name": "flaky",
+                                "worker": str(flaky_worker),
+                                "after": [],
+                                "retries": 1,
+                                "backoff_seconds": 0.0,
+                            },
+                            {
+                                "name": "downstream",
+                                "worker": str(downstream_worker),
+                                "after": ["flaky"],
+                            },
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            proc = self._run(
+                "run-plan",
+                str(ast_path),
+                "--json",
+            )
+
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr or proc.stdout)
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["status"], "ok")
+        self.assertEqual([item["task"] for item in payload["tasks"]], ["flaky", "downstream"])
+        self.assertEqual(payload["tasks"][0]["provenance"]["attempt"], 2)
+        self.assertEqual(len(payload["tasks"][0]["provenance"]["attempts"]), 2)
+        self.assertEqual(payload["tasks"][1]["output"]["from_first"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

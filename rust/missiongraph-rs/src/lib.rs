@@ -19,6 +19,16 @@ pub struct AstTask {
     pub worker: String,
     #[serde(default)]
     pub after: Vec<String>,
+    #[serde(default)]
+    pub timeout_seconds: Option<f64>,
+    #[serde(default)]
+    pub retries: Option<u32>,
+    #[serde(default)]
+    pub retry_if: Option<String>,
+    #[serde(default)]
+    pub backoff_seconds: Option<f64>,
+    #[serde(default)]
+    pub jitter_seconds: Option<f64>,
 }
 
 #[derive(Debug, Serialize)]
