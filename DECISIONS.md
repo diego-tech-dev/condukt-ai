@@ -379,3 +379,10 @@ Status: accepted
 Decision: integrate TanStack AI as a first-party task adapter surface (`tanstackChatTask`) in the TS runtime.
 Rationale: TanStack AI aligns with Condukt’s type-safety goals and provides a direct ecosystem wedge for TypeScript-first agent workflows without introducing a separate orchestration framework.
 Consequences: Condukt now includes a TanStack adapter task builder that executes `chat({ stream: false })`, parses JSON output for contract validation, and emits provider/model metadata in task traces.
+
+## 2026-02-14
+
+Status: accepted
+Decision: execute dependency levels in parallel by default in the TS pipeline runtime.
+Rationale: orchestration throughput should scale with DAG fan-out; level-parallel execution preserves dependency correctness while reducing end-to-end latency.
+Consequences: `Pipeline.runDetailed()` now executes independent tasks concurrently per level, trace execution metadata reports `mode: level_parallel`, and trace/task ordering remains deterministic by declared level order.

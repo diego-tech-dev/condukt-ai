@@ -286,3 +286,50 @@ test("retries execution failures and succeeds on later attempt", async () => {
   expect(trace.tasks[0]?.attempts?.[0]?.status).toBe("error");
   expect(trace.tasks[0]?.attempts?.[1]?.status).toBe("ok");
 });
+
+test("executes independent dependency levels in parallel while keeping deterministic task order", async () => {
+  const starts: Record<string, number> = {};
+
+  const pipeline = new Pipeline("parallel-levels")
+    .addTask({
+      id: "a",
+      output: z.object({ value: z.string() }),
+      run: async () => {
+        starts.a = Date.now();
+        await waitMs(80);
+        return { data: { value: "A" } };
+      },
+    })
+    .addTask({
+      id: "b",
+      output: z.object({ value: z.string() }),
+      run: async () => {
+        starts.b = Date.now();
+        await waitMs(80);
+        return { data: { value: "B" } };
+      },
+    })
+    .addTask({
+      id: "join",
+      after: ["a", "b"] as const,
+      output: z.object({ values: z.array(z.string()) }),
+      run: async ({ dependencyOutputs }) => ({
+        data: { values: [dependencyOutputs.a.value, dependencyOutputs.b.value] },
+      }),
+    });
+
+  const result = await pipeline.runDetailed();
+  const startDeltaMs = Math.abs((starts.a ?? 0) - (starts.b ?? 0));
+
+  expect(result.trace.status).toBe("ok");
+  expect(result.trace.execution.mode).toBe("level_parallel");
+  expect(result.trace.task_order).toEqual(["a", "b", "join"]);
+  expect(startDeltaMs).toBeLessThan(50);
+  expect(result.outputs.join?.values).toEqual(["A", "B"]);
+});
+
+async function waitMs(durationMs: number): Promise<void> {
+  await new Promise((resolve) => {
+    setTimeout(resolve, durationMs);
+  });
+}

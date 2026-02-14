@@ -93,7 +93,7 @@ export interface PipelineTrace {
   readonly started_at: string;
   readonly finished_at: string;
   readonly execution: {
-    readonly mode: "sequential";
+    readonly mode: "level_parallel";
     readonly levels: readonly (readonly string[])[];
   };
   readonly task_order: readonly string[];
@@ -262,51 +262,51 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     let failed = false;
 
     for (const level of levels) {
-      for (const taskId of level) {
-        const task = this.tasksById.get(taskId);
-        if (!task) {
-          throw new Error(`internal error: task '${taskId}' missing from registry`);
-        }
-
-        const dependencyOutputs: Record<string, unknown> = {};
-        for (const dependency of task.after ?? []) {
-          if (!(dependency in outputs)) {
-            const trace = buildTaskErrorTrace({
-              task,
-              startedAt: nowIso(),
-              finishedAt: nowIso(),
-              durationMs: 0,
-              errorCode: ERROR_CODE_TASK_DEPENDENCY_MISSING,
-              error: `dependency output missing: ${dependency}`,
-            });
-            taskTrace.push(trace);
-            taskResults[task.id] = trace;
-            failed = true;
-            break;
+      const levelResults = await Promise.all(
+        level.map(async (taskId) => {
+          const task = this.tasksById.get(taskId);
+          if (!task) {
+            throw new Error(`internal error: task '${taskId}' missing from registry`);
           }
-          dependencyOutputs[dependency] = outputs[dependency];
-        }
 
-        if (failed) {
-          break;
-        }
+          const dependencyOutputs: Record<string, unknown> = {};
+          for (const dependency of task.after ?? []) {
+            if (!(dependency in outputs)) {
+              return {
+                task,
+                trace: buildTaskErrorTrace({
+                  task,
+                  startedAt: nowIso(),
+                  finishedAt: nowIso(),
+                  durationMs: 0,
+                  errorCode: ERROR_CODE_TASK_DEPENDENCY_MISSING,
+                  error: `dependency output missing: ${dependency}`,
+                }),
+              };
+            }
+            dependencyOutputs[dependency] = outputs[dependency];
+          }
 
-        const trace = await executeTaskWithRetry(task, {
-          outputs,
-          taskResults,
-          dependencyOutputs,
-        });
+          const trace = await executeTaskWithRetry(task, {
+            outputs,
+            taskResults,
+            dependencyOutputs,
+          });
 
-        taskTrace.push(trace);
-        taskResults[task.id] = trace;
+          return { task, trace };
+        }),
+      );
 
-        if (trace.status === "ok") {
-          outputs[task.id] = trace.output;
+      for (const result of levelResults) {
+        taskTrace.push(result.trace);
+        taskResults[result.task.id] = result.trace;
+
+        if (result.trace.status === "ok") {
+          outputs[result.task.id] = result.trace.output;
           continue;
         }
 
         failed = true;
-        break;
       }
 
       if (failed) {
@@ -324,7 +324,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
       started_at: startedAt,
       finished_at: finishedAt,
       execution: {
-        mode: "sequential",
+        mode: "level_parallel",
         levels,
       },
       task_order: taskOrder,

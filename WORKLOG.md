@@ -309,8 +309,8 @@ Status: in progress
 
 Milestone status:
 - `E1` TanStack AI adapter integration for pipeline tasks: completed
-- `E2` Parallel execution for independent dependency levels: in progress
-- `E3` Adaptive control-flow primitives for conditional execution: pending
+- `E2` Parallel execution for independent dependency levels: completed
+- `E3` Adaptive control-flow primitives for conditional execution: in progress
 - `E4` Trials API extraction into dedicated package surface: pending
 
 Notes:
@@ -318,3 +318,5 @@ Notes:
 - Added runtime coverage for TanStack integration (`ts/test/tanstack.test.ts`) including valid JSON flow and malformed JSON failure diagnostics.
 - Added compile-time fixture for adapter option typing (`ts/typecheck/tanstack.typecheck.ts`).
 - Updated TS package metadata to include `@tanstack/ai` runtime dependency and documented TanStack adapter usage in `ts/README.md`.
+- Switched pipeline execution to run tasks in parallel within dependency levels (`execution.mode = level_parallel`) while preserving deterministic per-level trace ordering.
+- Added runtime coverage to verify concurrent fan-out behavior and ordering guarantees (`ts/test/pipeline.test.ts`).
