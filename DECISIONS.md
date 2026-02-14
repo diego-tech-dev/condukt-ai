@@ -288,3 +288,10 @@ Status: accepted
 Decision: compute trial speedup with participant+scenario paired analysis in addition to global mode medians.
 Rationale: unpaired aggregate medians can distort diagnosis-speed claims when baseline and condukt samples come from different cohorts.
 Consequences: TS trial summaries now include a `paired` section with pair count, pair-level entries, and paired median/p90 speedup metrics.
+
+## 2026-02-14
+
+Status: accepted
+Decision: enforce configurable trial quality gates at report time.
+Rationale: external trials need objective pass/fail criteria to avoid subjective interpretation of small or low-quality datasets.
+Consequences: trial reporting now supports threshold gates for record count, accuracy, paired sample count, and paired speedup, with non-zero exit code when thresholds are not met.

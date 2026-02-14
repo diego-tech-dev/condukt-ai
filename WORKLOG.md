@@ -176,10 +176,12 @@ Status: in_progress
 
 Milestone status:
 - `R1` Paired trial analytics by participant/scenario: completed
-- `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): pending
+- `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): completed
 - `R3` Shareable markdown summary output + documentation refresh: pending
 
 Notes:
 - Added paired trial analysis in TS summary output (`paired` block with pair-level speedup stats).
 - Updated trial report output to include paired sample count and median paired speedup.
 - Added TS unit coverage for pairing logic and latest-run selection.
+- Added TS trial quality-gate evaluation (`min_records`, `min_accuracy`, `min_pairs`, `min_paired_speedup`) with explicit failure reasons.
+- Added trial CLI gate flags (`--min-records`, `--min-accuracy`, `--min-pairs`, `--min-speedup`) with non-zero exit on gate failure.

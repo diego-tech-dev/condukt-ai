@@ -40,6 +40,7 @@ export type { FailureDiagnosis } from "./diagnostics.js";
 export {
   completeTrialSession,
   createTrialSession,
+  evaluateTrialSummary,
   summarizeTrialRecords,
 } from "./trials.js";
 export type {
@@ -49,6 +50,8 @@ export type {
   TrialMode,
   TrialPair,
   TrialPairSummary,
+  TrialQualityGate,
+  TrialQualityGateResult,
   TrialModeSummary,
   TrialRecord,
   TrialSession,

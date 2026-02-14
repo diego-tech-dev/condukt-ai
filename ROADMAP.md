@@ -106,5 +106,5 @@ Status: completed
 Status: in_progress
 
 1. `R1` Paired trial analytics by participant/scenario: completed
-2. `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): pending
+2. `R2` CLI quality gates for trial success criteria (speedup/accuracy/pairs): completed
 3. `R3` Shareable markdown summary output + documentation refresh: pending

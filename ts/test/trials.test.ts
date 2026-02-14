@@ -3,6 +3,7 @@ import { expect, test } from "vitest";
 import {
   completeTrialSession,
   createTrialSession,
+  evaluateTrialSummary,
   summarizeTrialRecords,
   type PipelineTrace,
 } from "../src/index.js";
@@ -248,4 +249,102 @@ test("summarizeTrialRecords pairs by participant and scenario using latest runs"
   expect(summary.paired.median_speedup).toBe(3);
   expect(summary.paired.pairs[0]?.baseline_elapsed_ms).toBe(60_000);
   expect(summary.paired.pairs[0]?.condukt_elapsed_ms).toBe(20_000);
+});
+
+test("evaluateTrialSummary passes when thresholds are met", () => {
+  const summary = summarizeTrialRecords([
+    {
+      session_id: "s1",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "condukt",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:20.000Z",
+      elapsed_ms: 20_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+    {
+      session_id: "s2",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "baseline",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:01:20.000Z",
+      elapsed_ms: 80_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: true,
+      matched_error_code: true,
+      diagnosis_correct: true,
+    },
+  ]);
+
+  const result = evaluateTrialSummary(summary, {
+    min_records: 2,
+    min_accuracy: 1,
+    min_pairs: 1,
+    min_paired_speedup: 2,
+  });
+
+  expect(result.pass).toBe(true);
+  expect(result.failures).toEqual([]);
+});
+
+test("evaluateTrialSummary fails with actionable reasons", () => {
+  const summary = summarizeTrialRecords([
+    {
+      session_id: "s1",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "condukt",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:30.000Z",
+      elapsed_ms: 30_000,
+      expected: {
+        task: "draft",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+        contract_paths: ["claims"],
+      },
+      diagnosed: {
+        task: "wrong-task",
+        error_code: "CONTRACT_OUTPUT_VIOLATION",
+      },
+      matched_task: false,
+      matched_error_code: true,
+      diagnosis_correct: false,
+    },
+  ]);
+
+  const result = evaluateTrialSummary(summary, {
+    min_records: 2,
+    min_accuracy: 0.8,
+    min_pairs: 1,
+    min_paired_speedup: 2,
+  });
+
+  expect(result.pass).toBe(false);
+  expect(result.failures).toEqual([
+    "records 1 < required 2",
+    "accuracy 0.0% < required 80.0%",
+    "paired samples 0 < required 1",
+    "paired median speedup unavailable",
+  ]);
 });

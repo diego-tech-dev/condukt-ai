@@ -5,8 +5,10 @@ import type { PipelineTrace } from "../src/pipeline.js";
 import {
   completeTrialSession,
   createTrialSession,
+  evaluateTrialSummary,
   summarizeTrialRecords,
   type TrialMode,
+  type TrialQualityGate,
   type TrialRecord,
   type TrialSession,
 } from "../src/trials.js";
@@ -105,8 +107,31 @@ async function runReport(args: Map<string, string>): Promise<void> {
   const inputPath = resolve(process.cwd(), args.get("input") ?? DEFAULT_TRIAL_DATA);
   const records = await readJsonLines<TrialRecord>(inputPath);
   const summary = summarizeTrialRecords(records);
+  const gate = parseTrialQualityGate(args);
+  const hasGate = hasGateConfiguration(gate);
 
   if (args.has("json")) {
+    if (hasGate) {
+      const gateResult = evaluateTrialSummary(summary, gate);
+      console.log(
+        JSON.stringify(
+          {
+            summary,
+            gate: {
+              config: gate,
+              result: gateResult,
+            },
+          },
+          null,
+          2,
+        ),
+      );
+      if (!gateResult.pass) {
+        process.exitCode = 1;
+      }
+      return;
+    }
+
     console.log(JSON.stringify(summary, null, 2));
     return;
   }
@@ -129,6 +154,17 @@ async function runReport(args: Map<string, string>): Promise<void> {
       summary.paired.median_speedup ? `${summary.paired.median_speedup.toFixed(2)}x` : "n/a"
     }`,
   );
+
+  if (hasGate) {
+    const gateResult = evaluateTrialSummary(summary, gate);
+    console.log(`Gate status: ${gateResult.pass ? "PASS" : "FAIL"}`);
+    for (const failure of gateResult.failures) {
+      console.log(`- ${failure}`);
+    }
+    if (!gateResult.pass) {
+      process.exitCode = 1;
+    }
+  }
 }
 
 function parseArgs(args: readonly string[]): Map<string, string> {
@@ -158,6 +194,57 @@ function requiredArg(args: Map<string, string>, key: string): string {
     throw new Error(`missing --${key}`);
   }
   return value;
+}
+
+function parseTrialQualityGate(args: Map<string, string>): TrialQualityGate {
+  return {
+    min_records: parseOptionalInt(args.get("min-records"), "min-records"),
+    min_accuracy: parseOptionalRatio(args.get("min-accuracy"), "min-accuracy"),
+    min_pairs: parseOptionalInt(args.get("min-pairs"), "min-pairs"),
+    min_paired_speedup: parseOptionalFloat(args.get("min-speedup"), "min-speedup"),
+  };
+}
+
+function hasGateConfiguration(gate: TrialQualityGate): boolean {
+  return (
+    typeof gate.min_records === "number" ||
+    typeof gate.min_accuracy === "number" ||
+    typeof gate.min_pairs === "number" ||
+    typeof gate.min_paired_speedup === "number"
+  );
+}
+
+function parseOptionalInt(value: string | undefined, field: string): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`invalid --${field}, expected non-negative integer`);
+  }
+  return parsed;
+}
+
+function parseOptionalFloat(value: string | undefined, field: string): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error(`invalid --${field}, expected non-negative number`);
+  }
+  return parsed;
+}
+
+function parseOptionalRatio(value: string | undefined, field: string): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) {
+    throw new Error(`invalid --${field}, expected number between 0 and 1`);
+  }
+  return parsed;
 }
 
 function splitList(value: string | undefined): readonly string[] {
@@ -190,7 +277,7 @@ function printUsage(): void {
     "Usage:\n" +
       "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt|baseline> [--trace <trace.json>]\n" +
       "  trial-metrics.ts finish --session <session.json> [--diagnosed-task <id>] [--diagnosed-error-code <code>] [--out <metrics.jsonl>]\n" +
-      "  trial-metrics.ts report [--input <metrics.jsonl>] [--json]",
+      "  trial-metrics.ts report [--input <metrics.jsonl>] [--json] [--min-records <int>] [--min-accuracy <0..1>] [--min-pairs <int>] [--min-speedup <number>]",
   );
 }
 

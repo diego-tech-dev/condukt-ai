@@ -254,3 +254,18 @@ What changed:
 
 Guardrail:
 - Any public claim about trial speedup should cite paired metrics when paired samples are available.
+
+## 2026-02-14
+
+Context:
+- Added trial quality-gate checks to reporting flow.
+
+Learning:
+- Trials need explicit acceptance criteria; otherwise a dataset can look promising while still being too small or too noisy for decisions.
+
+What changed:
+- Added summary gate evaluator and CLI gate flags with failure diagnostics.
+- Trial report now exits non-zero when required thresholds are not met.
+
+Guardrail:
+- Treat gate thresholds as part of experiment design, not post-hoc tuning after seeing results.

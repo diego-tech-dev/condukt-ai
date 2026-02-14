@@ -100,6 +100,18 @@ export interface TrialPairSummary {
   readonly pairs: readonly TrialPair[];
 }
 
+export interface TrialQualityGate {
+  readonly min_records?: number;
+  readonly min_accuracy?: number;
+  readonly min_pairs?: number;
+  readonly min_paired_speedup?: number;
+}
+
+export interface TrialQualityGateResult {
+  readonly pass: boolean;
+  readonly failures: readonly string[];
+}
+
 export function createTrialSession(input: CreateTrialSessionInput): TrialSession {
   const expectedFromTrace = input.trace ? expectationFromTrace(input.trace) : undefined;
   const expected: TrialExpectation = {
@@ -184,6 +196,42 @@ export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSum
         ? baselineSummary.median_elapsed_ms / conduktSummary.median_elapsed_ms
         : null,
     paired,
+  };
+}
+
+export function evaluateTrialSummary(
+  summary: TrialSummary,
+  gate: TrialQualityGate,
+): TrialQualityGateResult {
+  const failures: string[] = [];
+
+  if (typeof gate.min_records === "number" && summary.total < gate.min_records) {
+    failures.push(`records ${summary.total} < required ${gate.min_records}`);
+  }
+
+  if (typeof gate.min_accuracy === "number" && summary.accuracy < gate.min_accuracy) {
+    failures.push(
+      `accuracy ${(summary.accuracy * 100).toFixed(1)}% < required ${(gate.min_accuracy * 100).toFixed(1)}%`,
+    );
+  }
+
+  if (typeof gate.min_pairs === "number" && summary.paired.total_pairs < gate.min_pairs) {
+    failures.push(`paired samples ${summary.paired.total_pairs} < required ${gate.min_pairs}`);
+  }
+
+  if (typeof gate.min_paired_speedup === "number") {
+    if (summary.paired.median_speedup === null) {
+      failures.push("paired median speedup unavailable");
+    } else if (summary.paired.median_speedup < gate.min_paired_speedup) {
+      failures.push(
+        `paired median speedup ${summary.paired.median_speedup.toFixed(2)}x < required ${gate.min_paired_speedup.toFixed(2)}x`,
+      );
+    }
+  }
+
+  return {
+    pass: failures.length === 0,
+    failures,
   };
 }
 
