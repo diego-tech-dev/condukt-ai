@@ -1,6 +1,7 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { chat, type AnyTextAdapter } from "@tanstack/ai";
 
+import { parseJsonText } from "./json.js";
 import type { TaskDefinition, TaskRetryPolicy, TaskRuntimeContext } from "./pipeline.js";
 
 type TaskOutputMap = Record<string, unknown>;
@@ -74,7 +75,12 @@ export function tanstackChatTask<
         ...(options ?? {}),
       });
 
-      const data = parseJsonText(rawOutput, definition.adapter.name);
+      const data = parseJsonText(rawOutput, {
+        provider: definition.adapter.name,
+        maxPreviewChars: 160,
+        formatError: ({ provider, preview }) =>
+          `${provider} response did not contain valid JSON: ${preview}`,
+      });
 
       return {
         data,
@@ -94,16 +100,4 @@ export function tanstackChatTask<
       };
     },
   };
-}
-
-function parseJsonText(rawText: string, providerName: string): unknown {
-  try {
-    return JSON.parse(rawText) as unknown;
-  } catch (error) {
-    const preview = rawText.length > 160 ? `${rawText.slice(0, 157)}...` : rawText;
-    throw new Error(
-      `${providerName} response did not contain valid JSON: ${preview}`,
-      { cause: error },
-    );
-  }
 }

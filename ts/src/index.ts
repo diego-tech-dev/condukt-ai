@@ -11,10 +11,12 @@ export {
 
 export type {
   LLMTaskDefinition,
+  PipelineOptions,
   PipelineRunResult,
   PipelineTrace,
   TaskDefinition,
   TaskExecutionResult,
+  TaskRetryPolicy,
   TaskRuntimeContext,
   TaskTrace,
 } from "./pipeline.js";

@@ -400,3 +400,24 @@ Status: accepted
 Decision: isolate trial instrumentation APIs behind a dedicated package surface (`condukt-ai/trials`) instead of the core root export.
 Rationale: diagnosis-trial tooling is useful but orthogonal to the core orchestration runtime; a separate entrypoint keeps the core surface focused and reduces accidental coupling.
 Consequences: trial helpers are removed from `src/index.ts`, exposed through a subpath export in `package.json`, and tests/docs now import trial APIs from `condukt-ai/trials`.
+
+## 2026-02-14
+
+Status: accepted
+Decision: split pipeline runtime implementation into internal modules while preserving a stable public `pipeline.ts` facade.
+Rationale: the previous single-file implementation mixed type surfaces, DAG planning, execution, retry behavior, and trace shaping, which slowed iteration and increased regression risk.
+Consequences: pipeline internals now live under `src/pipeline/` (`types`, `llm`, `graph`, `execution`, `trace`, `runtime`, `class`) and `src/pipeline.ts` re-exports the public API.
+
+## 2026-02-14
+
+Status: accepted
+Decision: inject runtime environment primitives (`nowMs`, `nowIso`, `random`, `sleep`) into pipeline execution.
+Rationale: deterministic tests and reproducible retry behavior require control over time and randomness; hardcoded `Date.now`/`Math.random`/`setTimeout` made this difficult.
+Consequences: `Pipeline` now accepts runtime overrides via constructor options, retry/backoff uses runtime-provided randomness/sleep, and deterministic retry behavior is test-covered.
+
+## 2026-02-14
+
+Status: accepted
+Decision: centralize JSON parse and preview behavior in a shared utility module.
+Rationale: provider and adapter paths duplicated JSON parsing/error-preview logic, creating drift risk and inconsistent diagnostics.
+Consequences: added `src/json.ts` and migrated OpenAI/Anthropic/TanStack integrations to shared parsing + preview helpers with per-integration error formatting hooks where needed.

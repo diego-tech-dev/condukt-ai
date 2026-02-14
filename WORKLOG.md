@@ -325,3 +325,19 @@ Notes:
 - Added runtime and compile-time coverage for conditional execution semantics (`ts/test/pipeline.test.ts`, `ts/typecheck/pipeline-dependencies.typecheck.ts`).
 - Removed trial helpers from the core `condukt-ai` root export and exposed them via a dedicated `condukt-ai/trials` subpath export.
 - Updated tests and docs to use isolated trials imports (`ts/test/trials.test.ts`, `ts/README.md`).
+
+### Sprint: Runtime architecture run
+
+Status: completed
+
+Milestone status:
+- `R1` Split pipeline monolith into internal modules (`types`, `llm`, `graph`, `execution`, `trace`, `runtime`, `class`): completed
+- `R2` Inject runtime environment primitives (`now`, `random`, `sleep`) for deterministic execution/testing: completed
+- `R3` Remove unsafe internal pipeline casts via typed shared-state builder design: completed
+- `R4` Consolidate JSON parsing/preview logic into shared runtime utility: completed
+
+Notes:
+- Replaced the former monolithic `ts/src/pipeline.ts` implementation with a facade + modular internals under `ts/src/pipeline/`.
+- Added `PipelineRuntimeEnvironment` with overrideable `nowMs`, `nowIso`, `random`, and `sleep` hooks, plus deterministic runtime coverage in `ts/test/pipeline.test.ts`.
+- Refactored `Pipeline` builder internals to use shared state and typed helper methods, removing prior `as unknown as` casts in task registration/chaining paths.
+- Added shared JSON utility module (`ts/src/json.ts`) and migrated OpenAI/Anthropic/TanStack parsing + preview behavior to use it.

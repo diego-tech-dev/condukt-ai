@@ -325,6 +325,41 @@ test("retries execution failures and succeeds on later attempt", async () => {
   expect(trace.tasks[0]?.attempts?.[1]?.status).toBe("ok");
 });
 
+test("uses injected runtime primitives for deterministic retry behavior", async () => {
+  const delays: number[] = [];
+  let attempts = 0;
+
+  const pipeline = new Pipeline("deterministic-runtime", {
+    runtime: {
+      random: () => 0.5,
+      sleep: async (delayMs) => {
+        delays.push(delayMs);
+      },
+    },
+  }).addTask({
+    id: "job",
+    retry: {
+      retries: 2,
+      backoffMs: 10,
+      jitterMs: 4,
+      retryIf: "execution_error",
+    },
+    output: z.object({ ok: z.boolean() }),
+    run: async () => {
+      attempts += 1;
+      if (attempts < 3) {
+        throw new Error("transient");
+      }
+      return { data: { ok: true } };
+    },
+  });
+
+  const trace = await pipeline.run();
+
+  expect(trace.status).toBe("ok");
+  expect(delays).toEqual([12, 22]);
+});
+
 test("executes independent dependency levels in parallel while keeping deterministic task order", async () => {
   const starts: Record<string, number> = {};
 

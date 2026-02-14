@@ -1,3 +1,5 @@
+import { parseJsonText, previewJson } from "./json.js";
+
 export interface LLMJsonRequest<
   TModel extends string = string,
   TSettings extends object = Record<string, never>,
@@ -172,7 +174,7 @@ export function createOpenAIProvider(
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(`OpenAI request failed (${response.status}): ${jsonPreview(payload)}`);
+        throw new Error(`OpenAI request failed (${response.status}): ${previewJson(payload)}`);
       }
 
       const content = payload?.choices?.[0]?.message?.content;
@@ -181,7 +183,7 @@ export function createOpenAIProvider(
         provider: "openai",
         model: request.model,
         rawText,
-        data: parseJsonText(rawText, "openai"),
+        data: parseJsonText(rawText, { provider: "openai" }),
         responseId: payload?.id,
         usage: payload?.usage,
       };
@@ -231,7 +233,7 @@ export function createAnthropicProvider(
       const payload = await response.json();
       if (!response.ok) {
         throw new Error(
-          `Anthropic request failed (${response.status}): ${jsonPreview(payload)}`,
+          `Anthropic request failed (${response.status}): ${previewJson(payload)}`,
         );
       }
 
@@ -253,7 +255,7 @@ export function createAnthropicProvider(
         provider: "anthropic",
         model: request.model,
         rawText,
-        data: parseJsonText(rawText, "anthropic"),
+        data: parseJsonText(rawText, { provider: "anthropic" }),
         responseId: payload?.id,
         usage: payload?.usage,
       };
@@ -300,31 +302,4 @@ function extractContentText(content: unknown, provider: string): string {
   }
 
   throw new Error(`${provider} response did not contain text content`);
-}
-
-function parseJsonText(text: string, provider: string): unknown {
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    throw new Error(
-      `${provider} response is not valid JSON: ${(error as Error).message}; content=${previewText(text)}`,
-    );
-  }
-}
-
-function previewText(value: string): string {
-  const compact = value.replace(/\s+/g, " ").trim();
-  if (compact.length <= 180) {
-    return compact;
-  }
-  return `${compact.slice(0, 177)}...`;
-}
-
-function jsonPreview(value: unknown): string {
-  try {
-    const text = JSON.stringify(value);
-    return previewText(text);
-  } catch {
-    return "<unserializable-response>";
-  }
 }

@@ -106,6 +106,19 @@ console.log(result.outputs.research?.topics);
 
 See `examples/research-write.ts` for a 3-step pipeline example.
 
+## Runtime overrides (deterministic tests)
+
+Inject runtime primitives when you need deterministic retry/backoff behavior:
+
+```ts
+const pipeline = new Pipeline("deterministic", {
+  runtime: {
+    random: () => 0.5,
+    sleep: async () => {},
+  },
+});
+```
+
 ## TanStack AI adapter
 
 Use `tanstackChatTask` to run a TanStack text adapter inside a Condukt pipeline task:

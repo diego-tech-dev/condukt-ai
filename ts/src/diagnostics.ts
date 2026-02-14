@@ -21,7 +21,7 @@ export function diagnoseFailure(trace: PipelineTrace): FailureDiagnosis {
     };
   }
 
-  const failedTask = trace.tasks[taskIndex] as TaskTrace;
+  const failedTask: TaskTrace = trace.tasks[taskIndex];
   return {
     pipeline: trace.pipeline,
     failed: true,

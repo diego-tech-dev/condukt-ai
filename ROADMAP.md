@@ -173,3 +173,12 @@ Status: completed
 2. `E2` Parallel execution for independent dependency levels: completed
 3. `E3` Adaptive control-flow primitives for conditional execution: completed
 4. `E4` Trials API extraction into dedicated package surface: completed
+
+## Runtime Architecture Sprint (Autonomous)
+
+Status: completed
+
+1. `R1` Split pipeline monolith into internal modules (`types`, `llm`, `graph`, `execution`, `trace`, `runtime`, `class`): completed
+2. `R2` Inject runtime environment primitives (`now`, `random`, `sleep`) for deterministic execution/testing: completed
+3. `R3` Remove unsafe internal pipeline casts via typed shared-state builder design: completed
+4. `R4` Consolidate JSON parsing/preview logic into shared runtime utility: completed
