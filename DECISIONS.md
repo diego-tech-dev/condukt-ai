@@ -239,3 +239,10 @@ Status: accepted
 Decision: ship a built-in 10-minute TS quickstart with an intentionally broken variant.
 Rationale: adoption risk is reduced when users can experience trace-based diagnosis without credentials or external setup.
 Consequences: added `pnpm quickstart` and `pnpm quickstart:broken`, plus `ts/docs/TRACE_WALKTHROUGH.md` for deterministic diagnosis flow.
+
+## 2026-02-14
+
+Status: accepted
+Decision: name the TypeScript runtime package `condukt`.
+Rationale: short, searchable, and aligned with the orchestration/conduct metaphor while avoiding saturated `agent/flow/graph` naming patterns.
+Consequences: TS package metadata and docs now use `condukt`; broader project naming remains MissionGraph for current Python/Rust references.

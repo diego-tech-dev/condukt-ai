@@ -1,4 +1,4 @@
-# missiongraph-ts (prototype)
+# condukt (prototype)
 
 TypeScript-first contract and trace runtime for agent workflows.
 
@@ -43,7 +43,7 @@ Both commands write `trace.quickstart.json`. Follow `docs/TRACE_WALKTHROUGH.md` 
 
 ```ts
 import { z } from "zod";
-import { Pipeline, llmTask, createOpenAIProvider } from "missiongraph-ts";
+import { Pipeline, llmTask, createOpenAIProvider } from "condukt";
 
 const provider = createOpenAIProvider();
 const pipeline = new Pipeline("research-and-write");

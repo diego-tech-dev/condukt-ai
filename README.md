@@ -27,6 +27,8 @@ A TypeScript-first runtime prototype now lives in `ts/` with:
 - structured trace output for fast diagnosis
 - OpenAI and Anthropic JSON task adapters
 
+Current TS package name: `condukt`.
+
 Quick start:
 
 ```bash

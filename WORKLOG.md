@@ -127,3 +127,4 @@ Notes:
 - Added TS provider tests with mocked HTTP responses for OpenAI and Anthropic JSON parsing behavior.
 - Added TS quickstart demo (`pnpm quickstart` / `pnpm quickstart:broken`) that writes a trace and demonstrates boundary-failure diagnosis.
 - Added 10-minute walkthrough doc at `ts/docs/TRACE_WALKTHROUGH.md`.
+- Renamed TS package to `condukt`.

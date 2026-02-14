@@ -19,7 +19,7 @@ It exists to make multi-agent work:
 - portable across runtimes (stable AST/trace contracts)
 
 Active product track:
-- TypeScript contract-first pipeline runtime (`ts/`) focused on fast agent workflow debugging via boundary contracts + structured traces.
+- TypeScript contract-first pipeline runtime (`ts/`, package name `condukt`) focused on fast agent workflow debugging via boundary contracts + structured traces.
 
 ## North Star
 
@@ -112,6 +112,7 @@ Rules for safe migration:
 - Added TypeScript runtime prototype (`ts/`) with Standard Schema contracts, trace-first pipeline execution, and OpenAI/Anthropic adapters.
 - Added TypeScript task retry policies with per-attempt trace history and provider integration tests.
 - Added credential-free TS quickstart + broken-run walkthrough to demonstrate trace-based failure diagnosis in under 10 minutes.
+- Named the TypeScript package `condukt`.
 
 ## Near-Term Direction
 
