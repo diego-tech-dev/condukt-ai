@@ -44,7 +44,7 @@ const pipeline = new Pipeline("typed-dependencies")
     },
   });
 
-pipeline.addLLMTask({
+const pipelineWithVerify = pipeline.addLLMTask({
   id: "verify",
   provider,
   model: "gpt-4.1-mini",
@@ -57,6 +57,17 @@ pipeline.addLLMTask({
     return "{}";
   },
 });
+
+async function assertTypedRunOutputs(): Promise<void> {
+  const result = await pipelineWithVerify.runDetailed();
+  result.outputs.verify?.verified;
+  result.outputs.draft?.claims;
+
+  // @ts-expect-error unknown output key
+  result.outputs.nonexistent;
+}
+
+void assertTypedRunOutputs();
 
 const invalidPipeline = new Pipeline("invalid-dependencies");
 invalidPipeline

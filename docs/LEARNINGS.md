@@ -65,6 +65,20 @@ Guardrail:
 ## 2026-02-14
 
 Context:
+- Extended orchestration API to expose typed outputs on execution results.
+
+Learning:
+- Type-safe builder composition is incomplete if execution APIs erase types at the final handoff.
+
+What changed:
+- Added `runDetailed()` and `PipelineRunResult<TOutputs>` so execution returns typed outputs and task-result maps along with trace metadata.
+
+Guardrail:
+- Any new execution helper should preserve generic output maps instead of returning only untyped trace fragments.
+
+## 2026-02-14
+
+Context:
 - Added dual-runtime conformance and golden parity gates.
 
 Learning:

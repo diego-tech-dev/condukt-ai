@@ -273,3 +273,18 @@ Notes:
 - Added `Pipeline<TOutputs>` accumulation and `addLLMTask(...)` to make dependency outputs typed from declared `after` keys.
 - Migrated TS examples and core pipeline tests to builder chaining without manual `as` casts for dependency outputs.
 - Added compile-time dependency fixtures at `ts/typecheck/pipeline-dependencies.typecheck.ts`.
+
+### Sprint: Typed run result run
+
+Status: completed
+
+Milestone status:
+- `N1` Add typed pipeline run API (`runDetailed`) returning trace + typed outputs: completed
+- `N2` Add runtime tests for typed run-output behavior: completed
+- `N3` Add compile-time run-output key safety fixtures and docs updates: completed
+
+Notes:
+- Added `PipelineRunResult<TOutputs>` and `Pipeline.runDetailed()` returning typed `outputs`/`taskResults` plus full trace.
+- Kept `Pipeline.run()` as a trace-only convenience wrapper for backward-compatible callsites.
+- Added runtime test coverage for typed output retrieval and updated README usage to show `runDetailed()` output access.
+- Extended typecheck fixtures to assert output-key safety on `runDetailed()` results.

@@ -11,6 +11,7 @@ export {
 
 export type {
   LLMTaskDefinition,
+  PipelineRunResult,
   PipelineTrace,
   TaskDefinition,
   TaskExecutionResult,

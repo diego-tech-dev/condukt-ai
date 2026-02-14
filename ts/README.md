@@ -89,8 +89,9 @@ const pipeline = new Pipeline("research-and-write").addLLMTask({
     prompt: () => "Return JSON with topics.",
   });
 
-const trace = await pipeline.run();
-console.log(trace);
+const result = await pipeline.runDetailed();
+console.log(result.trace.status);
+console.log(result.outputs.research?.topics);
 ```
 
 See `examples/research-write.ts` for a 3-step pipeline example.

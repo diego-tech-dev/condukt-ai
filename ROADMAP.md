@@ -148,3 +148,11 @@ Status: completed
 1. `M1` Generic task/runtime context typing for dependency output inference: completed
 2. `M2` Add `Pipeline.addLLMTask` typed builder path and migrate examples: completed
 3. `M3` Add compile-time dependency-key fixtures and validate with release checks: completed
+
+## Typed Run Result Sprint (Autonomous)
+
+Status: completed
+
+1. `N1` Add typed pipeline run API (`runDetailed`) returning trace + typed outputs: completed
+2. `N2` Add runtime tests for typed run-output behavior: completed
+3. `N3` Add compile-time run-output key safety fixtures and docs updates: completed

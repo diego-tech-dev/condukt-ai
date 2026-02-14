@@ -99,6 +99,12 @@ export interface PipelineTrace {
   };
 }
 
+export interface PipelineRunResult<TOutputs extends TaskOutputMap> {
+  readonly trace: PipelineTrace;
+  readonly outputs: Readonly<Partial<TOutputs>>;
+  readonly taskResults: Readonly<Record<string, TaskTrace>>;
+}
+
 type RequiredKeys<TValue extends object> = {
   [TKey in keyof TValue]-?: object extends Pick<TValue, TKey> ? never : TKey;
 }[keyof TValue];
@@ -234,7 +240,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     return this.addTask(llmTask(definition));
   }
 
-  async run(): Promise<PipelineTrace> {
+  async runDetailed(): Promise<PipelineRunResult<TOutputs>> {
     const levels = buildDependencyLevels(Array.from(this.tasksById.values()));
     const taskOrder = levels.flat();
 
@@ -301,7 +307,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     const finishedAt = nowIso();
     const summary = summarize(taskTrace);
 
-    return {
+    const trace: PipelineTrace = {
       trace_version: TRACE_VERSION,
       pipeline: this.name,
       status: failed ? "failed" : "ok",
@@ -315,6 +321,17 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
       tasks: taskTrace,
       summary,
     };
+
+    return {
+      trace,
+      outputs: outputs as Partial<TOutputs>,
+      taskResults,
+    };
+  }
+
+  async run(): Promise<PipelineTrace> {
+    const result = await this.runDetailed();
+    return result.trace;
   }
 }
 

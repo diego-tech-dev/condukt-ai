@@ -106,6 +106,48 @@ test("runs an LLM pipeline with typed contracts and trace output", async () => {
   expect(trace.tasks[1]?.input?.provider).toBe("fake");
 });
 
+test("runDetailed returns typed outputs for completed tasks", async () => {
+  const provider = new FakeProvider({
+    "research:typed": {
+      topics: ["contracts"],
+      sources: ["schema"],
+    },
+    "draft typed": {
+      claims: ["contracts reduce silent failures"],
+    },
+  });
+
+  const pipeline = new Pipeline("typed-results")
+    .addLLMTask({
+      id: "research",
+      provider,
+      model: "fake-model",
+      output: z.object({
+        topics: z.array(z.string()),
+        sources: z.array(z.string()),
+      }),
+      prompt: () => "research:typed",
+    })
+    .addLLMTask({
+      id: "draft",
+      provider,
+      model: "fake-model",
+      after: ["research"] as const,
+      output: z.object({
+        claims: z.array(z.string()),
+      }),
+      prompt: ({ dependencyOutputs }) =>
+        dependencyOutputs.research.topics.length > 0 ? "draft typed" : "draft-empty",
+    });
+
+  const result = await pipeline.runDetailed();
+
+  expect(result.trace.status).toBe("ok");
+  expect(result.outputs.research?.sources).toEqual(["schema"]);
+  expect(result.outputs.draft?.claims).toEqual(["contracts reduce silent failures"]);
+  expect(result.taskResults.draft?.status).toBe("ok");
+});
+
 test("fails fast with contract diagnostics when a task returns invalid shape", async () => {
   const provider = new FakeProvider({
     "research": {
