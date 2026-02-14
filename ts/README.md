@@ -26,6 +26,9 @@ pnpm install
 ## Run checks
 
 ```bash
+pnpm lint
+pnpm format
+pnpm typecheck
 pnpm test
 pnpm check
 pnpm build

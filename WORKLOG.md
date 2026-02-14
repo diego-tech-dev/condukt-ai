@@ -149,3 +149,14 @@ Notes:
 - Added trace diagnosis helpers (`diagnoseFailure`) and trial instrumentation utilities (`createTrialSession`, `completeTrialSession`, `summarizeTrialRecords`) in TS runtime.
 - Added trial metrics CLI (`ts/scripts/trial-metrics.ts`) with start/finish/report commands writing JSONL records.
 - Added trial instrumentation docs (`ts/docs/TRIALS.md`) and TS test coverage for diagnosis/trial metrics behavior.
+
+### Sprint: TS tooling conventions
+
+Status: completed
+
+Notes:
+- Added Biome configuration at `ts/biome.json`.
+- Added TS scripts: `pnpm lint`, `pnpm format`, and `pnpm typecheck`.
+- Updated `pnpm check` and `pnpm release:check` to include lint/typecheck and pnpm-based pack validation.
+- Updated TS GitHub workflows to run lint and to publish with `pnpm publish`.
+- Updated agent conventions to enforce pnpm-only JS/TS workflow and no TypeScript `any`.

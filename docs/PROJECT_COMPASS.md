@@ -116,6 +116,7 @@ Rules for safe migration:
 - Added npm publish-readiness metadata and release validation scripts for `condukt`.
 - Added TS quality and publish GitHub Actions workflows for reproducible CI/release gates.
 - Added TS trace-diagnosis and external-trial metric instrumentation (session start/finish/report with JSONL records).
+- Added TS Biome lint/format baseline and pnpm-only package workflow enforcement.
 
 ## Near-Term Direction
 

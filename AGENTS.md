@@ -46,6 +46,9 @@ Read first for deeper context:
 - Dual-runtime golden gate: `python3 scripts/conformance.py --json --require-goldens`
 - Parity matrix: `python3 scripts/parity_matrix.py --json`
 - TypeScript install/check: `cd ts && pnpm install && pnpm check`
+- TypeScript lint: `cd ts && pnpm lint`
+- TypeScript format: `cd ts && pnpm format`
+- TypeScript typecheck: `cd ts && pnpm typecheck`
 - TypeScript tests: `cd ts && pnpm test`
 - TypeScript build: `cd ts && pnpm build`
 - TypeScript quickstart trace demo: `cd ts && pnpm quickstart`

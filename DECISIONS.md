@@ -267,3 +267,10 @@ Status: accepted
 Decision: instrument external time-to-diagnose trials with trace-derived expectations and JSONL metric records.
 Rationale: proving the core value proposition requires measurable diagnosis speed/accuracy data across baseline vs Condukt workflows.
 Consequences: TS runtime now includes diagnosis/trial helpers, a trial metrics CLI (`start`/`finish`/`report`), and documentation for repeatable external trial execution.
+
+## 2026-02-14
+
+Status: accepted
+Decision: standardize TypeScript lint/format checks on Biome and enforce pnpm-only JS/TS package operations.
+Rationale: fast deterministic linting plus one package-manager path reduces drift across local and CI workflows.
+Consequences: added `ts/biome.json`, new TS scripts (`lint`, `format`, `typecheck`), updated CI quality/publish workflows, and removed npm-based pack/publish commands from TS release paths.

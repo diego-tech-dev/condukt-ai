@@ -2,8 +2,8 @@
 
 ## Preconditions
 
-- npm account authenticated (`npm whoami`)
-- package name availability checked (`npm view condukt`)
+- npm account authenticated (`pnpm npm whoami`)
+- package name availability checked (`pnpm npm view condukt`)
 - clean git state
 
 ## 1) Validate release locally
@@ -15,16 +15,17 @@ pnpm release:check
 ```
 
 This runs:
+- lint
 - typecheck
 - tests
 - build
-- npm pack dry-run
+- `pnpm pack` artifact check
 
 ## 2) Bump version
 
 ```bash
 cd ts
-npm version patch
+pnpm version patch
 ```
 
 Use `minor`/`major` when needed.
@@ -33,7 +34,7 @@ Use `minor`/`major` when needed.
 
 ```bash
 cd ts
-npm publish --access public
+pnpm publish --access public --no-git-checks
 ```
 
 Or use GitHub Actions manual workflow:

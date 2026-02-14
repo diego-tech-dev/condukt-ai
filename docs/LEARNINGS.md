@@ -209,3 +209,18 @@ What changed:
 
 Guardrail:
 - Do not record elapsed diagnosis time without expected diagnosis fields (`task` and/or `error_code`), or speed claims become unauditable.
+
+## 2026-02-14
+
+Context:
+- Added TypeScript lint/format tooling and aligned package operations with pnpm-only conventions.
+
+Learning:
+- Tooling conventions only stick when local scripts and CI workflows enforce the same command surface.
+
+What changed:
+- Added Biome config and TS lint/format/typecheck scripts.
+- Updated CI quality/publish workflows and release docs to remove npm command usage for TS package workflows.
+
+Guardrail:
+- Any new JS/TS workflow command must use `pnpm` and be represented in both package scripts and CI if it is release-critical.
