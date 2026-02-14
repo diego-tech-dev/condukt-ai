@@ -19,6 +19,30 @@ This MVP includes:
 - Mermaid graph rendering
 - Versioned interchange contracts (`ast_version`, `trace_version`)
 
+## TypeScript Pivot (New)
+
+A TypeScript-first runtime prototype now lives in `ts/` with:
+- Standard Schema contracts (`@standard-schema/spec`) for schema-library flexibility
+- fail-fast task boundary validation
+- structured trace output for fast diagnosis
+- OpenAI and Anthropic JSON task adapters
+
+Quick start:
+
+```bash
+cd ts
+pnpm install
+pnpm test
+pnpm check
+```
+
+Example pipeline:
+
+```bash
+cd ts
+pnpm tsx examples/research-write.ts
+```
+
 ## DSL Example
 
 ```mgl

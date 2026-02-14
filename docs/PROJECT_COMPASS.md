@@ -18,6 +18,9 @@ It exists to make multi-agent work:
 - auditable (structured, versioned traces)
 - portable across runtimes (stable AST/trace contracts)
 
+Active product track:
+- TypeScript contract-first pipeline runtime (`ts/`) focused on fast agent workflow debugging via boundary contracts + structured traces.
+
 ## North Star
 
 Given the same `.mgl` program and same worker behavior, any compliant runtime should produce semantically equivalent execution behavior and trace outputs.
@@ -56,6 +59,8 @@ These should not be changed without a deliberate version bump:
 - Planner: `missiongraph/planner.py`
 - Executor: `missiongraph/executor.py`
 - CLI: `missiongraph/cli.py`
+- TypeScript runtime: `ts/src/pipeline.ts`
+- TypeScript providers: `ts/src/providers.ts`
 - Spec constants: `missiongraph/spec.py`
 - Schemas: `spec/ast-v1.schema.json`, `spec/trace-v1.schema.json`
 - Conformance tests: `tests/test_end_to_end.py`, `tests/golden/*`
@@ -104,11 +109,12 @@ Rules for safe migration:
 - Added Rust `run-plan` prototype with sequential dependency-order task execution and fail-fast semantics.
 - Added Rust retry/timeout policy-loop parity (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`) for both `run-task` and `run-plan`.
 - Added Rust run-plan diagnostics assembly for `constraints`, `verify`, and grouped `verify_summary` outputs.
+- Added TypeScript runtime prototype (`ts/`) with Standard Schema contracts, trace-first pipeline execution, and OpenAI/Anthropic adapters.
 
 ## Near-Term Direction
 
-1. Expand Rust runtime parity from sequential execution to dependency-level parallel fan-out.
-2. Add Rust parity for contract/artifact validation (input/output schema and consume/produce enforcement).
+1. Harden TypeScript LLM adapters with integration coverage and retry policy controls.
+2. Deliver a 10-minute TS onboarding path with template pipeline and trace-debug walkthrough.
 
 ## Resume Checklist
 

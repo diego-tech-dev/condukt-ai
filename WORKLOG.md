@@ -106,3 +106,20 @@ Notes:
 - Added Rust CLI coverage for retry-to-success, timeout-only retry gating, and run-plan dependency execution after retries.
 - Added Rust run-plan diagnostics assembly for `constraints`, `verify`, and `verify_summary` fields.
 - Added Rust CLI coverage for successful verify summaries, explicit verify failures, and unresolved-constraint reporting (`passed: null`).
+
+### Sprint: TypeScript pivot run
+
+Status: in_progress
+
+Milestone status:
+- `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
+- `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): pending
+- `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): pending
+
+Notes:
+- Added `ts/` package managed by `pnpm`.
+- Added Standard Schema-first contract validation (`@standard-schema/spec`) to keep schema-library choice open.
+- Added TypeScript `Pipeline` runtime with fail-fast task boundary contracts and structured per-task traces.
+- Added OpenAI and Anthropic JSON provider adapters for real LLM-backed tasks.
+- Added `llmTask` helper and runnable 3-step example (`ts/examples/research-write.ts`).
+- Added TypeScript tests for success path, contract violation diagnostics, and dependency validation.

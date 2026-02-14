@@ -19,6 +19,7 @@ Read first for deeper context:
 ## Repository Map
 
 - `missiongraph/`: parser, planner, executor, CLI, specs/constants
+- `ts/`: TypeScript runtime prototype (Standard Schema contracts + trace-first pipeline)
 - `examples/`: runnable `.mgl` programs
 - `workers/`: demo worker implementations
 - `spec/`: JSON schemas for AST and trace contracts
@@ -44,6 +45,9 @@ Read first for deeper context:
 - Multi-runtime conformance: `python3 scripts/conformance.py --json`
 - Dual-runtime golden gate: `python3 scripts/conformance.py --json --require-goldens`
 - Parity matrix: `python3 scripts/parity_matrix.py --json`
+- TypeScript install/check: `cd ts && pnpm install && pnpm check`
+- TypeScript tests: `cd ts && pnpm test`
+- TypeScript build: `cd ts && pnpm build`
 
 ## Hard Invariants
 

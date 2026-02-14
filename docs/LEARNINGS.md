@@ -116,3 +116,19 @@ What changed:
 
 Guardrail:
 - When adding new expression forms, add explicit evaluator tests and verify-summary expectations before changing parser or runtime behavior.
+
+## 2026-02-14
+
+Context:
+- Started the TypeScript product pivot for contract-first agent workflow execution.
+
+Learning:
+- Standard Schema keeps the contract layer reusable across libraries while preserving strict runtime validation.
+
+What changed:
+- Added `ts/` runtime with `Pipeline`, `llmTask`, and per-task structured traces.
+- Bound task contracts to `StandardSchemaV1` and validated with `@standard-schema/spec`.
+- Kept examples in Zod without coupling runtime interfaces to Zod-only types.
+
+Guardrail:
+- Keep contract interfaces library-agnostic at API boundaries; examples can be opinionated, runtime surfaces should not be.

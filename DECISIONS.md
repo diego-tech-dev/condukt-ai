@@ -211,3 +211,17 @@ Status: accepted
 Decision: assemble Rust `run-plan` trace diagnostics for `constraints`, `verify`, and `verify_summary`.
 Rationale: full-plan trace parity requires post-execution diagnostics, not only task-result emission.
 Consequences: Rust `run-plan` now evaluates constraint/verify expressions against runtime context, emits grouped verify failures, and factors diagnostics into overall trace status.
+
+## 2026-02-14
+
+Status: accepted
+Decision: pivot product direction to a TypeScript-first runtime while keeping Python as a temporary reference implementation.
+Rationale: target users for agentic application development are concentrated in the TypeScript ecosystem; Python remains useful as behavioral reference during migration.
+Consequences: added `ts/` runtime package and tests; Python/Rust tracks remain maintained for parity and backward context until TS workflow path is validated.
+
+## 2026-02-14
+
+Status: accepted
+Decision: standardize task contracts on Standard Schema (`@standard-schema/spec`) for TypeScript runtime surfaces.
+Rationale: contract portability should not lock users to a single validation library; Standard Schema allows Zod and other compliant schema libraries.
+Consequences: TS pipeline contract validation consumes `StandardSchemaV1`; examples use Zod while preserving schema-library interoperability.

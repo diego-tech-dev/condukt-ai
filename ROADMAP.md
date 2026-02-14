@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: completed
+Current sprint status: in_progress
 
 ## Autonomy Sprint (5 milestones)
 
@@ -84,3 +84,11 @@ Status: completed
 1. `E1` Rust multi-task sequential execution (dependency order): completed
 2. `E2` Rust retry/timeout policy loop parity for task execution: completed
 3. `E3` Rust trace assembly for full-plan runs (tasks + verify summary): completed
+
+## TS Pivot Sprint (Autonomous)
+
+Status: in_progress
+
+1. `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
+2. `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): pending
+3. `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): pending
