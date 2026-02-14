@@ -372,3 +372,10 @@ Status: accepted
 Decision: enforce duplicate task-id protection in typed pipeline builders.
 Rationale: repeated task IDs are a high-impact authoring error that should be blocked before runtime when task IDs are known statically.
 Consequences: `addTask` and `addLLMTask` now encode duplicate-id constraints in type signatures, while runtime duplicate checks remain in place for dynamic IDs.
+
+## 2026-02-14
+
+Status: accepted
+Decision: integrate TanStack AI as a first-party task adapter surface (`tanstackChatTask`) in the TS runtime.
+Rationale: TanStack AI aligns with Condukt’s type-safety goals and provides a direct ecosystem wedge for TypeScript-first agent workflows without introducing a separate orchestration framework.
+Consequences: Condukt now includes a TanStack adapter task builder that executes `chat({ stream: false })`, parses JSON output for contract validation, and emits provider/model metadata in task traces.

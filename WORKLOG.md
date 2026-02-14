@@ -302,3 +302,19 @@ Notes:
 - Added duplicate-id type constraints to `addTask` and `addLLMTask` so chained builder composition rejects repeated static task IDs.
 - Added runtime test for duplicate IDs introduced through dynamic string IDs to preserve fail-fast behavior beyond static typing.
 - Extended dependency typecheck fixtures with duplicate-id compile-time assertions.
+
+### Sprint: Ecosystem execution run
+
+Status: in progress
+
+Milestone status:
+- `E1` TanStack AI adapter integration for pipeline tasks: completed
+- `E2` Parallel execution for independent dependency levels: in progress
+- `E3` Adaptive control-flow primitives for conditional execution: pending
+- `E4` Trials API extraction into dedicated package surface: pending
+
+Notes:
+- Added `tanstackChatTask` (`ts/src/tanstack.ts`) to bridge TanStack AI text adapters into Condukt task execution.
+- Added runtime coverage for TanStack integration (`ts/test/tanstack.test.ts`) including valid JSON flow and malformed JSON failure diagnostics.
+- Added compile-time fixture for adapter option typing (`ts/typecheck/tanstack.typecheck.ts`).
+- Updated TS package metadata to include `@tanstack/ai` runtime dependency and documented TanStack adapter usage in `ts/README.md`.

@@ -20,7 +20,8 @@
     "contracts",
     "trace",
     "standard-schema",
-    "llm"
+    "llm",
+    "tanstack-ai"
   ],
   "packageManager": "pnpm@10.6.0",
   "main": "./dist/index.js",
@@ -62,6 +63,7 @@
     "prepack": "pnpm build"
   },
   "dependencies": {
+    "@tanstack/ai": "^0.5.0",
     "@standard-schema/spec": "^1.0.0"
   },
   "devDependencies": {

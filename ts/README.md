@@ -6,6 +6,7 @@ Focus of this package:
 - Standard Schema task contracts (`@standard-schema/spec`) so users can bring Zod or any compliant schema library
 - structured execution traces for fast failure diagnosis
 - LLM task adapters for OpenAI and Anthropic JSON workflows
+- TanStack AI task adapter (`tanstackChatTask`) for SDK-native chat integrations
 - provider-model-aware typing (model IDs + settings inferred per provider/model)
 - typed dependency context via `pipeline.addLLMTask(...)` so `dependencyOutputs` matches declared `after` tasks
 - duplicate task IDs rejected during typed builder composition (and runtime-guarded for dynamic IDs)
@@ -96,3 +97,23 @@ console.log(result.outputs.research?.topics);
 ```
 
 See `examples/research-write.ts` for a 3-step pipeline example.
+
+## TanStack AI adapter
+
+Use `tanstackChatTask` to run a TanStack text adapter inside a Condukt pipeline task:
+
+```ts
+import { Pipeline, tanstackChatTask } from "condukt-ai";
+
+const pipeline = new Pipeline("tanstack").addTask(
+  tanstackChatTask({
+    id: "research",
+    adapter: openaiText("gpt-4o-mini"),
+    output: z.object({ topics: z.array(z.string()) }),
+    prompt: () => "Return JSON with a topics array.",
+    system: "Always respond with valid JSON.",
+  }),
+);
+```
+
+`tanstackChatTask` executes `chat({ stream: false })` and parses JSON text for contract validation.

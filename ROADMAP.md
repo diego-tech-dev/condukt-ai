@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: completed
+Current sprint status: in progress
 
 ## Autonomy Sprint (5 milestones)
 
@@ -164,3 +164,12 @@ Status: completed
 1. `P1` Add compile-time duplicate task-id constraints for typed builders: completed
 2. `P2` Add runtime fallback test coverage for dynamic duplicate IDs: completed
 3. `P3` Update typecheck fixtures and docs for duplicate-id safety guarantees: completed
+
+## Ecosystem Execution Sprint (Autonomous)
+
+Status: in progress
+
+1. `E1` TanStack AI adapter integration for pipeline tasks: completed
+2. `E2` Parallel execution for independent dependency levels: pending
+3. `E3` Adaptive control-flow primitives for conditional execution: pending
+4. `E4` Trials API extraction into dedicated package surface: pending

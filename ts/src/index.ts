@@ -19,6 +19,9 @@ export type {
   TaskTrace,
 } from "./pipeline.js";
 
+export { tanstackChatTask } from "./tanstack.js";
+export type { TanStackChatTaskDefinition } from "./tanstack.js";
+
 export {
   ANTHROPIC_MODELS,
   OPENAI_MODELS,
