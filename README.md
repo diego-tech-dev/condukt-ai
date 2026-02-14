@@ -6,6 +6,7 @@ Project context and direction:
 - Agent entrypoint: `AGENTS.md`
 - See `docs/PROJECT_COMPASS.md` before making design changes.
 - Foundational architecture decisions: `docs/FOUNDATIONS.md`
+- Implementation memory track: `docs/LEARNINGS.md`
 - Decision log: `DECISIONS.md`
 
 This MVP includes:

@@ -99,3 +99,4 @@ Milestone status:
 
 Notes:
 - Added `docs/FOUNDATIONS.md` to capture explicit language/runtime design baselines, tradeoffs, and migration paths across all core design dimensions.
+- Added `docs/LEARNINGS.md` as a persistent memory track for implementation lessons and guardrails.

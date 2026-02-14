@@ -183,3 +183,10 @@ Status: accepted
 Decision: publish explicit foundations baseline in `docs/FOUNDATIONS.md`.
 Rationale: core language/runtime choices (including open decisions) should be durable, reviewable, and resumable without relying on chat context.
 Consequences: each major design dimension now records decision state, rationale, tradeoffs, migration path, and agent-specific constraints.
+
+## 2026-02-14
+
+Status: accepted
+Decision: maintain a dedicated implementation learning log in `docs/LEARNINGS.md`.
+Rationale: important execution lessons (root causes + guardrails) are different from architecture decisions and should persist across agent sessions.
+Consequences: resume workflow now includes a memory track of operational learnings to reduce repeated mistakes.

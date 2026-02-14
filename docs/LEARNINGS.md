@@ -1,0 +1,88 @@
+# MissionGraph Learnings
+
+Last updated: 2026-02-14
+
+Purpose:
+- capture implementation learnings that are easy to forget
+- preserve root causes and guardrails, not just outcomes
+- make future autonomous runs safer and faster
+
+Entry format:
+- `Date`
+- `Context`
+- `Learning`
+- `What changed`
+- `Guardrail`
+
+## 2026-02-14
+
+Context:
+- Added dual-runtime conformance and golden parity gates.
+
+Learning:
+- Contract parity needs machine-readable checks (`--json`) at every runtime boundary.
+
+What changed:
+- Added JSON status output for Rust `check-ast`.
+- Conformance harness now consumes Rust JSON payloads and validates versions/order/levels.
+
+Guardrail:
+- Keep all cross-runtime checks machine-readable first; human text output is secondary.
+
+## 2026-02-14
+
+Context:
+- Expanded trace goldens to resilient-policy scenarios.
+
+Learning:
+- Normalization must include nested timestamp fields (for example retry attempt history), not only top-level task timestamps.
+
+What changed:
+- Trace normalizer now scrubs nested `provenance.attempts[].started_at/finished_at`.
+- Goldens regenerated after normalization fix.
+
+Guardrail:
+- When adding new trace substructures with timestamps, update normalizer and golden tests in the same change.
+
+## 2026-02-14
+
+Context:
+- Versioned AST/trace contracts were bumped and synchronized across Python and Rust.
+
+Learning:
+- Version governance only works if constants, schemas, goldens, and runtime checks move in lockstep.
+
+What changed:
+- Added contract-version consistency tests spanning Python constants, schema consts, Rust constants, and goldens.
+
+Guardrail:
+- Never bump contract versions without a single atomic change touching all contract surfaces.
+
+## 2026-02-14
+
+Context:
+- Started Rust execution migration with `run-task`.
+
+Learning:
+- Migration confidence improves when partial runtimes emit full contract-shaped fields early (`error_code`, provenance, timestamps).
+
+What changed:
+- Rust `run-task` now outputs normalized task-result style records and explicit error mapping.
+
+Guardrail:
+- Treat partial runtime outputs as contract surfaces, not temporary internal debug formats.
+
+## 2026-02-14
+
+Context:
+- Built parity matrix across core, artifact-flow, fanout, and resilient-policy programs.
+
+Learning:
+- A parity matrix makes coverage gaps visible; “one happy-path example passes” is not enough.
+
+What changed:
+- Added resilient/fanout goldens.
+- Added `scripts/parity_matrix.py` with dedicated test coverage.
+
+Guardrail:
+- Any new language feature should add at least one representative parity row and golden pair.

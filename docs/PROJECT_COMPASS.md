@@ -5,6 +5,7 @@ This document is the durable context for MissionGraph. It is the first file to r
 Companion docs:
 - `AGENTS.md` for agent entrypoint and execution workflow.
 - `FOUNDATIONS.md` for language/runtime design baselines.
+- `LEARNINGS.md` for implementation lessons and guardrails.
 - `DECISIONS.md` for decision history.
 
 ## Purpose
@@ -112,14 +113,15 @@ When picking up work:
 
 1. Read this file.
 2. Read `docs/FOUNDATIONS.md`.
-3. Run:
+3. Read `docs/LEARNINGS.md`.
+4. Run:
    - `python3 -m unittest discover -s tests -p "test_*.py"`
    - `python3 -m missiongraph parse examples/ship_release.mgl`
    - `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
    - `python3 scripts/conformance.py --json`
    - `python3 scripts/conformance.py --json --require-goldens`
    - `python3 scripts/parity_matrix.py --json`
-4. Confirm no schema/golden drift unless intentional.
+5. Confirm no schema/golden drift unless intentional.
 
 ## Update Protocol
 
