@@ -114,5 +114,5 @@ Status: completed
 Status: in_progress
 
 1. `I1` Align package/repo/docs identity to `condukt-ai`: completed
-2. `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: pending
+2. `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: completed
 3. `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): pending

@@ -203,10 +203,12 @@ Status: in_progress
 
 Milestone status:
 - `I1` Align package/repo/docs identity to `condukt-ai`: completed
-- `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: pending
+- `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: completed
 - `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): pending
 
 Notes:
 - Renamed GitHub repository to `diego-tech-dev/condukt-ai`.
 - Updated TS package metadata, trial mode labels, and docs/examples to `condukt-ai`.
 - Updated normalized trace goldens for canonical workspace rename (`condukt` -> `condukt-ai` path segment).
+- Added trial-mode normalization (`condukt` alias -> `condukt-ai`) in runtime and CLI.
+- Added strict trial-record input normalization for report ingestion with line-numbered validation errors.

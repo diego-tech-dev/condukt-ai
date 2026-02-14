@@ -299,3 +299,18 @@ What changed:
 
 Guardrail:
 - Keep one canonical external identifier (`condukt-ai`) for package/repo/docs, and treat internal module paths (`condukt`) as implementation details.
+
+## 2026-02-14
+
+Context:
+- Added compatibility handling for legacy trial mode labels.
+
+Learning:
+- Renames should include explicit ingestion normalization paths, not just output renames, to preserve historical data usability.
+
+What changed:
+- Added trial mode normalization and strict trial-record normalization for report ingestion.
+- Added test coverage for legacy mode alias and malformed record rejection.
+
+Guardrail:
+- When renaming externally visible enums/labels, keep a temporary compatibility alias plus deterministic validation errors.

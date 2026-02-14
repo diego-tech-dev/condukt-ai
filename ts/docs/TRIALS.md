@@ -32,6 +32,9 @@ pnpm trial:start \
 
 Output includes a session file path (stored under `ts/trials/sessions/` by default).
 
+Legacy note:
+- mode alias `condukt` is still accepted and normalized to `condukt-ai` for compatibility.
+
 For baseline runs without a trace-driven expectation:
 
 ```bash

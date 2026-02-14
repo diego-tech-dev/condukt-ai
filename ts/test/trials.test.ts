@@ -4,6 +4,8 @@ import {
   completeTrialSession,
   createTrialSession,
   evaluateTrialSummary,
+  normalizeTrialMode,
+  normalizeTrialRecord,
   renderTrialSummaryMarkdown,
   summarizeTrialRecords,
   type PipelineTrace,
@@ -406,4 +408,58 @@ test("renderTrialSummaryMarkdown includes summary and paired table", () => {
   expect(markdown).toContain("- Paired samples: 1");
   expect(markdown).toContain("## Paired Samples");
   expect(markdown).toContain("| p1 | quickstart-broken | 80000 ms | 20000 ms | 4.00x |");
+});
+
+test("normalizeTrialMode accepts legacy 'condukt' alias", () => {
+  expect(normalizeTrialMode("baseline")).toBe("baseline");
+  expect(normalizeTrialMode("condukt-ai")).toBe("condukt-ai");
+  expect(normalizeTrialMode("condukt")).toBe("condukt-ai");
+});
+
+test("normalizeTrialRecord maps legacy mode and validates fields", () => {
+  const normalized = normalizeTrialRecord({
+    session_id: "s1",
+    participant: "p1",
+    scenario: "quickstart-broken",
+    mode: "condukt",
+    started_at: "2026-02-14T10:00:00.000Z",
+    finished_at: "2026-02-14T10:00:10.000Z",
+    elapsed_ms: 10_000,
+    expected: {
+      task: "draft",
+      error_code: "CONTRACT_OUTPUT_VIOLATION",
+      contract_paths: ["claims"],
+    },
+    diagnosed: {
+      task: "draft",
+      error_code: "CONTRACT_OUTPUT_VIOLATION",
+    },
+    matched_task: true,
+    matched_error_code: true,
+    diagnosis_correct: true,
+  });
+
+  expect(normalized.mode).toBe("condukt-ai");
+  expect(normalized.expected.contract_paths).toEqual(["claims"]);
+});
+
+test("normalizeTrialRecord rejects malformed records", () => {
+  expect(() =>
+    normalizeTrialRecord({
+      session_id: "s1",
+      participant: "p1",
+      scenario: "quickstart-broken",
+      mode: "unknown",
+      started_at: "2026-02-14T10:00:00.000Z",
+      finished_at: "2026-02-14T10:00:10.000Z",
+      elapsed_ms: 10_000,
+      expected: {
+        contract_paths: [],
+      },
+      diagnosed: {},
+      matched_task: null,
+      matched_error_code: null,
+      diagnosis_correct: true,
+    }),
+  ).toThrow(/mode must be one of/);
 });

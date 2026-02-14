@@ -122,6 +122,7 @@ Rules for safe migration:
 - Added trial report quality gates for speedup/accuracy/sample-threshold evaluation.
 - Added markdown trial reporting output for shareable experiment artifacts.
 - Aligned public package/repository identity on `condukt-ai`.
+- Added compatibility normalization for legacy trial mode labels (`condukt` -> `condukt-ai`).
 
 ## Near-Term Direction
 

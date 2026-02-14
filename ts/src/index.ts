@@ -41,6 +41,8 @@ export {
   completeTrialSession,
   createTrialSession,
   evaluateTrialSummary,
+  normalizeTrialMode,
+  normalizeTrialRecord,
   renderTrialSummaryMarkdown,
   summarizeTrialRecords,
 } from "./trials.js";

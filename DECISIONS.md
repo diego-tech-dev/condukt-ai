@@ -309,3 +309,10 @@ Status: accepted
 Decision: align public package and repository identity on `condukt-ai`.
 Rationale: one canonical external name reduces ambiguity during adoption and avoids package-name confusion.
 Consequences: npm package metadata, trial mode labels, and documentation now use `condukt-ai`; repository remote targets `github.com/diego-tech-dev/condukt-ai`.
+
+## 2026-02-14
+
+Status: accepted
+Decision: keep backward compatibility for legacy trial mode label `condukt` while normalizing to canonical `condukt-ai`.
+Rationale: existing trial datasets and scripts may still emit legacy mode labels; hard breaks would reduce continuity during rename rollout.
+Consequences: trial CLI accepts legacy mode input and report ingestion normalizes legacy records to canonical mode with validation.

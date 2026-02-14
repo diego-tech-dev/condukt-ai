@@ -6,6 +6,8 @@ import {
   completeTrialSession,
   createTrialSession,
   evaluateTrialSummary,
+  normalizeTrialMode,
+  normalizeTrialRecord,
   renderTrialSummaryMarkdown,
   summarizeTrialRecords,
   type TrialMode,
@@ -44,10 +46,10 @@ async function main(): Promise<void> {
 async function runStart(args: Map<string, string>): Promise<void> {
   const participant = requiredArg(args, "participant");
   const scenario = requiredArg(args, "scenario");
-  const mode = requiredArg(args, "mode") as TrialMode;
-
-  if (mode !== "condukt-ai" && mode !== "baseline") {
-    throw new Error(`invalid --mode '${mode}', expected condukt-ai|baseline`);
+  const rawMode = requiredArg(args, "mode");
+  const mode = normalizeTrialMode(rawMode) as TrialMode;
+  if (rawMode === "condukt") {
+    console.log("Mode alias 'condukt' is deprecated; normalized to 'condukt-ai'.");
   }
 
   const tracePath = args.get("trace");
@@ -107,7 +109,7 @@ async function runFinish(args: Map<string, string>): Promise<void> {
 
 async function runReport(args: Map<string, string>): Promise<void> {
   const inputPath = resolve(process.cwd(), args.get("input") ?? DEFAULT_TRIAL_DATA);
-  const records = await readJsonLines<TrialRecord>(inputPath);
+  const records = await readAndNormalizeTrialRecords(inputPath);
   const summary = summarizeTrialRecords(records);
   const gate = parseTrialQualityGate(args);
   const hasGate = hasGateConfiguration(gate);
@@ -275,6 +277,18 @@ async function readJsonLines<T>(path: string): Promise<T[]> {
     .map((line) => JSON.parse(line) as T);
 }
 
+async function readAndNormalizeTrialRecords(path: string): Promise<TrialRecord[]> {
+  const records = await readJsonLines<unknown>(path);
+  return records.map((record, index) => {
+    try {
+      return normalizeTrialRecord(record);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`invalid trial record at line ${index + 1}: ${message}`);
+    }
+  });
+}
+
 async function maybeWriteMarkdownReport(
   args: Map<string, string>,
   summary: ReturnType<typeof summarizeTrialRecords>,
@@ -312,8 +326,8 @@ async function maybeWriteMarkdownReport(
 
 function printUsage(): void {
   console.log(
-    "Usage:\n" +
-      "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt-ai|baseline> [--trace <trace.json>]\n" +
+      "Usage:\n" +
+      "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt-ai|condukt|baseline> [--trace <trace.json>]\n" +
       "  trial-metrics.ts finish --session <session.json> [--diagnosed-task <id>] [--diagnosed-error-code <code>] [--out <metrics.jsonl>]\n" +
       "  trial-metrics.ts report [--input <metrics.jsonl>] [--json] [--markdown-out <file.md>] [--title <text>] [--max-pairs <int>] [--min-records <int>] [--min-accuracy <0..1>] [--min-pairs <int>] [--min-speedup <number>]",
   );
