@@ -42,6 +42,7 @@ const pipeline = new Pipeline("typed-dependencies")
       dependencyOutputs.verify;
       return "{}";
     },
+    when: ({ dependencyOutputs }) => dependencyOutputs.research.topics.length > 0,
   });
 
 const pipelineWithVerify = pipeline.addLLMTask({

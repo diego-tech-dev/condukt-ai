@@ -25,6 +25,8 @@ export interface TanStackChatTaskDefinition<
   readonly id: TTaskId;
   readonly description?: string;
   readonly after?: TDependencies;
+  readonly when?:
+    | ((context: TaskRuntimeContext<TOutputs, TDependencies>) => MaybePromise<boolean>);
   readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
   readonly adapter: TAdapter;
@@ -50,6 +52,7 @@ export function tanstackChatTask<
     id: definition.id,
     description: definition.description,
     after: definition.after,
+    when: definition.when,
     retry: definition.retry,
     output: definition.output,
     async run(context) {

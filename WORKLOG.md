@@ -310,8 +310,8 @@ Status: in progress
 Milestone status:
 - `E1` TanStack AI adapter integration for pipeline tasks: completed
 - `E2` Parallel execution for independent dependency levels: completed
-- `E3` Adaptive control-flow primitives for conditional execution: in progress
-- `E4` Trials API extraction into dedicated package surface: pending
+- `E3` Adaptive control-flow primitives for conditional execution: completed
+- `E4` Trials API extraction into dedicated package surface: in progress
 
 Notes:
 - Added `tanstackChatTask` (`ts/src/tanstack.ts`) to bridge TanStack AI text adapters into Condukt task execution.
@@ -320,3 +320,6 @@ Notes:
 - Updated TS package metadata to include `@tanstack/ai` runtime dependency and documented TanStack adapter usage in `ts/README.md`.
 - Switched pipeline execution to run tasks in parallel within dependency levels (`execution.mode = level_parallel`) while preserving deterministic per-level trace ordering.
 - Added runtime coverage to verify concurrent fan-out behavior and ordering guarantees (`ts/test/pipeline.test.ts`).
+- Added conditional task gating (`when`) across task definitions and LLM/TanStack task builders.
+- Added `skipped` task traces with explicit `skip_reason`, plus summary-level skipped counts for adaptive-flow diagnostics.
+- Added runtime and compile-time coverage for conditional execution semantics (`ts/test/pipeline.test.ts`, `ts/typecheck/pipeline-dependencies.typecheck.ts`).

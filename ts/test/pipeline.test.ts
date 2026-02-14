@@ -250,6 +250,44 @@ test("rejects duplicate task ids at runtime for dynamic task ids", () => {
   ).toThrow(/duplicate task id 'research'/);
 });
 
+test("supports conditional task execution and records skipped tasks", async () => {
+  const pipeline = new Pipeline("conditional-flow")
+    .addTask({
+      id: "gate",
+      output: z.object({
+        shouldRun: z.boolean(),
+      }),
+      run: async () => ({
+        data: { shouldRun: false },
+      }),
+    })
+    .addTask({
+      id: "deploy",
+      after: ["gate"] as const,
+      when: ({ dependencyOutputs }) => dependencyOutputs.gate.shouldRun,
+      output: z.object({
+        deployed: z.boolean(),
+      }),
+      run: async () => ({
+        data: { deployed: true },
+      }),
+    });
+
+  const result = await pipeline.runDetailed();
+  const deployTrace = result.trace.tasks[1];
+
+  expect(result.trace.status).toBe("ok");
+  expect(result.trace.summary).toEqual({
+    total: 2,
+    passed: 1,
+    failed: 0,
+    skipped: 1,
+  });
+  expect(result.outputs.deploy).toBeUndefined();
+  expect(deployTrace?.status).toBe("skipped");
+  expect(deployTrace?.skip_reason).toBe("condition returned false");
+});
+
 test("retries execution failures and succeeds on later attempt", async () => {
   let attempts = 0;
   const provider = new FakeProvider({

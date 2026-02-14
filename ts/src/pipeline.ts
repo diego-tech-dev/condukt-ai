@@ -39,6 +39,11 @@ export interface TaskRuntimeContext<
   readonly dependencyOutputs: Readonly<Pick<TOutputs, TDependencies[number]>>;
 }
 
+type TaskCondition<
+  TOutputs extends TaskOutputMap = TaskOutputMap,
+  TDependencies extends readonly TaskOutputKey<TOutputs>[] = readonly TaskOutputKey<TOutputs>[],
+> = (context: TaskRuntimeContext<TOutputs, TDependencies>) => boolean | Promise<boolean>;
+
 export interface TaskExecutionResult {
   readonly data: unknown;
   readonly input?: unknown;
@@ -55,6 +60,7 @@ export interface TaskDefinition<
   readonly id: TTaskId;
   readonly description?: string;
   readonly after?: TDependencies;
+  readonly when?: TaskCondition<TOutputs, TDependencies>;
   readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
   run(context: TaskRuntimeContext<TOutputs, TDependencies>): Promise<TaskExecutionResult>;
@@ -72,7 +78,7 @@ export interface TaskAttemptTrace {
 
 export interface TaskTrace {
   readonly task: string;
-  readonly status: "ok" | "error";
+  readonly status: "ok" | "error" | "skipped";
   readonly started_at: string;
   readonly finished_at: string;
   readonly duration_ms: number;
@@ -82,6 +88,7 @@ export interface TaskTrace {
   readonly meta?: Record<string, unknown>;
   readonly error?: string;
   readonly error_code?: string;
+  readonly skip_reason?: string;
   readonly contract_issues?: readonly ContractIssue[];
   readonly attempts?: readonly TaskAttemptTrace[];
 }
@@ -102,6 +109,7 @@ export interface PipelineTrace {
     readonly total: number;
     readonly passed: number;
     readonly failed: number;
+    readonly skipped: number;
   };
 }
 
@@ -134,6 +142,7 @@ export type LLMTaskDefinition<
   readonly id: TTaskId;
   readonly description?: string;
   readonly after?: TDependencies;
+  readonly when?: TaskCondition<TOutputs, TDependencies>;
   readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
   readonly provider: LLMProvider<TModel, TSettingsByModel>;
@@ -167,6 +176,7 @@ export function llmTask<
     id: definition.id,
     description: definition.description,
     after: definition.after,
+    when: definition.when,
     retry: definition.retry,
     output: definition.output,
     async run(context) {
@@ -287,10 +297,46 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
             dependencyOutputs[dependency] = outputs[dependency];
           }
 
-          const trace = await executeTaskWithRetry(task, {
+          const context = {
             outputs,
             taskResults,
             dependencyOutputs,
+          };
+
+          if (task.when) {
+            const conditionStartedAt = nowIso();
+            const conditionStartedMs = Date.now();
+            try {
+              const shouldRun = await task.when(context);
+              if (!shouldRun) {
+                return {
+                  task,
+                  trace: buildTaskSkippedTrace({
+                    task,
+                    startedAt: conditionStartedAt,
+                    finishedAt: nowIso(),
+                    durationMs: Date.now() - conditionStartedMs,
+                    reason: "condition returned false",
+                  }),
+                };
+              }
+            } catch (error) {
+              return {
+                task,
+                trace: buildTaskErrorTrace({
+                  task,
+                  startedAt: conditionStartedAt,
+                  finishedAt: nowIso(),
+                  durationMs: Date.now() - conditionStartedMs,
+                  errorCode: ERROR_CODE_TASK_EXECUTION_FAILURE,
+                  error: `task condition failed: ${asErrorMessage(error)}`,
+                }),
+              };
+            }
+          }
+
+          const trace = await executeTaskWithRetry(task, {
+            ...context,
           });
 
           return { task, trace };
@@ -306,7 +352,9 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
           continue;
         }
 
-        failed = true;
+        if (result.trace.status === "error") {
+          failed = true;
+        }
       }
 
       if (failed) {
@@ -525,6 +573,14 @@ interface BuildTaskErrorInput {
   readonly attempts?: readonly TaskAttemptTrace[];
 }
 
+interface BuildTaskSkippedInput {
+  readonly task: TaskDefinition;
+  readonly startedAt: string;
+  readonly finishedAt: string;
+  readonly durationMs: number;
+  readonly reason: string;
+}
+
 function buildTaskErrorTrace(args: BuildTaskErrorInput): TaskTrace {
   return {
     task: args.task.id,
@@ -539,6 +595,17 @@ function buildTaskErrorTrace(args: BuildTaskErrorInput): TaskTrace {
     error: args.error,
     contract_issues: args.contractIssues,
     attempts: args.attempts,
+  };
+}
+
+function buildTaskSkippedTrace(args: BuildTaskSkippedInput): TaskTrace {
+  return {
+    task: args.task.id,
+    status: "skipped",
+    started_at: args.startedAt,
+    finished_at: args.finishedAt,
+    duration_ms: args.durationMs,
+    skip_reason: args.reason,
   };
 }
 
@@ -619,13 +686,17 @@ function summarize(tasks: readonly TaskTrace[]): {
   readonly total: number;
   readonly passed: number;
   readonly failed: number;
+  readonly skipped: number;
 } {
   const total = tasks.length;
+  const passed = tasks.filter((task) => task.status === "ok").length;
   const failed = tasks.filter((task) => task.status === "error").length;
+  const skipped = tasks.filter((task) => task.status === "skipped").length;
   return {
     total,
-    passed: total - failed,
+    passed,
     failed,
+    skipped,
   };
 }
 

@@ -6,6 +6,7 @@ Focus of this package:
 - Standard Schema task contracts (`@standard-schema/spec`) so users can bring Zod or any compliant schema library
 - structured execution traces for fast failure diagnosis
 - parallel execution across independent dependency levels
+- conditional task gating with `when(...)` and skipped-task trace diagnostics
 - LLM task adapters for OpenAI and Anthropic JSON workflows
 - TanStack AI task adapter (`tanstackChatTask`) for SDK-native chat integrations
 - provider-model-aware typing (model IDs + settings inferred per provider/model)

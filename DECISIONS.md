@@ -386,3 +386,10 @@ Status: accepted
 Decision: execute dependency levels in parallel by default in the TS pipeline runtime.
 Rationale: orchestration throughput should scale with DAG fan-out; level-parallel execution preserves dependency correctness while reducing end-to-end latency.
 Consequences: `Pipeline.runDetailed()` now executes independent tasks concurrently per level, trace execution metadata reports `mode: level_parallel`, and trace/task ordering remains deterministic by declared level order.
+
+## 2026-02-14
+
+Status: accepted
+Decision: add first-class conditional task execution (`when`) with explicit skipped-task traces.
+Rationale: adaptive agent workflows need lightweight branching without introducing a separate planner or imperative control language.
+Consequences: task definitions now support `when(context)`, skipped tasks emit `status: skipped` with `skip_reason`, and pipeline summaries report skipped counts alongside passed/failed totals.

@@ -171,5 +171,5 @@ Status: in progress
 
 1. `E1` TanStack AI adapter integration for pipeline tasks: completed
 2. `E2` Parallel execution for independent dependency levels: completed
-3. `E3` Adaptive control-flow primitives for conditional execution: in progress
-4. `E4` Trials API extraction into dedicated package surface: pending
+3. `E3` Adaptive control-flow primitives for conditional execution: completed
+4. `E4` Trials API extraction into dedicated package surface: in progress
