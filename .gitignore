@@ -1,7 +1,7 @@
-__pycache__/
-*.py[cod]
 .DS_Store
 AGENT.md
+__pycache__/
+*.py[cod]
 rust/**/target/
 ts/node_modules/
 ts/dist/

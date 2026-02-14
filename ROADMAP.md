@@ -124,3 +124,11 @@ Status: completed
 1. `J1` Trial module split (`types`/`normalization`/`session`/`summary`): completed
 2. `J2` Strict command-scoped parsing and validation in `trial-metrics` CLI: completed
 3. `J3` Path-agnostic trace goldens + CLI integration coverage: completed
+
+## TS-Only Consolidation Sprint (Autonomous)
+
+Status: completed
+
+1. `K1` Remove Python and Rust runtime tracks from repository: completed
+2. `K2` Remove cross-runtime conformance/parity scripts and tests: completed
+3. `K3` Rewrite root architecture docs for TS-only scope: completed

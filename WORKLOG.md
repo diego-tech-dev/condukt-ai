@@ -229,3 +229,17 @@ Notes:
 - Hardened `ts/scripts/trial-metrics.ts` parser with explicit command/flag validation, typed option parsing, and early failures for malformed flags.
 - Added end-to-end CLI integration coverage in `ts/test/trial-metrics-cli.test.ts` for `start`/`finish`/`report` workflow plus boolean-flag validation.
 - Normalized golden trace worker provenance to `workers/<file>` and updated Python trace normalization to remove machine-specific path prefixes.
+
+### Sprint: TS-only consolidation run
+
+Status: completed
+
+Milestone status:
+- `K1` Remove Python and Rust runtime tracks from repository: completed
+- `K2` Remove cross-runtime conformance/parity scripts and tests: completed
+- `K3` Rewrite root architecture docs for TS-only scope: completed
+
+Notes:
+- Removed legacy runtime source trees (`condukt/`, `rust/condukt-rs/`) and Python worker/example/spec assets tied to the old `.mgl` track.
+- Removed Python-based conformance/parity tooling and the full Python/Rust test suite.
+- Rewrote root docs (`README.md`, `docs/PROJECT_COMPASS.md`, `docs/FOUNDATIONS.md`) to reflect TS-only product scope.

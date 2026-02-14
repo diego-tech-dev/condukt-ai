@@ -2,6 +2,10 @@
 
 Last updated: 2026-02-14
 
+Note:
+- Entries below include historical learnings from the decommissioned Python/Rust runtime phase.
+- As of 2026-02-14, active implementation scope is TypeScript-only (`ts/`).
+
 Purpose:
 - capture implementation learnings that are easy to forget
 - preserve root causes and guardrails, not just outcomes
@@ -13,6 +17,20 @@ Entry format:
 - `Learning`
 - `What changed`
 - `Guardrail`
+
+## 2026-02-14
+
+Context:
+- Decommissioned Python and Rust runtime tracks after TS runtime reached release-grade checks.
+
+Learning:
+- Multi-runtime scaffolding is useful during exploration, but once product direction is clear it creates avoidable maintenance drag and diluted execution.
+
+What changed:
+- Removed legacy runtime code, cross-runtime conformance scripts, and Python/Rust test suites from this repository.
+
+Guardrail:
+- Before adding a new runtime track, require a product-level justification and a clear owner; otherwise keep focus on TS runtime velocity.
 
 ## 2026-02-14
 

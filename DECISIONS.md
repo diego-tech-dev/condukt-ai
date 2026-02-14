@@ -337,3 +337,10 @@ Status: accepted
 Decision: normalize worker provenance paths in golden trace comparisons.
 Rationale: absolute local workspace paths created false golden diffs when repos were moved or renamed.
 Consequences: golden traces now store `workers/<file>` paths and end-to-end normalization strips machine-specific prefixes before comparison.
+
+## 2026-02-14
+
+Status: accepted
+Decision: decommission Python and Rust runtime tracks and keep Condukt AI repository scope TypeScript-only.
+Rationale: active product direction and release workflow are fully centered on the `condukt-ai` TS package; maintaining legacy runtimes no longer provides sufficient value for the ongoing roadmap.
+Consequences: removed Python/Rust runtime code, `.mgl` examples/spec artifacts, and cross-runtime conformance/parity test harnesses; root project docs now describe a TS-only architecture.
