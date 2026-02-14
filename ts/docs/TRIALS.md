@@ -4,7 +4,7 @@ Goal: capture a measurable `time-to-diagnose` metric for broken agent workflows.
 
 This workflow records:
 - participant
-- mode (`baseline` or `condukt`)
+- mode (`baseline` or `condukt-ai`)
 - expected failure boundary (task + error code)
 - participant diagnosis
 - elapsed diagnosis time
@@ -26,7 +26,7 @@ cd ts
 pnpm trial:start \
   --participant p1 \
   --scenario quickstart-broken \
-  --mode condukt \
+  --mode condukt-ai \
   --trace trace.quickstart.json
 ```
 
@@ -68,7 +68,7 @@ Report includes:
 - total records
 - accuracy
 - median and p90 elapsed diagnosis times
-- median speedup ratio (`baseline / condukt`)
+- median speedup ratio (`baseline / condukt-ai`)
 - paired sample count and paired speedup metrics
 
 ## 5) Apply quality gates (recommended)
@@ -94,7 +94,7 @@ Gate behavior:
 cd ts
 pnpm trial:report -- \
   --markdown-out trials/report.md \
-  --title "Condukt Trial Report" \
+  --title "Condukt AI Trial Report" \
   --max-pairs 20 \
   --min-records 6 \
   --min-pairs 3 \
@@ -110,5 +110,5 @@ This writes a shareable markdown report with:
 ## Suggested 2-week target
 
 - collect at least 3 external participants
-- run one baseline + one condukt diagnosis per participant
+- run one baseline + one condukt-ai diagnosis per participant
 - success criterion: at least one participant repeats usage unprompted

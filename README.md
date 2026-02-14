@@ -1,4 +1,4 @@
-# Condukt Prototype
+# Condukt AI Prototype
 
 Minimal intent-first language prototype for agent orchestration.
 
@@ -27,7 +27,7 @@ A TypeScript-first runtime prototype now lives in `ts/` with:
 - structured trace output for fast diagnosis
 - OpenAI and Anthropic JSON task adapters
 
-Current TS package name: `condukt`.
+Current TS package name: `condukt-ai`.
 
 Package release runbook: `ts/docs/PUBLISHING.md`.
 

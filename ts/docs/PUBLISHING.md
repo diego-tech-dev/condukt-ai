@@ -3,7 +3,7 @@
 ## Preconditions
 
 - npm account authenticated (`pnpm npm whoami`)
-- package name availability checked (`pnpm npm view condukt`)
+- package name availability checked (`pnpm npm view condukt-ai`)
 - clean git state
 
 ## 1) Validate release locally
@@ -44,7 +44,7 @@ Or use GitHub Actions manual workflow:
 ## 4) Verify install
 
 ```bash
-pnpm dlx tsx -e "import('condukt').then(m => console.log(Object.keys(m).slice(0,8)))"
+pnpm dlx tsx -e "import('condukt-ai').then(m => console.log(Object.keys(m).slice(0,8)))"
 ```
 
 ## Release notes template

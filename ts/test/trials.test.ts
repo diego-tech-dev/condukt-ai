@@ -53,7 +53,7 @@ test("createTrialSession derives expected diagnosis from trace", () => {
   const session = createTrialSession({
     participant: "p1",
     scenario: "quickstart-broken",
-    mode: "condukt",
+    mode: "condukt-ai",
     trace: buildBrokenTrace(),
     sessionId: "session-1",
     startedAt: "2026-02-14T10:00:00.000Z",
@@ -69,7 +69,7 @@ test("completeTrialSession marks diagnosis accuracy", () => {
   const session = createTrialSession({
     participant: "p1",
     scenario: "quickstart-broken",
-    mode: "condukt",
+    mode: "condukt-ai",
     trace: buildBrokenTrace(),
     sessionId: "session-1",
     startedAt: "2026-02-14T10:00:00.000Z",
@@ -96,7 +96,7 @@ test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
       session_id: "s1",
       participant: "p1",
       scenario: "quickstart-broken",
-      mode: "condukt",
+      mode: "condukt-ai",
       started_at: "2026-02-14T10:00:00.000Z",
       finished_at: "2026-02-14T10:00:20.000Z",
       elapsed_ms: 20_000,
@@ -138,9 +138,9 @@ test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
 
   const summary = summarizeTrialRecords(records);
   expect(summary.total).toBe(2);
-  expect(summary.by_mode.condukt.total).toBe(1);
+  expect(summary.by_mode["condukt-ai"].total).toBe(1);
   expect(summary.by_mode.baseline.total).toBe(1);
-  expect(summary.condukt_vs_baseline_speedup).toBe(4);
+  expect(summary.condukt_ai_vs_baseline_speedup).toBe(4);
   expect(summary.paired.total_pairs).toBe(1);
   expect(summary.paired.median_speedup).toBe(4);
   expect(summary.paired.p90_speedup).toBe(4);
@@ -149,10 +149,10 @@ test("summarizeTrialRecords computes per-mode aggregates and speedup", () => {
       participant: "p1",
       scenario: "quickstart-broken",
       baseline_elapsed_ms: 80_000,
-      condukt_elapsed_ms: 20_000,
+      condukt_ai_elapsed_ms: 20_000,
       speedup: 4,
       baseline_correct: true,
-      condukt_correct: true,
+      condukt_ai_correct: true,
     },
   ]);
 });
@@ -202,10 +202,10 @@ test("summarizeTrialRecords pairs by participant and scenario using latest runs"
       diagnosis_correct: true,
     },
     {
-      session_id: "condukt",
+      session_id: "condukt-ai",
       participant: "p1",
       scenario: "quickstart-broken",
-      mode: "condukt",
+      mode: "condukt-ai",
       started_at: "2026-02-14T10:00:00.000Z",
       finished_at: "2026-02-14T10:00:20.000Z",
       elapsed_ms: 20_000,
@@ -226,7 +226,7 @@ test("summarizeTrialRecords pairs by participant and scenario using latest runs"
       session_id: "unpaired",
       participant: "p2",
       scenario: "quickstart-broken",
-      mode: "condukt",
+      mode: "condukt-ai",
       started_at: "2026-02-14T10:00:00.000Z",
       finished_at: "2026-02-14T10:00:40.000Z",
       elapsed_ms: 40_000,
@@ -249,7 +249,7 @@ test("summarizeTrialRecords pairs by participant and scenario using latest runs"
   expect(summary.paired.total_pairs).toBe(1);
   expect(summary.paired.median_speedup).toBe(3);
   expect(summary.paired.pairs[0]?.baseline_elapsed_ms).toBe(60_000);
-  expect(summary.paired.pairs[0]?.condukt_elapsed_ms).toBe(20_000);
+  expect(summary.paired.pairs[0]?.condukt_ai_elapsed_ms).toBe(20_000);
 });
 
 test("evaluateTrialSummary passes when thresholds are met", () => {
@@ -258,7 +258,7 @@ test("evaluateTrialSummary passes when thresholds are met", () => {
       session_id: "s1",
       participant: "p1",
       scenario: "quickstart-broken",
-      mode: "condukt",
+      mode: "condukt-ai",
       started_at: "2026-02-14T10:00:00.000Z",
       finished_at: "2026-02-14T10:00:20.000Z",
       elapsed_ms: 20_000,
@@ -315,7 +315,7 @@ test("evaluateTrialSummary fails with actionable reasons", () => {
       session_id: "s1",
       participant: "p1",
       scenario: "quickstart-broken",
-      mode: "condukt",
+      mode: "condukt-ai",
       started_at: "2026-02-14T10:00:00.000Z",
       finished_at: "2026-02-14T10:00:30.000Z",
       elapsed_ms: 30_000,
@@ -356,7 +356,7 @@ test("renderTrialSummaryMarkdown includes summary and paired table", () => {
       session_id: "s1",
       participant: "p1",
       scenario: "quickstart-broken",
-      mode: "condukt",
+      mode: "condukt-ai",
       started_at: "2026-02-14T10:00:00.000Z",
       finished_at: "2026-02-14T10:00:20.000Z",
       elapsed_ms: 20_000,

@@ -284,3 +284,18 @@ What changed:
 
 Guardrail:
 - Keep markdown report structure stable so downstream sharing/review workflows remain predictable.
+
+## 2026-02-14
+
+Context:
+- Aligned public naming across package/repository-facing surfaces.
+
+Learning:
+- Early naming drift between package, repo, and docs creates avoidable onboarding friction even when runtime behavior is stable.
+
+What changed:
+- Renamed TS package identity and trial mode label to `condukt-ai`.
+- Updated repository metadata links and publish docs for the new canonical name.
+
+Guardrail:
+- Keep one canonical external identifier (`condukt-ai`) for package/repo/docs, and treat internal module paths (`condukt`) as implementation details.

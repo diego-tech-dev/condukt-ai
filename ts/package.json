@@ -1,18 +1,18 @@
 {
-  "name": "condukt",
+  "name": "condukt-ai",
   "version": "0.1.0",
   "private": false,
   "type": "module",
-  "description": "TypeScript contract-first pipeline runtime for Condukt",
+  "description": "TypeScript contract-first pipeline runtime for Condukt AI",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/diego-tech-dev/missiongraph.git",
+    "url": "git+https://github.com/diego-tech-dev/condukt-ai.git",
     "directory": "ts"
   },
-  "homepage": "https://github.com/diego-tech-dev/missiongraph/tree/main/ts",
+  "homepage": "https://github.com/diego-tech-dev/condukt-ai/tree/main/ts",
   "bugs": {
-    "url": "https://github.com/diego-tech-dev/missiongraph/issues"
+    "url": "https://github.com/diego-tech-dev/condukt-ai/issues"
   },
   "keywords": [
     "agent",

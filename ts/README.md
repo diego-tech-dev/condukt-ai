@@ -1,4 +1,4 @@
-# condukt (prototype)
+# condukt-ai (prototype)
 
 TypeScript-first contract and trace runtime for agent workflows.
 
@@ -14,7 +14,7 @@ Focus of this package:
 From npm:
 
 ```bash
-pnpm add condukt zod
+pnpm add condukt-ai zod
 ```
 
 From source:
@@ -57,11 +57,11 @@ Both commands write `trace.quickstart.json`. Follow `docs/TRACE_WALKTHROUGH.md` 
 Capture diagnosis-time metrics for external users:
 
 ```bash
-pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt --trace trace.quickstart.json
+pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt-ai --trace trace.quickstart.json
 pnpm trial:finish --session trials/sessions/<session-id>.session.json --diagnosed-task draft --diagnosed-error-code CONTRACT_OUTPUT_VIOLATION
 pnpm trial:report
 pnpm trial:report -- --min-records 6 --min-accuracy 0.75 --min-pairs 3 --min-speedup 1.5
-pnpm trial:report -- --markdown-out trials/report.md --title "Condukt Trial Report"
+pnpm trial:report -- --markdown-out trials/report.md --title "Condukt AI Trial Report"
 ```
 
 Trial protocol details: `docs/TRIALS.md`.
@@ -70,7 +70,7 @@ Trial protocol details: `docs/TRIALS.md`.
 
 ```ts
 import { z } from "zod";
-import { Pipeline, llmTask, createOpenAIProvider } from "condukt";
+import { Pipeline, llmTask, createOpenAIProvider } from "condukt-ai";
 
 const provider = createOpenAIProvider();
 const pipeline = new Pipeline("research-and-write");

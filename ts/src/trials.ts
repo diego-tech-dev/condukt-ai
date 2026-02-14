@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { diagnoseFailure } from "./diagnostics.js";
 import type { PipelineTrace } from "./pipeline.js";
 
-export type TrialMode = "condukt" | "baseline";
+export type TrialMode = "condukt-ai" | "baseline";
 
 export interface TrialExpectation {
   readonly task?: string;
@@ -71,7 +71,7 @@ export interface TrialSummary {
   readonly median_elapsed_ms: number | null;
   readonly p90_elapsed_ms: number | null;
   readonly by_mode: Record<TrialMode, TrialModeSummary>;
-  readonly condukt_vs_baseline_speedup: number | null;
+  readonly condukt_ai_vs_baseline_speedup: number | null;
   readonly paired: TrialPairSummary;
 }
 
@@ -87,10 +87,10 @@ export interface TrialPair {
   readonly participant: string;
   readonly scenario: string;
   readonly baseline_elapsed_ms: number;
-  readonly condukt_elapsed_ms: number;
+  readonly condukt_ai_elapsed_ms: number;
   readonly speedup: number;
   readonly baseline_correct: boolean;
-  readonly condukt_correct: boolean;
+  readonly condukt_ai_correct: boolean;
 }
 
 export interface TrialPairSummary {
@@ -177,7 +177,7 @@ export function completeTrialSession(input: CompleteTrialSessionInput): TrialRec
 
 export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSummary {
   const byMode: Record<TrialMode, TrialRecord[]> = {
-    condukt: [],
+    "condukt-ai": [],
     baseline: [],
   };
 
@@ -185,7 +185,7 @@ export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSum
     byMode[record.mode].push(record);
   }
 
-  const conduktSummary = summarizeMode(byMode.condukt);
+  const conduktSummary = summarizeMode(byMode["condukt-ai"]);
   const baselineSummary = summarizeMode(byMode.baseline);
   const overall = summarizeMode(records);
   const paired = summarizePairs(records);
@@ -193,10 +193,10 @@ export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSum
   return {
     ...overall,
     by_mode: {
-      condukt: conduktSummary,
+      "condukt-ai": conduktSummary,
       baseline: baselineSummary,
     },
-    condukt_vs_baseline_speedup:
+    condukt_ai_vs_baseline_speedup:
       baselineSummary.median_elapsed_ms !== null && conduktSummary.median_elapsed_ms !== null
         ? baselineSummary.median_elapsed_ms / conduktSummary.median_elapsed_ms
         : null,
@@ -244,7 +244,7 @@ export function renderTrialSummaryMarkdown(
   summary: TrialSummary,
   options: TrialSummaryMarkdownOptions = {},
 ): string {
-  const title = options.title ?? "Condukt Trial Report";
+  const title = options.title ?? "Condukt AI Trial Report";
   const maxPairs = Math.max(1, Math.floor(options.max_pairs ?? 20));
   const visiblePairs = summary.paired.pairs.slice(0, maxPairs);
 
@@ -257,7 +257,7 @@ export function renderTrialSummaryMarkdown(
     `- Accuracy: ${formatPercent(summary.accuracy)}`,
     `- Median elapsed: ${formatMilliseconds(summary.median_elapsed_ms)}`,
     `- P90 elapsed: ${formatMilliseconds(summary.p90_elapsed_ms)}`,
-    `- Global speedup (mode medians): ${formatSpeedup(summary.condukt_vs_baseline_speedup)}`,
+    `- Global speedup (mode medians): ${formatSpeedup(summary.condukt_ai_vs_baseline_speedup)}`,
     `- Paired samples: ${summary.paired.total_pairs}`,
     `- Paired median speedup: ${formatSpeedup(summary.paired.median_speedup)}`,
     `- Paired p90 speedup: ${formatSpeedup(summary.paired.p90_speedup)}`,
@@ -266,7 +266,7 @@ export function renderTrialSummaryMarkdown(
     "",
     "| Mode | Records | Accuracy | Median elapsed | P90 elapsed |",
     "| --- | ---: | ---: | ---: | ---: |",
-    modeRow("condukt", summary.by_mode.condukt),
+    modeRow("condukt-ai", summary.by_mode["condukt-ai"]),
     modeRow("baseline", summary.by_mode.baseline),
   ];
 
@@ -275,10 +275,10 @@ export function renderTrialSummaryMarkdown(
       "",
       "## Paired Samples",
       "",
-      "| Participant | Scenario | Baseline elapsed | Condukt elapsed | Speedup |",
+      "| Participant | Scenario | Baseline elapsed | Condukt AI elapsed | Speedup |",
       "| --- | --- | ---: | ---: | ---: |",
       ...visiblePairs.map((pair) =>
-        `| ${pair.participant} | ${pair.scenario} | ${pair.baseline_elapsed_ms} ms | ${pair.condukt_elapsed_ms} ms | ${pair.speedup.toFixed(2)}x |`
+        `| ${pair.participant} | ${pair.scenario} | ${pair.baseline_elapsed_ms} ms | ${pair.condukt_ai_elapsed_ms} ms | ${pair.speedup.toFixed(2)}x |`
       ),
     );
 
@@ -347,7 +347,7 @@ function summarizePairs(records: readonly TrialRecord[]): TrialPairSummary {
 function buildPairs(records: readonly TrialRecord[]): TrialPair[] {
   interface PairBucket {
     baseline?: TrialRecord;
-    condukt?: TrialRecord;
+    conduktAi?: TrialRecord;
   }
 
   const buckets = new Map<string, PairBucket>();
@@ -358,7 +358,7 @@ function buildPairs(records: readonly TrialRecord[]): TrialPair[] {
     if (record.mode === "baseline") {
       bucket.baseline = pickLatestRecord(bucket.baseline, record);
     } else {
-      bucket.condukt = pickLatestRecord(bucket.condukt, record);
+      bucket.conduktAi = pickLatestRecord(bucket.conduktAi, record);
     }
 
     buckets.set(key, bucket);
@@ -366,11 +366,11 @@ function buildPairs(records: readonly TrialRecord[]): TrialPair[] {
 
   const pairs: TrialPair[] = [];
   for (const [key, bucket] of buckets.entries()) {
-    if (!bucket.baseline || !bucket.condukt) {
+    if (!bucket.baseline || !bucket.conduktAi) {
       continue;
     }
 
-    if (bucket.condukt.elapsed_ms <= 0) {
+    if (bucket.conduktAi.elapsed_ms <= 0) {
       continue;
     }
 
@@ -379,10 +379,10 @@ function buildPairs(records: readonly TrialRecord[]): TrialPair[] {
       participant,
       scenario,
       baseline_elapsed_ms: bucket.baseline.elapsed_ms,
-      condukt_elapsed_ms: bucket.condukt.elapsed_ms,
-      speedup: bucket.baseline.elapsed_ms / bucket.condukt.elapsed_ms,
+      condukt_ai_elapsed_ms: bucket.conduktAi.elapsed_ms,
+      speedup: bucket.baseline.elapsed_ms / bucket.conduktAi.elapsed_ms,
       baseline_correct: bucket.baseline.diagnosis_correct,
-      condukt_correct: bucket.condukt.diagnosis_correct,
+      condukt_ai_correct: bucket.conduktAi.diagnosis_correct,
     });
   }
 

@@ -55,5 +55,5 @@ This is the core Condukt TS value proposition: contract failures are explicit an
 To capture trial metrics for this run, feed the same trace into:
 
 ```bash
-pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt --trace trace.quickstart.json
+pnpm trial:start --participant p1 --scenario quickstart-broken --mode condukt-ai --trace trace.quickstart.json
 ```

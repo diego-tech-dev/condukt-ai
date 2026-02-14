@@ -1,4 +1,4 @@
-# Condukt Worklog
+# Condukt AI Worklog
 
 ## 2026-02-13
 
@@ -127,7 +127,7 @@ Notes:
 - Added TS provider tests with mocked HTTP responses for OpenAI and Anthropic JSON parsing behavior.
 - Added TS quickstart demo (`pnpm quickstart` / `pnpm quickstart:broken`) that writes a trace and demonstrates boundary-failure diagnosis.
 - Added 10-minute walkthrough doc at `ts/docs/TRACE_WALKTHROUGH.md`.
-- Renamed TS package to `condukt`.
+- Renamed TS package to `condukt-ai`.
 
 ### Sprint: Distribution run
 
@@ -139,7 +139,7 @@ Milestone status:
 - `U3` External trial instrumentation for time-to-diagnose metric capture: completed
 
 Notes:
-- Started npm publish-readiness hardening for the `condukt` package.
+- Started npm publish-readiness hardening for the `condukt-ai` package.
 - Added publish metadata (`exports`, `files`, `repository`, `engines`, `publishConfig`) and release scripts (`release:check`, `prepack`) to `ts/package.json`.
 - Added package publishing runbook at `ts/docs/PUBLISHING.md`.
 - Added local `ts/LICENSE` to ensure packaged license inclusion.
@@ -187,3 +187,12 @@ Notes:
 - Added trial CLI gate flags (`--min-records`, `--min-accuracy`, `--min-pairs`, `--min-speedup`) with non-zero exit on gate failure.
 - Added markdown trial summary renderer and `--markdown-out` export path in trial CLI.
 - Added report formatting controls (`--title`, `--max-pairs`) and docs for gate-driven shareable reporting.
+
+### Sprint: Naming alignment run
+
+Status: completed
+
+Notes:
+- Renamed external TS package identity to `condukt-ai` and aligned docs/examples accordingly.
+- Updated trial mode labels and report fields from `condukt` to `condukt-ai`.
+- Updated repository metadata links to `github.com/diego-tech-dev/condukt-ai`.

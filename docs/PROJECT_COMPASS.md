@@ -1,6 +1,6 @@
-# Condukt Project Compass
+# Condukt AI Project Compass
 
-This document is the durable context for Condukt. It is the first file to read when resuming work.
+This document is the durable context for Condukt AI. It is the first file to read when resuming work.
 
 Companion docs:
 - `AGENTS.md` for agent entrypoint and execution workflow.
@@ -10,7 +10,7 @@ Companion docs:
 
 ## Purpose
 
-Condukt is an intent-first orchestration language for agents.
+Condukt AI is an intent-first orchestration language for agents.
 
 It exists to make multi-agent work:
 - explicit (`goal`, `constraints`, `plan`, `contracts`, `verify`)
@@ -19,7 +19,7 @@ It exists to make multi-agent work:
 - portable across runtimes (stable AST/trace contracts)
 
 Active product track:
-- TypeScript contract-first pipeline runtime (`ts/`, package name `condukt`) focused on fast agent workflow debugging via boundary contracts + structured traces.
+- TypeScript contract-first pipeline runtime (`ts/`, package name `condukt-ai`) focused on fast agent workflow debugging via boundary contracts + structured traces.
 
 ## North Star
 
@@ -112,8 +112,8 @@ Rules for safe migration:
 - Added TypeScript runtime prototype (`ts/`) with Standard Schema contracts, trace-first pipeline execution, and OpenAI/Anthropic adapters.
 - Added TypeScript task retry policies with per-attempt trace history and provider integration tests.
 - Added credential-free TS quickstart + broken-run walkthrough to demonstrate trace-based failure diagnosis in under 10 minutes.
-- Named the TypeScript package `condukt`.
-- Added npm publish-readiness metadata and release validation scripts for `condukt`.
+- Named the TypeScript package `condukt-ai`.
+- Added npm publish-readiness metadata and release validation scripts for `condukt-ai`.
 - Added TS quality and publish GitHub Actions workflows for reproducible CI/release gates.
 - Added TS trace-diagnosis and external-trial metric instrumentation (session start/finish/report with JSONL records).
 - Added TS Biome lint/format baseline and pnpm-only package workflow enforcement.
@@ -121,10 +121,11 @@ Rules for safe migration:
 - Added paired trial analytics (participant+scenario matching) for stronger speedup measurement.
 - Added trial report quality gates for speedup/accuracy/sample-threshold evaluation.
 - Added markdown trial reporting output for shareable experiment artifacts.
+- Aligned public package/repository identity on `condukt-ai`.
 
 ## Near-Term Direction
 
-1. Run external user trials with `ts/docs/TRIALS.md` protocol, quality gates, and markdown exports for decision-ready baseline-vs-Condukt metrics.
+1. Run external user trials with `ts/docs/TRIALS.md` protocol, quality gates, and markdown exports for decision-ready baseline-vs-Condukt AI metrics.
 2. Iterate TS API shape from trial feedback while preserving contract/trace core value.
 
 ## Resume Checklist

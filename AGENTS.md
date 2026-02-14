@@ -4,7 +4,7 @@ Standard agent entrypoint for this repository.
 
 ## Project Overview
 
-Condukt is an intent-first orchestration language for agent systems.
+Condukt AI is an intent-first orchestration language for agent systems.
 
 Core objective:
 - define goals, constraints, plans, contracts, and verification in one deterministic workflow language

@@ -46,8 +46,8 @@ async function runStart(args: Map<string, string>): Promise<void> {
   const scenario = requiredArg(args, "scenario");
   const mode = requiredArg(args, "mode") as TrialMode;
 
-  if (mode !== "condukt" && mode !== "baseline") {
-    throw new Error(`invalid --mode '${mode}', expected condukt|baseline`);
+  if (mode !== "condukt-ai" && mode !== "baseline") {
+    throw new Error(`invalid --mode '${mode}', expected condukt-ai|baseline`);
   }
 
   const tracePath = args.get("trace");
@@ -146,9 +146,9 @@ async function runReport(args: Map<string, string>): Promise<void> {
   console.log(`Median elapsed ms: ${summary.median_elapsed_ms ?? "n/a"}`);
   console.log(`P90 elapsed ms: ${summary.p90_elapsed_ms ?? "n/a"}`);
   console.log(
-    `Condukt vs baseline speedup (median): ${
-      summary.condukt_vs_baseline_speedup
-        ? `${summary.condukt_vs_baseline_speedup.toFixed(2)}x`
+    `Condukt AI vs baseline speedup (median): ${
+      summary.condukt_ai_vs_baseline_speedup
+        ? `${summary.condukt_ai_vs_baseline_speedup.toFixed(2)}x`
         : "n/a"
     }`,
   );
@@ -313,7 +313,7 @@ async function maybeWriteMarkdownReport(
 function printUsage(): void {
   console.log(
     "Usage:\n" +
-      "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt|baseline> [--trace <trace.json>]\n" +
+      "  trial-metrics.ts start --participant <id> --scenario <name> --mode <condukt-ai|baseline> [--trace <trace.json>]\n" +
       "  trial-metrics.ts finish --session <session.json> [--diagnosed-task <id>] [--diagnosed-error-code <code>] [--out <metrics.jsonl>]\n" +
       "  trial-metrics.ts report [--input <metrics.jsonl>] [--json] [--markdown-out <file.md>] [--title <text>] [--max-pairs <int>] [--min-records <int>] [--min-accuracy <0..1>] [--min-pairs <int>] [--min-speedup <number>]",
   );

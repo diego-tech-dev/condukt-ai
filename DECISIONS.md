@@ -14,7 +14,7 @@ Format:
 Status: accepted
 Decision: rename language and runtime project to Condukt.
 Rationale: align naming with mission orchestration + DAG semantics.
-Consequences: package name `condukt`, CLI `mgl`, docs/examples updated.
+Consequences: package name `condukt-ai`, CLI `mgl`, docs/examples updated.
 
 ## 2026-02-13
 
@@ -243,14 +243,14 @@ Consequences: added `pnpm quickstart` and `pnpm quickstart:broken`, plus `ts/doc
 ## 2026-02-14
 
 Status: accepted
-Decision: name the TypeScript runtime package `condukt`.
+Decision: name the TypeScript runtime package `condukt-ai`.
 Rationale: short, searchable, and aligned with the orchestration/conduct metaphor while avoiding saturated `agent/flow/graph` naming patterns.
-Consequences: TS package metadata and docs now use `condukt`; broader project naming remains Condukt for current Python/Rust references.
+Consequences: TS package metadata and docs now use `condukt-ai`; product branding is Condukt AI while Python/Rust runtime module paths remain `condukt` for now.
 
 ## 2026-02-14
 
 Status: accepted
-Decision: prepare `condukt` for direct npm distribution with explicit export/file boundaries and release checks.
+Decision: prepare `condukt-ai` for direct npm distribution with explicit export/file boundaries and release checks.
 Rationale: user adoption requires installable package ergonomics and reproducible pre-publish quality gates.
 Consequences: TS package now includes publish metadata (`repository`, `engines`, `exports`, `files`, `publishConfig`) and a `release:check` script plus publishing playbook.
 
@@ -286,7 +286,7 @@ Consequences: TS test scripts now use Vitest (`pnpm test`, `pnpm test:watch`) an
 
 Status: accepted
 Decision: compute trial speedup with participant+scenario paired analysis in addition to global mode medians.
-Rationale: unpaired aggregate medians can distort diagnosis-speed claims when baseline and condukt samples come from different cohorts.
+Rationale: unpaired aggregate medians can distort diagnosis-speed claims when baseline and condukt-ai samples come from different cohorts.
 Consequences: TS trial summaries now include a `paired` section with pair count, pair-level entries, and paired median/p90 speedup metrics.
 
 ## 2026-02-14
@@ -302,3 +302,10 @@ Status: accepted
 Decision: generate shareable markdown trial reports directly from the trial CLI.
 Rationale: trial outcomes need a portable artifact for async review and decision-making without requiring custom post-processing.
 Consequences: trial reporting now supports `--markdown-out`, optional title/pair limits, and includes gate status in the exported markdown when thresholds are configured.
+
+## 2026-02-14
+
+Status: accepted
+Decision: align public package and repository identity on `condukt-ai`.
+Rationale: one canonical external name reduces ambiguity during adoption and avoids package-name confusion.
+Consequences: npm package metadata, trial mode labels, and documentation now use `condukt-ai`; repository remote targets `github.com/diego-tech-dev/condukt-ai`.
