@@ -47,7 +47,7 @@
     "clean": "rm -rf dist",
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test test/**/*.test.ts",
+    "test": "tsx --test test/*.test.ts",
     "quickstart": "tsx examples/quickstart-debug.ts",
     "quickstart:broken": "tsx examples/quickstart-debug.ts --broken",
     "trial:start": "tsx scripts/trial-metrics.ts start",
