@@ -79,6 +79,20 @@ Guardrail:
 ## 2026-02-14
 
 Context:
+- Added compile-time duplicate-id constraints for typed pipeline builders.
+
+Learning:
+- Compile-time uniqueness constraints should be paired with runtime checks to cover dynamic IDs and non-literal composition paths.
+
+What changed:
+- Added duplicate-id type guards in builder signatures and runtime tests for dynamic duplicate insertion.
+
+Guardrail:
+- Keep compile-time and runtime duplicate-id protections in sync; do not remove runtime checks when adding stricter generic constraints.
+
+## 2026-02-14
+
+Context:
 - Added dual-runtime conformance and golden parity gates.
 
 Learning:

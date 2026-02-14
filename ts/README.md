@@ -8,6 +8,7 @@ Focus of this package:
 - LLM task adapters for OpenAI and Anthropic JSON workflows
 - provider-model-aware typing (model IDs + settings inferred per provider/model)
 - typed dependency context via `pipeline.addLLMTask(...)` so `dependencyOutputs` matches declared `after` tasks
+- duplicate task IDs rejected during typed builder composition (and runtime-guarded for dynamic IDs)
 - task-level retry policies (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces
 - Vitest-powered TypeScript test workflow
 

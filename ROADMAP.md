@@ -156,3 +156,11 @@ Status: completed
 1. `N1` Add typed pipeline run API (`runDetailed`) returning trace + typed outputs: completed
 2. `N2` Add runtime tests for typed run-output behavior: completed
 3. `N3` Add compile-time run-output key safety fixtures and docs updates: completed
+
+## Builder Guard Sprint (Autonomous)
+
+Status: completed
+
+1. `P1` Add compile-time duplicate task-id constraints for typed builders: completed
+2. `P2` Add runtime fallback test coverage for dynamic duplicate IDs: completed
+3. `P3` Update typecheck fixtures and docs for duplicate-id safety guarantees: completed

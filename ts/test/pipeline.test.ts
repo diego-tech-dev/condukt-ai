@@ -224,6 +224,32 @@ test("rejects unknown dependencies", async () => {
   await expect(pipeline.run()).rejects.toThrow(/depends on unknown task 'missing_task'/);
 });
 
+test("rejects duplicate task ids at runtime for dynamic task ids", () => {
+  const provider = new FakeProvider({
+    ok: { value: true },
+  });
+
+  const pipeline = new Pipeline("duplicate-ids").addLLMTask({
+    id: "research",
+    provider,
+    model: "fake-model",
+    output: z.object({ value: z.boolean() }),
+    prompt: () => "ok",
+  });
+
+  const duplicateId = "research" as string;
+
+  expect(() =>
+    pipeline.addLLMTask({
+      id: duplicateId,
+      provider,
+      model: "fake-model",
+      output: z.object({ value: z.boolean() }),
+      prompt: () => "ok",
+    }),
+  ).toThrow(/duplicate task id 'research'/);
+});
+
 test("retries execution failures and succeeds on later attempt", async () => {
   let attempts = 0;
   const provider = new FakeProvider({

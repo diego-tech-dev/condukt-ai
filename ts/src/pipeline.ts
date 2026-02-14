@@ -23,6 +23,12 @@ type MergeTaskOutputs<
   TTaskId extends string,
   TOutput,
 > = Omit<TOutputs, TTaskId> & Record<TTaskId, TOutput>;
+type DuplicateTaskIdConstraint<
+  TOutputs extends TaskOutputMap,
+  TTaskId extends string,
+> = TTaskId extends TaskOutputKey<TOutputs>
+  ? { readonly __duplicate_task_id__: never }
+  : Record<never, never>;
 
 export interface TaskRuntimeContext<
   TOutputs extends TaskOutputMap = TaskOutputMap,
@@ -208,9 +214,10 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
   addTask<
     TOutput,
     TDependencies extends readonly TaskOutputKey<TOutputs>[],
-    TTaskId extends string,
+    const TTaskId extends string,
   >(
-    task: TaskDefinition<TOutput, TOutputs, TDependencies, TTaskId>,
+    task: TaskDefinition<TOutput, TOutputs, TDependencies, TTaskId> &
+      DuplicateTaskIdConstraint<TOutputs, TTaskId>,
   ): Pipeline<MergeTaskOutputs<TOutputs, TTaskId, TOutput>> {
     if (this.tasksById.has(task.id)) {
       throw new Error(`duplicate task id '${task.id}'`);
@@ -225,7 +232,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     TSettingsByModel extends Record<TModel, object>,
     TSelectedModel extends TModel,
     TDependencies extends readonly TaskOutputKey<TOutputs>[],
-    TTaskId extends string,
+    const TTaskId extends string,
   >(
     definition: LLMTaskDefinition<
       TOutput,
@@ -235,9 +242,12 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
       TOutputs,
       TDependencies,
       TTaskId
-    >,
+    > &
+      DuplicateTaskIdConstraint<TOutputs, TTaskId>,
   ): Pipeline<MergeTaskOutputs<TOutputs, TTaskId, TOutput>> {
-    return this.addTask(llmTask(definition));
+    const task = llmTask(definition) as TaskDefinition<TOutput, TOutputs, TDependencies, TTaskId> &
+      DuplicateTaskIdConstraint<TOutputs, TTaskId>;
+    return this.addTask(task);
   }
 
   async runDetailed(): Promise<PipelineRunResult<TOutputs>> {

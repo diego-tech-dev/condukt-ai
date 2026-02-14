@@ -80,3 +80,20 @@ invalidPipeline
     output: z.object({ ok: z.boolean() }),
     prompt: () => "{}",
   });
+
+const duplicateIdPipeline = new Pipeline("duplicate-ids").addLLMTask({
+  id: "research",
+  provider,
+  model: "gpt-4.1-mini",
+  output: z.object({ topics: z.array(z.string()) }),
+  prompt: () => "{}",
+});
+
+// @ts-expect-error duplicate task ids are rejected at compile-time in chained builders
+duplicateIdPipeline.addLLMTask({
+  id: "research",
+  provider,
+  model: "gpt-4.1-mini",
+  output: z.object({ topics: z.array(z.string()) }),
+  prompt: () => "{}",
+});

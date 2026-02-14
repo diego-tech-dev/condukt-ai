@@ -365,3 +365,10 @@ Status: accepted
 Decision: expose a typed pipeline execution API (`runDetailed`) that returns both trace and typed outputs.
 Rationale: trace-only execution forces downstream consumers to cast task outputs manually, reducing the value of compile-time type safety in orchestration code.
 Consequences: `Pipeline.runDetailed()` now returns typed `outputs` and `taskResults` alongside the trace, and compile-time fixtures verify output-key safety across composed pipelines.
+
+## 2026-02-14
+
+Status: accepted
+Decision: enforce duplicate task-id protection in typed pipeline builders.
+Rationale: repeated task IDs are a high-impact authoring error that should be blocked before runtime when task IDs are known statically.
+Consequences: `addTask` and `addLLMTask` now encode duplicate-id constraints in type signatures, while runtime duplicate checks remain in place for dynamic IDs.

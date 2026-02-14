@@ -288,3 +288,17 @@ Notes:
 - Kept `Pipeline.run()` as a trace-only convenience wrapper for backward-compatible callsites.
 - Added runtime test coverage for typed output retrieval and updated README usage to show `runDetailed()` output access.
 - Extended typecheck fixtures to assert output-key safety on `runDetailed()` results.
+
+### Sprint: Builder guard run
+
+Status: completed
+
+Milestone status:
+- `P1` Add compile-time duplicate task-id constraints for typed builders: completed
+- `P2` Add runtime fallback test coverage for dynamic duplicate IDs: completed
+- `P3` Update typecheck fixtures and docs for duplicate-id safety guarantees: completed
+
+Notes:
+- Added duplicate-id type constraints to `addTask` and `addLLMTask` so chained builder composition rejects repeated static task IDs.
+- Added runtime test for duplicate IDs introduced through dynamic string IDs to preserve fail-fast behavior beyond static typing.
+- Extended dependency typecheck fixtures with duplicate-id compile-time assertions.
