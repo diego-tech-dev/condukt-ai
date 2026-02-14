@@ -23,8 +23,8 @@ Given the same `.mgl` program and same worker behavior, any compliant runtime sh
 ## Current Scope (v1)
 
 - Language file extension: `.mgl` only.
-- Parser outputs a versioned AST (`ast_version = "1.0"`).
-- Executor outputs a versioned trace (`trace_version = "1.0"`).
+- Parser outputs a versioned AST (`ast_version = "1.1"`).
+- Executor outputs a versioned trace (`trace_version = "1.1"`).
 - Task graph supports dependency levels and parallel fan-out.
 - Contracts are fail-fast on input and output schema violations.
 - Conformance is guarded by golden tests and JSON schemas.
@@ -90,11 +90,13 @@ Rules for safe migration:
 - Added Rust bootstrap runtime (`rust/missiongraph-rs`) for contract-level conformance checks.
 - Added deterministic retry seeding (`--retry-seed`) for reproducible retry behavior.
 - Added multi-runtime conformance harness (`scripts/conformance.py`).
+- Bumped v1 contracts to `ast_version = 1.1` and `trace_version = 1.1`.
+- Added explicit contract version governance in `spec/VERSIONING.md` with consistency tests.
 
 ## Near-Term Direction
 
-1. Contract/versioning governance checks for AST/trace schemas.
-2. Rust runtime prototype with execution parity on golden suite.
+1. Rust runtime prototype with execution parity on golden suite.
+2. Expand dual-runtime conformance coverage across example programs.
 
 ## Resume Checklist
 
@@ -105,6 +107,7 @@ When picking up work:
    - `python3 -m unittest discover -s tests -p "test_*.py"`
    - `python3 -m missiongraph parse examples/ship_release.mgl`
    - `python3 -m missiongraph run examples/ship_release.mgl --capability ci --capability prod_access --sequential`
+   - `python3 scripts/conformance.py --json`
 3. Confirm no schema/golden drift unless intentional.
 
 ## Update Protocol
@@ -113,4 +116,4 @@ After each meaningful change:
 
 - update `Decision Log` with date and decisions
 - update `Near-Term Direction` if priorities change
-- if contracts changed, bump version and update schemas/goldens together
+- if contracts changed, follow `spec/VERSIONING.md` and update schemas/goldens/runtime constants together

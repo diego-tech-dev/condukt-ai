@@ -7,6 +7,8 @@ import sys
 import unittest
 from pathlib import Path
 
+from missiongraph.spec import AST_VERSION, TRACE_VERSION
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -33,8 +35,8 @@ class ConformanceHarnessTests(unittest.TestCase):
         self.assertEqual(len(payload["cases"]), 1)
         case = payload["cases"][0]
         self.assertTrue(case["ok"])
-        self.assertEqual(case["python_ast_version"], "1.0")
-        self.assertEqual(case["rust_trace_version"], "1.0")
+        self.assertEqual(case["python_ast_version"], AST_VERSION)
+        self.assertEqual(case["rust_trace_version"], TRACE_VERSION)
 
 
 if __name__ == "__main__":

@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 
-pub const AST_VERSION: &str = "1.0";
-pub const TRACE_VERSION: &str = "1.0";
+pub const AST_VERSION: &str = "1.1";
+pub const TRACE_VERSION: &str = "1.1";
 
 #[derive(Debug, Deserialize)]
 pub struct Ast {
@@ -148,7 +148,7 @@ mod tests {
     #[test]
     fn emits_trace_skeleton_with_contract_version() {
         let ast_text = r#"{
-          "ast_version":"1.0",
+          "ast_version":"1.1",
           "goal":"hello",
           "tasks":[{"name":"a","after":[]},{"name":"b","after":["a"]}]
         }"#;

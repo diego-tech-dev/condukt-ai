@@ -33,7 +33,7 @@ Consequences: semantic contracts are defined by schemas + goldens, not Python in
 ## 2026-02-13
 
 Status: accepted
-Decision: enforce versioned contracts for AST and trace (`1.0`).
+Decision: enforce versioned contracts for AST and trace (`1.x`, current `1.1`).
 Rationale: create stable interchange surface for multi-runtime conformance.
 Consequences: `ast_version` and `trace_version` are required and schema-governed.
 
@@ -127,3 +127,10 @@ Status: accepted
 Decision: add a first-class Python/Rust conformance harness script.
 Rationale: continuously verify that runtime contract surfaces stay aligned across implementations.
 Consequences: `scripts/conformance.py` validates AST/trace contract compatibility for selected `.mgl` programs and is covered by tests.
+
+## 2026-02-14
+
+Status: accepted
+Decision: bump AST/trace contract minor versions from `1.0` to `1.1` and codify versioning governance.
+Rationale: versioning rules should be explicit and test-enforced before adding more runtime surface area.
+Consequences: runtime constants, schemas, goldens, Rust bootstrap constants, and governance docs/tests move in lockstep for any future version bump.

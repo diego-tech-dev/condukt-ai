@@ -1,6 +1,6 @@
 # MissionGraph Roadmap
 
-Last updated: 2026-02-13
+Last updated: 2026-02-14
 
 Current sprint status: completed
 
@@ -55,8 +55,16 @@ Status: completed
 
 ## Quality Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `Q1` Deterministic retry seeding: completed
 2. `Q2` Multi-runtime conformance harness: completed
-3. `Q3` Contract/versioning governance checks: pending
+3. `Q3` Contract/versioning governance checks: completed
+
+## Next Sprint (Autonomous)
+
+Status: in_progress
+
+1. `N1` Rust contract CLI parity hardening: pending
+2. `N2` Rust trace semantics expansion: pending
+3. `N3` Dual-runtime golden conformance gate: pending

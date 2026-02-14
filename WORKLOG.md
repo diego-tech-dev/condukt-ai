@@ -40,13 +40,24 @@ Notes:
 
 ### Sprint: Autonomous quality run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `Q1` Deterministic retry seeding: completed
 - `Q2` Multi-runtime conformance harness: completed
-- `Q3` Contract/versioning governance checks: pending
+- `Q3` Contract/versioning governance checks: completed
 
 Notes:
 - Added deterministic retry seeding (`--retry-seed`) for reproducible jitter behavior.
 - Added `scripts/conformance.py` to validate Python/Rust AST+trace contract alignment.
+- Bumped contract versions to `ast_version = 1.1` and `trace_version = 1.1`.
+- Added `spec/VERSIONING.md` and contract-version consistency tests across Python, schemas, Rust, and goldens.
+
+### Sprint: Autonomous next run
+
+Status: in_progress
+
+Milestone status:
+- `N1` Rust contract CLI parity hardening: pending
+- `N2` Rust trace semantics expansion: pending
+- `N3` Dual-runtime golden conformance gate: pending

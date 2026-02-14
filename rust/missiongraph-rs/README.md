@@ -5,7 +5,7 @@ Rust bootstrap runtime for MissionGraph contract conformance.
 This prototype focuses on AST/trace contract handling:
 
 - validate AST JSON (`check-ast`)
-- emit trace skeleton with `trace_version = "1.0"` (`trace-skeleton`)
+- emit trace skeleton with `trace_version = "1.1"` (`trace-skeleton`)
 
 ## Usage
 

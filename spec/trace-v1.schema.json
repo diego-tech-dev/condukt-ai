@@ -19,7 +19,7 @@
   ],
   "properties": {
     "trace_version": {
-      "const": "1.0"
+      "const": "1.1"
     },
     "goal": {
       "type": "string"
