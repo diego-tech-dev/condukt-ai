@@ -52,3 +52,11 @@ Status: completed
 1. `B1` Typed artifact payload contracts: completed
 2. `B2` Policy enhancements (`retry_if`, jitter): completed
 3. `B3` Rust runtime bootstrap: completed
+
+## Quality Sprint (Autonomous)
+
+Status: in_progress
+
+1. `Q1` Deterministic retry seeding: completed
+2. `Q2` Multi-runtime conformance harness: pending
+3. `Q3` Contract/versioning governance checks: pending

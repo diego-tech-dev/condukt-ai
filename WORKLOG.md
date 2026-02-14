@@ -37,3 +37,15 @@ Notes:
 - Added static/runtime checks for artifact type compatibility.
 - Added `retry_if` strategy and retry jitter controls in `with` task policies.
 - Added `rust/missiongraph-rs` bootstrap CLI (`check-ast`, `trace-skeleton`) with Rust tests.
+
+### Sprint: Autonomous quality run
+
+Status: in_progress
+
+Milestone status:
+- `Q1` Deterministic retry seeding: completed
+- `Q2` Multi-runtime conformance harness: pending
+- `Q3` Contract/versioning governance checks: pending
+
+Notes:
+- Added deterministic retry seeding (`--retry-seed`) for reproducible jitter behavior.

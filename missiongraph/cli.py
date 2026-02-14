@@ -77,6 +77,12 @@ def main(argv: list[str] | None = None) -> int:
         default=4,
         help="Maximum workers to run concurrently per dependency level",
     )
+    run_cmd.add_argument(
+        "--retry-seed",
+        type=int,
+        default=None,
+        help="Optional deterministic seed for retry jitter behavior",
+    )
 
     args = parser.parse_args(argv)
 
@@ -157,6 +163,7 @@ def main(argv: list[str] | None = None) -> int:
                 variables=variables,
                 parallel=not args.sequential,
                 max_parallel=args.max_parallel,
+                retry_seed=args.retry_seed,
             )
         except ExecutionError as exc:
             print(str(exc), file=sys.stderr)

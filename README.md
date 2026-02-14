@@ -55,6 +55,7 @@ verify {
 python3 -m missiongraph run examples/ship_release.mgl \
   --capability ci \
   --capability prod_access \
+  --retry-seed 42 \
   --trace-out traces/ship_release.json
 ```
 
@@ -194,6 +195,7 @@ Runtime behavior:
 - `retry_if <mode>`: retry strategy (`error`, `timeout`, `worker_failure`).
 - `backoff <duration>`: exponential retry base delay (`delay * 2^(attempt-1)`).
 - `jitter <duration>`: random delay added per retry (`0..jitter`).
+- CLI `--retry-seed <int>`: deterministic retry+jitter behavior for reproducible runs.
 
 Example:
 

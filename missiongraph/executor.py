@@ -62,6 +62,7 @@ def execute_program(
     variables: dict[str, Any] | None = None,
     parallel: bool = True,
     max_parallel: int = 4,
+    retry_seed: int | None = None,
 ) -> dict[str, Any]:
     capabilities = capabilities or set()
     variables = variables or {}
@@ -151,6 +152,7 @@ def execute_program(
             base_dir=program.base_dir,
             parallel=parallel,
             max_parallel=max_parallel,
+            retry_seed=retry_seed,
         )
 
         level_failed = False
@@ -249,6 +251,7 @@ def _run_level(
     base_dir: Path,
     parallel: bool,
     max_parallel: int,
+    retry_seed: int | None,
 ) -> dict[str, dict[str, Any]]:
     if parallel and len(level) > 1 and max_parallel > 1:
         return _run_level_parallel(
@@ -256,8 +259,14 @@ def _run_level(
             payload_by_task=payload_by_task,
             base_dir=base_dir,
             max_parallel=max_parallel,
+            retry_seed=retry_seed,
         )
-    return _run_level_sequential(level=level, payload_by_task=payload_by_task, base_dir=base_dir)
+    return _run_level_sequential(
+        level=level,
+        payload_by_task=payload_by_task,
+        base_dir=base_dir,
+        retry_seed=retry_seed,
+    )
 
 
 def _run_level_parallel(
@@ -265,6 +274,7 @@ def _run_level_parallel(
     payload_by_task: dict[str, dict[str, Any]],
     base_dir: Path,
     max_parallel: int,
+    retry_seed: int | None,
 ) -> dict[str, dict[str, Any]]:
     task_by_name = {task.name: task for task in level}
     results: dict[str, dict[str, Any]] = {}
@@ -272,7 +282,13 @@ def _run_level_parallel(
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
-            executor.submit(_run_task, task, payload_by_task[task.name], base_dir): task.name
+            executor.submit(
+                _run_task,
+                task,
+                payload_by_task[task.name],
+                base_dir,
+                retry_seed,
+            ): task.name
             for task in level
         }
         for future in as_completed(futures):
@@ -293,11 +309,17 @@ def _run_level_sequential(
     level: list[Task],
     payload_by_task: dict[str, dict[str, Any]],
     base_dir: Path,
+    retry_seed: int | None,
 ) -> dict[str, dict[str, Any]]:
     results: dict[str, dict[str, Any]] = {}
     for task in level:
         try:
-            results[task.name] = _run_task(task, payload_by_task[task.name], base_dir)
+            results[task.name] = _run_task(
+                task,
+                payload_by_task[task.name],
+                base_dir,
+                retry_seed,
+            )
         except Exception as exc:  # pragma: no cover
             results[task.name] = _build_runtime_failure_result(
                 task=task,
@@ -307,11 +329,17 @@ def _run_level_sequential(
     return results
 
 
-def _run_task(task: Task, payload: dict[str, Any], base_dir: Path) -> dict[str, Any]:
+def _run_task(
+    task: Task,
+    payload: dict[str, Any],
+    base_dir: Path,
+    retry_seed: int | None = None,
+) -> dict[str, Any]:
     command = _resolve_worker_command(task.worker, base_dir)
     max_attempts = task.retries + 1
     attempt_history: list[dict[str, Any]] = []
     result: dict[str, Any] | None = None
+    retry_rng = _new_task_rng(retry_seed, task.name)
 
     for attempt in range(1, max_attempts + 1):
         result = _run_task_attempt(
@@ -321,6 +349,7 @@ def _run_task(task: Task, payload: dict[str, Any], base_dir: Path) -> dict[str, 
             base_dir=base_dir,
             attempt=attempt,
             max_attempts=max_attempts,
+            retry_seed=retry_seed,
         )
         attempt_history.append(
             {
@@ -341,6 +370,7 @@ def _run_task(task: Task, payload: dict[str, Any], base_dir: Path) -> dict[str, 
                 task.backoff_seconds,
                 attempt,
                 task.jitter_seconds,
+                retry_rng,
             )
             if delay > 0:
                 time.sleep(delay)
@@ -360,6 +390,7 @@ def _run_task_attempt(
     base_dir: Path,
     attempt: int,
     max_attempts: int,
+    retry_seed: int | None = None,
 ) -> dict[str, Any]:
     started_at = _now()
     timeout_seconds = task.timeout_seconds if task.timeout_seconds is not None else None
@@ -387,6 +418,7 @@ def _run_task_attempt(
             parsed=_parse_worker_output(stdout, proc.returncode),
             attempt=attempt,
             max_attempts=max_attempts,
+            retry_seed=retry_seed,
         )
     except subprocess.TimeoutExpired as exc:
         stdout = _coerce_stream_text(exc.stdout).strip()
@@ -410,6 +442,7 @@ def _run_task_attempt(
             parsed=parsed,
             attempt=attempt,
             max_attempts=max_attempts,
+            retry_seed=retry_seed,
         )
 
 
@@ -425,6 +458,7 @@ def _build_task_result(
     parsed: dict[str, Any],
     attempt: int,
     max_attempts: int,
+    retry_seed: int | None = None,
 ) -> dict[str, Any]:
     if return_code not in (None, 0) and parsed.get("status") == "ok":
         parsed["status"] = "error"
@@ -463,6 +497,8 @@ def _build_task_result(
         default_provenance["backoff_seconds"] = task.backoff_seconds
     if task.jitter_seconds > 0:
         default_provenance["jitter_seconds"] = task.jitter_seconds
+    if retry_seed is not None:
+        default_provenance["retry_seed"] = retry_seed
     if task.consumes:
         default_provenance["consumes"] = task.consumes
     if task.produces:
@@ -523,13 +559,15 @@ def _retry_delay_seconds(
     backoff_seconds: float,
     attempt: int,
     jitter_seconds: float,
+    retry_rng: random.Random | None = None,
 ) -> float:
     base = 0.0
     if backoff_seconds > 0:
         base = backoff_seconds * float(2 ** (attempt - 1))
     jitter = 0.0
     if jitter_seconds > 0:
-        jitter = random.uniform(0.0, jitter_seconds)
+        rng = retry_rng if retry_rng is not None else random
+        jitter = rng.uniform(0.0, jitter_seconds)
     return base + jitter
 
 
@@ -552,6 +590,12 @@ def _should_retry(task: Task, result: dict[str, Any]) -> bool:
             ERROR_CODE_RUNTIME_EXECUTION_FAILURE,
         }
     return False
+
+
+def _new_task_rng(retry_seed: int | None, task_name: str) -> random.Random | None:
+    if retry_seed is None:
+        return None
+    return random.Random(f"{retry_seed}:{task_name}")
 
 
 def _resolve_worker_command(worker: str, base_dir: Path) -> list[str]:

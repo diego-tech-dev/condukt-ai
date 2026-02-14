@@ -88,11 +88,12 @@ Rules for safe migration:
 - Added typed artifact contracts (`artifact:type`) for `consumes`/`produces`.
 - Added retry policy controls (`retry_if`, jitter) in task execution policy.
 - Added Rust bootstrap runtime (`rust/missiongraph-rs`) for contract-level conformance checks.
+- Added deterministic retry seeding (`--retry-seed`) for reproducible retry behavior.
 
 ## Near-Term Direction
 
-1. Rust runtime prototype with execution parity on golden suite.
-2. Multi-runtime conformance harness (shared fixtures runner).
+1. Multi-runtime conformance harness (shared fixtures runner).
+2. Contract/versioning governance checks for AST/trace schemas.
 
 ## Resume Checklist
 

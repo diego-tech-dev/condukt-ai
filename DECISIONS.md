@@ -113,3 +113,10 @@ Status: accepted
 Decision: bootstrap a Rust reference runtime focused on AST/trace contract conformance.
 Rationale: de-risk multi-runtime migration by validating shared contracts before full executor parity.
 Consequences: `rust/missiongraph-rs` provides AST checks and trace-skeleton emission against v1 contracts.
+
+## 2026-02-13
+
+Status: accepted
+Decision: add deterministic retry seeding support in runtime/CLI.
+Rationale: make retry+jitter behavior reproducible across runs for debugging and CI stability.
+Consequences: `execute_program` and `mgl run` accept a retry seed; per-task retry jitter uses deterministic seeded RNG when provided.

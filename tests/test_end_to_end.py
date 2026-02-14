@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import io
 import json
+import random
 import subprocess
 import threading
 import time
@@ -215,7 +216,7 @@ plan {{
         max_active = 0
         lock = threading.Lock()
 
-        def fake_run_task(task, payload, base_dir):  # type: ignore[no-untyped-def]
+        def fake_run_task(task, payload, base_dir, *args, **kwargs):  # type: ignore[no-untyped-def]
             nonlocal active, max_active
             with lock:
                 active += 1
@@ -321,7 +322,7 @@ plan {{
 """.strip()
         )
 
-        def fake_run_task(task, payload, base_dir):  # type: ignore[no-untyped-def]
+        def fake_run_task(task, payload, base_dir, *args, **kwargs):  # type: ignore[no-untyped-def]
             if task.name == "test_suite":
                 return {
                     "task": task.name,
@@ -679,6 +680,95 @@ plan {{
 
         self.assertEqual(trace["status"], "ok")
         sleep_mock.assert_called_once_with(1.25)
+
+    def test_retry_seed_makes_jitter_deterministic(self) -> None:
+        program = parse_program(
+            f"""
+goal "retry seed deterministic"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" with retries 1 backoff 1s jitter 500ms requires capability.ci
+}}
+""".strip()
+        )
+
+        def fake_run_task_attempt(**kwargs):  # type: ignore[no-untyped-def]
+            if kwargs["attempt"] == 1:
+                return {
+                    "task": "test_suite",
+                    "worker": program.tasks[0].worker,
+                    "status": "error",
+                    "confidence": 0.0,
+                    "output": {},
+                    "error_code": ERROR_CODE_WORKER_TIMEOUT,
+                    "error": "worker timed out",
+                    "started_at": "t0",
+                    "finished_at": "t1",
+                    "provenance": {},
+                }
+            return {
+                "task": "test_suite",
+                "worker": program.tasks[0].worker,
+                "status": "ok",
+                "confidence": 1.0,
+                "output": {},
+                "error_code": None,
+                "error": None,
+                "started_at": "t0",
+                "finished_at": "t1",
+                "provenance": {},
+            }
+
+        with patch(
+            "missiongraph.executor._run_task_attempt",
+            side_effect=fake_run_task_attempt,
+        ), patch("missiongraph.executor.time.sleep") as sleep_mock_1:
+            trace_1 = execute_program(
+                program,
+                capabilities={"ci"},
+                parallel=False,
+                retry_seed=7,
+            )
+        with patch(
+            "missiongraph.executor._run_task_attempt",
+            side_effect=fake_run_task_attempt,
+        ), patch("missiongraph.executor.time.sleep") as sleep_mock_2:
+            trace_2 = execute_program(
+                program,
+                capabilities={"ci"},
+                parallel=False,
+                retry_seed=7,
+            )
+
+        self.assertEqual(trace_1["status"], "ok")
+        self.assertEqual(trace_2["status"], "ok")
+        delay_1 = sleep_mock_1.call_args_list[0][0][0]
+        delay_2 = sleep_mock_2.call_args_list[0][0][0]
+        self.assertAlmostEqual(delay_1, delay_2)
+        expected_delay = 1.0 + random.Random("7:test_suite").uniform(0.0, 0.5)
+        self.assertAlmostEqual(delay_1, expected_delay)
+
+    def test_cli_run_accepts_retry_seed(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            exit_code = cli_main(
+                [
+                    "run",
+                    str(ROOT / "examples" / "ship_release.mgl"),
+                    "--capability",
+                    "ci",
+                    "--capability",
+                    "prod_access",
+                    "--sequential",
+                    "--retry-seed",
+                    "42",
+                ]
+            )
+        self.assertEqual(exit_code, 0)
+        trace = json.loads(stdout.getvalue())
+        self.assertTrue(all(task["provenance"]["retry_seed"] == 42 for task in trace["tasks"]))
+        self.assertEqual(stderr.getvalue(), "")
 
     def test_timeout_policy_returns_worker_timeout_error(self) -> None:
         program = parse_program(
