@@ -314,3 +314,18 @@ What changed:
 
 Guardrail:
 - When renaming externally visible enums/labels, keep a temporary compatibility alias plus deterministic validation errors.
+
+## 2026-02-14
+
+Context:
+- Added release-time guardrails for renamed package identity.
+
+Learning:
+- Naming consistency requires executable checks; doc-only guidance drifts too easily under rapid iteration.
+
+What changed:
+- Added release identity validator and guard script.
+- Wired guard into `release:check` so packaging fails on legacy-name drift.
+
+Guardrail:
+- Keep release guard required in the release path whenever external package/repo identity changes.

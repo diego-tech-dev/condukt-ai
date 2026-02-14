@@ -199,12 +199,12 @@ Notes:
 
 ### Sprint: Identity alignment run
 
-Status: in_progress
+Status: completed
 
 Milestone status:
 - `I1` Align package/repo/docs identity to `condukt-ai`: completed
 - `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: completed
-- `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): pending
+- `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): completed
 
 Notes:
 - Renamed GitHub repository to `diego-tech-dev/condukt-ai`.
@@ -212,3 +212,5 @@ Notes:
 - Updated normalized trace goldens for canonical workspace rename (`condukt` -> `condukt-ai` path segment).
 - Added trial-mode normalization (`condukt` alias -> `condukt-ai`) in runtime and CLI.
 - Added strict trial-record input normalization for report ingestion with line-numbered validation errors.
+- Added release identity validator (`ts/src/release_identity.ts`) and CLI guard (`pnpm release:guard`).
+- Integrated release identity guard into `pnpm release:check` and added TS guard unit tests.

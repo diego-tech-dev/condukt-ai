@@ -316,3 +316,10 @@ Status: accepted
 Decision: keep backward compatibility for legacy trial mode label `condukt` while normalizing to canonical `condukt-ai`.
 Rationale: existing trial datasets and scripts may still emit legacy mode labels; hard breaks would reduce continuity during rename rollout.
 Consequences: trial CLI accepts legacy mode input and report ingestion normalizes legacy records to canonical mode with validation.
+
+## 2026-02-14
+
+Status: accepted
+Decision: enforce a release identity guard for `condukt-ai` metadata and docs before packaging.
+Rationale: rename regressions are easy to miss across docs and package metadata; automated guardrails reduce publish risk.
+Consequences: added `pnpm release:guard` and integrated it into `pnpm release:check`, with failing checks for legacy-name drift.

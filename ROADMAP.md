@@ -2,7 +2,7 @@
 
 Last updated: 2026-02-14
 
-Current sprint status: in_progress
+Current sprint status: completed
 
 ## Autonomy Sprint (5 milestones)
 
@@ -111,8 +111,8 @@ Status: completed
 
 ## Identity Alignment Sprint (Autonomous)
 
-Status: in_progress
+Status: completed
 
 1. `I1` Align package/repo/docs identity to `condukt-ai`: completed
 2. `I2` Legacy trial-mode compatibility (`condukt` -> `condukt-ai`) and input normalization: completed
-3. `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): pending
+3. `I3` Release guardrails for renamed identity (name checks + docs/CLI hardening): completed

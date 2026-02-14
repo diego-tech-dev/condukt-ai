@@ -57,7 +57,8 @@
     "trial:start": "tsx scripts/trial-metrics.ts start",
     "trial:finish": "tsx scripts/trial-metrics.ts finish",
     "trial:report": "tsx scripts/trial-metrics.ts report",
-    "release:check": "pnpm clean && pnpm check && pnpm test && pnpm build && pnpm pack --pack-destination .artifacts && rm -rf .artifacts",
+    "release:guard": "tsx scripts/release-identity-guard.ts",
+    "release:check": "pnpm clean && pnpm check && pnpm test && pnpm build && pnpm release:guard && pnpm pack --pack-destination .artifacts && rm -rf .artifacts",
     "prepack": "pnpm build"
   },
   "dependencies": {

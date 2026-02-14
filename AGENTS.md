@@ -51,6 +51,7 @@ Read first for deeper context:
 - TypeScript typecheck: `cd ts && pnpm typecheck`
 - TypeScript tests: `cd ts && pnpm test`
 - TypeScript build: `cd ts && pnpm build`
+- TypeScript release identity guard: `cd ts && pnpm release:guard`
 - TypeScript quickstart trace demo: `cd ts && pnpm quickstart`
 - TypeScript quickstart broken demo: `cd ts && pnpm quickstart:broken`
 

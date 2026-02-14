@@ -123,6 +123,7 @@ Rules for safe migration:
 - Added markdown trial reporting output for shareable experiment artifacts.
 - Aligned public package/repository identity on `condukt-ai`.
 - Added compatibility normalization for legacy trial mode labels (`condukt` -> `condukt-ai`).
+- Added release identity guard to block publish-time naming drift.
 
 ## Near-Term Direction
 

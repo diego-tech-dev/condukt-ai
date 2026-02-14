@@ -19,6 +19,7 @@ This runs:
 - typecheck
 - tests
 - build
+- release identity guard
 - `pnpm pack` artifact check
 
 ## 2) Bump version

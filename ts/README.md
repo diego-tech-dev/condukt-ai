@@ -33,6 +33,7 @@ pnpm typecheck
 pnpm test
 pnpm check
 pnpm build
+pnpm release:guard
 pnpm release:check
 ```
 
