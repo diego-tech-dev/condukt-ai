@@ -120,3 +120,10 @@ Status: accepted
 Decision: add deterministic retry seeding support in runtime/CLI.
 Rationale: make retry+jitter behavior reproducible across runs for debugging and CI stability.
 Consequences: `execute_program` and `mgl run` accept a retry seed; per-task retry jitter uses deterministic seeded RNG when provided.
+
+## 2026-02-13
+
+Status: accepted
+Decision: add a first-class Python/Rust conformance harness script.
+Rationale: continuously verify that runtime contract surfaces stay aligned across implementations.
+Consequences: `scripts/conformance.py` validates AST/trace contract compatibility for selected `.mgl` programs and is covered by tests.

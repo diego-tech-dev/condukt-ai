@@ -58,5 +58,5 @@ Status: completed
 Status: in_progress
 
 1. `Q1` Deterministic retry seeding: completed
-2. `Q2` Multi-runtime conformance harness: pending
+2. `Q2` Multi-runtime conformance harness: completed
 3. `Q3` Contract/versioning governance checks: pending

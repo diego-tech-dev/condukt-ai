@@ -36,6 +36,7 @@ Read first for deeper context:
 - Render graph: `python3 -m missiongraph graph examples/release_fanout.mgl`
 - Test suite: `python3 -m unittest discover -s tests -p "test_*.py"`
 - Rust bootstrap tests: `cargo test --manifest-path rust/missiongraph-rs/Cargo.toml`
+- Multi-runtime conformance: `python3 scripts/conformance.py --json`
 
 ## Hard Invariants
 

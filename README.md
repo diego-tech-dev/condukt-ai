@@ -233,6 +233,14 @@ cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
 ```
 
+## Multi-Runtime Conformance
+
+Run Python vs Rust contract conformance checks:
+
+```bash
+python3 scripts/conformance.py --json
+```
+
 ## Tests
 
 ```bash

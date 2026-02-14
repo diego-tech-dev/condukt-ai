@@ -89,11 +89,12 @@ Rules for safe migration:
 - Added retry policy controls (`retry_if`, jitter) in task execution policy.
 - Added Rust bootstrap runtime (`rust/missiongraph-rs`) for contract-level conformance checks.
 - Added deterministic retry seeding (`--retry-seed`) for reproducible retry behavior.
+- Added multi-runtime conformance harness (`scripts/conformance.py`).
 
 ## Near-Term Direction
 
-1. Multi-runtime conformance harness (shared fixtures runner).
-2. Contract/versioning governance checks for AST/trace schemas.
+1. Contract/versioning governance checks for AST/trace schemas.
+2. Rust runtime prototype with execution parity on golden suite.
 
 ## Resume Checklist
 

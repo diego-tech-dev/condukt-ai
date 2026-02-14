@@ -44,8 +44,9 @@ Status: in_progress
 
 Milestone status:
 - `Q1` Deterministic retry seeding: completed
-- `Q2` Multi-runtime conformance harness: pending
+- `Q2` Multi-runtime conformance harness: completed
 - `Q3` Contract/versioning governance checks: pending
 
 Notes:
 - Added deterministic retry seeding (`--retry-seed`) for reproducible jitter behavior.
+- Added `scripts/conformance.py` to validate Python/Rust AST+trace contract alignment.
