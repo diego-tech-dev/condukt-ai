@@ -141,3 +141,10 @@ Status: accepted
 Decision: harden Rust `check-ast` with cycle detection and JSON report output.
 Rationale: bootstrap CLI should be directly usable by automation and should reject invalid DAGs consistently with planner semantics.
 Consequences: Rust validation now detects dependency cycles; `check-ast --json` emits machine-readable status used by conformance tooling/tests.
+
+## 2026-02-14
+
+Status: accepted
+Decision: make Rust trace-skeleton execution metadata dependency-aware.
+Rationale: contract conformance is stronger when Rust emits execution levels/order derived from AST dependencies instead of source-order placeholders.
+Consequences: Rust trace skeleton now computes topological levels/mode/max parallel; conformance harness validates these fields against Python-derived expectations.

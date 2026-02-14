@@ -39,6 +39,11 @@ class ConformanceHarnessTests(unittest.TestCase):
         self.assertTrue(case["rust_check_ok"])
         self.assertEqual(case["rust_ast_version"], AST_VERSION)
         self.assertEqual(case["rust_trace_version"], TRACE_VERSION)
+        self.assertEqual(case["rust_execution_mode"], "sequential")
+        self.assertEqual(
+            case["rust_execution_levels"],
+            [["test_suite"], ["deploy_prod"]],
+        )
 
 
 if __name__ == "__main__":

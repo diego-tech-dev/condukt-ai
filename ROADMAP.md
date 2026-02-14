@@ -66,5 +66,5 @@ Status: completed
 Status: in_progress
 
 1. `N1` Rust contract CLI parity hardening: completed
-2. `N2` Rust trace semantics expansion: pending
+2. `N2` Rust trace semantics expansion: completed
 3. `N3` Dual-runtime golden conformance gate: pending

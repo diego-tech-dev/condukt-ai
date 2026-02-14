@@ -6,6 +6,7 @@ This prototype focuses on AST/trace contract handling:
 
 - validate AST JSON (`check-ast`)
 - emit trace skeleton with `trace_version = "1.1"` (`trace-skeleton`)
+- derive dependency-aware execution metadata (`execution.levels`, `mode`, `max_parallel`)
 
 ## Usage
 

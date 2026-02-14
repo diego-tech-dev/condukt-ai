@@ -93,11 +93,12 @@ Rules for safe migration:
 - Bumped v1 contracts to `ast_version = 1.1` and `trace_version = 1.1`.
 - Added explicit contract version governance in `spec/VERSIONING.md` with consistency tests.
 - Hardened Rust `check-ast` with DAG cycle detection and `--json` machine-readable reporting.
+- Expanded Rust trace skeleton semantics to emit dependency-aware execution levels/mode/max parallel.
 
 ## Near-Term Direction
 
-1. Rust trace semantics expansion toward execution-level parity.
-2. Add dual-runtime golden conformance gate beyond bootstrap checks.
+1. Add dual-runtime golden conformance gate beyond bootstrap checks.
+2. Expand Rust runtime from contract bootstrap toward task execution parity.
 
 ## Resume Checklist
 

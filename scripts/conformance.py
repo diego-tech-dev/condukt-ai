@@ -118,7 +118,16 @@ def run_case(
         )
         return case
 
-    task_order = [task["name"] for task in ast.get("tasks", [])]
+    try:
+        expected_levels = _build_levels(ast.get("tasks", []))
+    except ValueError as exc:
+        case["errors"].append(f"python AST dependency resolution failed: {exc}")
+        return case
+    task_order = [name for level in expected_levels for name in level]
+    expected_mode = (
+        "parallel" if any(len(level) > 1 for level in expected_levels) else "sequential"
+    )
+    expected_max_parallel = max((len(level) for level in expected_levels), default=1)
 
     with tempfile.NamedTemporaryFile(
         mode="w",
@@ -204,6 +213,22 @@ def run_case(
             case["errors"].append("rust trace goal does not match python AST goal")
         if rust_trace.get("task_order") != task_order:
             case["errors"].append("rust trace task_order does not match python AST")
+        execution = rust_trace.get("execution", {})
+        case["rust_execution_mode"] = execution.get("mode")
+        case["rust_execution_levels"] = execution.get("levels")
+        if execution.get("levels") != expected_levels:
+            case["errors"].append(
+                "rust trace execution.levels does not match python dependency levels"
+            )
+        if execution.get("mode") != expected_mode:
+            case["errors"].append(
+                f"rust execution.mode mismatch: {execution.get('mode')} != {expected_mode}"
+            )
+        if execution.get("max_parallel") != expected_max_parallel:
+            case["errors"].append(
+                "rust execution.max_parallel mismatch: "
+                f"{execution.get('max_parallel')} != {expected_max_parallel}"
+            )
     finally:
         ast_file.unlink(missing_ok=True)
 
@@ -240,6 +265,50 @@ def _format_summary(summary: dict[str, Any]) -> str:
         for err in case["errors"]:
             lines.append(f"  - {err}")
     return "\n".join(lines)
+
+
+def _build_levels(tasks: list[dict[str, Any]]) -> list[list[str]]:
+    names = [str(task["name"]) for task in tasks]
+    if len(set(names)) != len(names):
+        raise ValueError("duplicate task names")
+
+    in_degree = {name: 0 for name in names}
+    children: dict[str, list[str]] = {name: [] for name in names}
+    position = {name: idx for idx, name in enumerate(names)}
+
+    for task in tasks:
+        task_name = str(task["name"])
+        for dep in task.get("after", []) or []:
+            dep_name = str(dep)
+            if dep_name not in children:
+                raise ValueError(
+                    f"task '{task_name}' depends on unknown task '{dep_name}'"
+                )
+            children[dep_name].append(task_name)
+            in_degree[task_name] += 1
+
+    for dep_name in children:
+        children[dep_name].sort(key=lambda child: position.get(child, 1_000_000))
+
+    ready = [name for name in names if in_degree[name] == 0]
+    levels: list[list[str]] = []
+    seen = 0
+    while ready:
+        current = ready
+        levels.append(current)
+        seen += len(current)
+        next_ready: list[str] = []
+        for node in current:
+            for child in children[node]:
+                in_degree[child] -= 1
+                if in_degree[child] == 0:
+                    next_ready.append(child)
+        ready = next_ready
+
+    if seen != len(names):
+        unresolved = [name for name in names if in_degree[name] > 0]
+        raise ValueError(f"cycle detected in plan: {', '.join(unresolved)}")
+    return levels
 
 
 if __name__ == "__main__":

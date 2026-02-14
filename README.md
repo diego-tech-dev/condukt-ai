@@ -241,6 +241,8 @@ Run Python vs Rust contract conformance checks:
 python3 scripts/conformance.py --json
 ```
 
+This validates AST/trace versions, task order, and dependency-level execution metadata.
+
 ## Tests
 
 ```bash
