@@ -90,5 +90,5 @@ Status: completed
 Status: in_progress
 
 1. `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
-2. `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): pending
+2. `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): completed
 3. `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): pending

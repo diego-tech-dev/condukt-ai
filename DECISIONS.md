@@ -225,3 +225,10 @@ Status: accepted
 Decision: standardize task contracts on Standard Schema (`@standard-schema/spec`) for TypeScript runtime surfaces.
 Rationale: contract portability should not lock users to a single validation library; Standard Schema allows Zod and other compliant schema libraries.
 Consequences: TS pipeline contract validation consumes `StandardSchemaV1`; examples use Zod while preserving schema-library interoperability.
+
+## 2026-02-14
+
+Status: accepted
+Decision: include retry policy controls directly in TypeScript task execution.
+Rationale: transient LLM/provider failures are common, and retry behavior should be configurable at task boundaries with trace visibility.
+Consequences: TS tasks now support `retries`, `backoffMs`, `jitterMs`, and `retryIf`; traces capture per-attempt history for diagnosis.

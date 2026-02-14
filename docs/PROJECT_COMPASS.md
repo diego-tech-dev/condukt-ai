@@ -110,11 +110,12 @@ Rules for safe migration:
 - Added Rust retry/timeout policy-loop parity (`timeout`, `retries`, `retry_if`, `backoff`, `jitter`) for both `run-task` and `run-plan`.
 - Added Rust run-plan diagnostics assembly for `constraints`, `verify`, and grouped `verify_summary` outputs.
 - Added TypeScript runtime prototype (`ts/`) with Standard Schema contracts, trace-first pipeline execution, and OpenAI/Anthropic adapters.
+- Added TypeScript task retry policies with per-attempt trace history and provider integration tests.
 
 ## Near-Term Direction
 
-1. Harden TypeScript LLM adapters with integration coverage and retry policy controls.
-2. Deliver a 10-minute TS onboarding path with template pipeline and trace-debug walkthrough.
+1. Deliver a 10-minute TS onboarding path with template pipeline and trace-debug walkthrough.
+2. Run external user trials and measure time-to-diagnose against current agent workflow baselines.
 
 ## Resume Checklist
 

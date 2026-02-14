@@ -6,6 +6,7 @@ Focus of this package:
 - Standard Schema task contracts (`@standard-schema/spec`) so users can bring Zod or any compliant schema library
 - structured execution traces for fast failure diagnosis
 - LLM task adapters for OpenAI and Anthropic JSON workflows
+- task-level retry policies (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces
 
 ## Install
 

@@ -189,3 +189,40 @@ test("rejects unknown dependencies", async () => {
     /depends on unknown task 'missing_task'/,
   );
 });
+
+test("retries execution failures and succeeds on later attempt", async () => {
+  let attempts = 0;
+  const provider = new FakeProvider({
+    recover: { ok: true },
+  });
+
+  const pipeline = new Pipeline("retry-success");
+  pipeline.addTask(
+    llmTask({
+      id: "recoverable",
+      provider,
+      model: "fake-model",
+      retry: {
+        retries: 2,
+        backoffMs: 0,
+        retryIf: "execution_error",
+      },
+      output: z.object({ ok: z.boolean() }),
+      prompt: () => {
+        attempts += 1;
+        if (attempts === 1) {
+          throw new Error("transient failure");
+        }
+        return "recover";
+      },
+    }),
+  );
+
+  const trace = await pipeline.run();
+  assert.equal(trace.status, "ok");
+  assert.equal(trace.tasks.length, 1);
+  assert.equal(trace.tasks[0]?.status, "ok");
+  assert.equal(trace.tasks[0]?.attempts?.length, 2);
+  assert.equal(trace.tasks[0]?.attempts?.[0]?.status, "error");
+  assert.equal(trace.tasks[0]?.attempts?.[1]?.status, "ok");
+});

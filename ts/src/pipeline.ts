@@ -9,6 +9,13 @@ export const ERROR_CODE_CONTRACT_OUTPUT_VIOLATION = "CONTRACT_OUTPUT_VIOLATION";
 export const ERROR_CODE_TASK_DEPENDENCY_MISSING = "TASK_DEPENDENCY_MISSING";
 export const ERROR_CODE_TASK_EXECUTION_FAILURE = "TASK_EXECUTION_FAILURE";
 
+export interface TaskRetryPolicy {
+  readonly retries?: number;
+  readonly backoffMs?: number;
+  readonly jitterMs?: number;
+  readonly retryIf?: "error" | "execution_error" | "contract_violation";
+}
+
 export interface TaskRuntimeContext {
   readonly outputs: Readonly<Record<string, unknown>>;
   readonly taskResults: Readonly<Record<string, TaskTrace>>;
@@ -26,8 +33,19 @@ export interface TaskDefinition<TOutput = unknown> {
   readonly id: string;
   readonly description?: string;
   readonly after?: readonly string[];
+  readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
   run(context: TaskRuntimeContext): Promise<TaskExecutionResult>;
+}
+
+export interface TaskAttemptTrace {
+  readonly attempt: number;
+  readonly status: "ok" | "error";
+  readonly error_code?: string;
+  readonly error?: string;
+  readonly started_at: string;
+  readonly finished_at: string;
+  readonly duration_ms: number;
 }
 
 export interface TaskTrace {
@@ -43,6 +61,7 @@ export interface TaskTrace {
   readonly error?: string;
   readonly error_code?: string;
   readonly contract_issues?: readonly ContractIssue[];
+  readonly attempts?: readonly TaskAttemptTrace[];
 }
 
 export interface PipelineTrace {
@@ -68,6 +87,7 @@ export interface LLMTaskDefinition<TOutput = unknown> {
   readonly id: string;
   readonly description?: string;
   readonly after?: readonly string[];
+  readonly retry?: TaskRetryPolicy;
   readonly output: StandardSchemaV1<unknown, TOutput>;
   readonly provider: LLMProvider;
   readonly model: string;
@@ -82,6 +102,7 @@ export function llmTask<TOutput>(definition: LLMTaskDefinition<TOutput>): TaskDe
     id: definition.id,
     description: definition.description,
     after: definition.after,
+    retry: definition.retry,
     output: definition.output,
     async run(context) {
       const prompt = await definition.prompt(context);
@@ -172,69 +193,22 @@ export class Pipeline {
           break;
         }
 
-        const taskStartedAt = nowIso();
-        const startedMs = Date.now();
+        const trace = await executeTaskWithRetry(task, {
+          outputs,
+          taskResults,
+          dependencyOutputs,
+        });
 
-        try {
-          const result = await task.run({
-            outputs,
-            taskResults,
-            dependencyOutputs,
-          });
+        taskTrace.push(trace);
+        taskResults[task.id] = trace;
 
-          const validation = await validateContract(task.output, result.data);
-          const taskFinishedAt = nowIso();
-          const durationMs = Date.now() - startedMs;
-
-          if (!validation.ok) {
-            const trace = buildTaskErrorTrace({
-              task,
-              startedAt: taskStartedAt,
-              finishedAt: taskFinishedAt,
-              durationMs,
-              input: result.input,
-              rawOutput: result.rawOutput,
-              meta: result.meta,
-              errorCode: ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
-              error: "task output contract violation",
-              contractIssues: validation.issues,
-            });
-            taskTrace.push(trace);
-            taskResults[task.id] = trace;
-            failed = true;
-            break;
-          }
-
-          outputs[task.id] = validation.value;
-          const trace: TaskTrace = {
-            task: task.id,
-            status: "ok",
-            started_at: taskStartedAt,
-            finished_at: taskFinishedAt,
-            duration_ms: durationMs,
-            input: result.input,
-            output: validation.value,
-            raw_output: result.rawOutput,
-            meta: result.meta,
-          };
-          taskTrace.push(trace);
-          taskResults[task.id] = trace;
-        } catch (error) {
-          const taskFinishedAt = nowIso();
-          const durationMs = Date.now() - startedMs;
-          const trace = buildTaskErrorTrace({
-            task,
-            startedAt: taskStartedAt,
-            finishedAt: taskFinishedAt,
-            durationMs,
-            errorCode: ERROR_CODE_TASK_EXECUTION_FAILURE,
-            error: asErrorMessage(error),
-          });
-          taskTrace.push(trace);
-          taskResults[task.id] = trace;
-          failed = true;
-          break;
+        if (trace.status === "ok") {
+          outputs[task.id] = trace.output;
+          continue;
         }
+
+        failed = true;
+        break;
       }
 
       if (failed) {
@@ -262,6 +236,172 @@ export class Pipeline {
   }
 }
 
+interface NormalizedTaskRetryPolicy {
+  readonly retries: number;
+  readonly backoffMs: number;
+  readonly jitterMs: number;
+  readonly retryIf: "error" | "execution_error" | "contract_violation";
+}
+
+async function executeTaskWithRetry(task: TaskDefinition, context: TaskRuntimeContext): Promise<TaskTrace> {
+  const retryPolicy = normalizeRetryPolicy(task.retry);
+  const maxAttempts = retryPolicy.retries + 1;
+  const attemptHistory: TaskAttemptTrace[] = [];
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const taskStartedAt = nowIso();
+    const startedMs = Date.now();
+
+    try {
+      const result = await task.run(context);
+      const validation = await validateContract(task.output, result.data);
+      const taskFinishedAt = nowIso();
+      const durationMs = Date.now() - startedMs;
+
+      if (!validation.ok) {
+        const trace = buildTaskErrorTrace({
+          task,
+          startedAt: taskStartedAt,
+          finishedAt: taskFinishedAt,
+          durationMs,
+          input: result.input,
+          rawOutput: result.rawOutput,
+          meta: result.meta,
+          errorCode: ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
+          error: "task output contract violation",
+          contractIssues: validation.issues,
+          attempts: recordAttempt(attemptHistory, {
+            attempt,
+            status: "error",
+            error_code: ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
+            error: "task output contract violation",
+            started_at: taskStartedAt,
+            finished_at: taskFinishedAt,
+            duration_ms: durationMs,
+          }),
+        });
+
+        if (!shouldRetry(retryPolicy, trace.error_code, attempt, maxAttempts)) {
+          return trace;
+        }
+      } else {
+        return {
+          task: task.id,
+          status: "ok",
+          started_at: taskStartedAt,
+          finished_at: taskFinishedAt,
+          duration_ms: durationMs,
+          input: result.input,
+          output: validation.value,
+          raw_output: result.rawOutput,
+          meta: result.meta,
+          attempts: maxAttempts > 1
+            ? recordAttempt(attemptHistory, {
+                attempt,
+                status: "ok",
+                started_at: taskStartedAt,
+                finished_at: taskFinishedAt,
+                duration_ms: durationMs,
+              })
+            : undefined,
+        };
+      }
+    } catch (error) {
+      const taskFinishedAt = nowIso();
+      const durationMs = Date.now() - startedMs;
+      const trace = buildTaskErrorTrace({
+        task,
+        startedAt: taskStartedAt,
+        finishedAt: taskFinishedAt,
+        durationMs,
+        errorCode: ERROR_CODE_TASK_EXECUTION_FAILURE,
+        error: asErrorMessage(error),
+        attempts: recordAttempt(attemptHistory, {
+          attempt,
+          status: "error",
+          error_code: ERROR_CODE_TASK_EXECUTION_FAILURE,
+          error: asErrorMessage(error),
+          started_at: taskStartedAt,
+          finished_at: taskFinishedAt,
+          duration_ms: durationMs,
+        }),
+      });
+      if (!shouldRetry(retryPolicy, trace.error_code, attempt, maxAttempts)) {
+        return trace;
+      }
+    }
+
+    const delayMs = retryDelayMs(retryPolicy, attempt);
+    if (delayMs > 0) {
+      await sleepMs(delayMs);
+    }
+  }
+
+  return buildTaskErrorTrace({
+    task,
+    startedAt: nowIso(),
+    finishedAt: nowIso(),
+    durationMs: 0,
+    errorCode: ERROR_CODE_TASK_EXECUTION_FAILURE,
+    error: "task attempts exhausted",
+    attempts: attemptHistory,
+  });
+}
+
+function normalizeRetryPolicy(policy: TaskRetryPolicy | undefined): NormalizedTaskRetryPolicy {
+  return {
+    retries: Math.max(0, Math.floor(policy?.retries ?? 0)),
+    backoffMs: Math.max(0, policy?.backoffMs ?? 0),
+    jitterMs: Math.max(0, policy?.jitterMs ?? 0),
+    retryIf: policy?.retryIf ?? "error",
+  };
+}
+
+function shouldRetry(
+  policy: NormalizedTaskRetryPolicy,
+  errorCode: string | undefined,
+  attempt: number,
+  maxAttempts: number,
+): boolean {
+  if (attempt >= maxAttempts) {
+    return false;
+  }
+
+  if (policy.retryIf === "error") {
+    return true;
+  }
+
+  if (policy.retryIf === "contract_violation") {
+    return errorCode === ERROR_CODE_CONTRACT_OUTPUT_VIOLATION;
+  }
+
+  if (policy.retryIf === "execution_error") {
+    return errorCode === ERROR_CODE_TASK_EXECUTION_FAILURE;
+  }
+
+  return false;
+}
+
+function retryDelayMs(policy: NormalizedTaskRetryPolicy, attempt: number): number {
+  const backoff = policy.backoffMs > 0 ? policy.backoffMs * 2 ** (attempt - 1) : 0;
+  const jitter = policy.jitterMs > 0 ? Math.random() * policy.jitterMs : 0;
+  return Math.max(0, backoff + jitter);
+}
+
+function recordAttempt(
+  attemptHistory: TaskAttemptTrace[],
+  attempt: TaskAttemptTrace,
+): readonly TaskAttemptTrace[] {
+  attemptHistory.push(attempt);
+  return [...attemptHistory];
+}
+
+async function sleepMs(delayMs: number): Promise<void> {
+  await new Promise((resolve) => {
+    setTimeout(resolve, delayMs);
+  });
+}
+
 interface BuildTaskErrorInput {
   readonly task: TaskDefinition;
   readonly startedAt: string;
@@ -273,6 +413,7 @@ interface BuildTaskErrorInput {
   readonly rawOutput?: string;
   readonly meta?: Record<string, unknown>;
   readonly contractIssues?: readonly ContractIssue[];
+  readonly attempts?: readonly TaskAttemptTrace[];
 }
 
 function buildTaskErrorTrace(args: BuildTaskErrorInput): TaskTrace {
@@ -288,6 +429,7 @@ function buildTaskErrorTrace(args: BuildTaskErrorInput): TaskTrace {
     error_code: args.errorCode,
     error: args.error,
     contract_issues: args.contractIssues,
+    attempts: args.attempts,
   };
 }
 

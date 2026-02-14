@@ -132,3 +132,19 @@ What changed:
 
 Guardrail:
 - Keep contract interfaces library-agnostic at API boundaries; examples can be opinionated, runtime surfaces should not be.
+
+## 2026-02-14
+
+Context:
+- Hardened TypeScript runtime behavior for real LLM-provider use.
+
+Learning:
+- Provider adapters need deterministic parse tests, and retry behavior needs explicit attempt history in traces to stay debuggable.
+
+What changed:
+- Added mocked integration tests for OpenAI/Anthropic provider JSON parsing.
+- Added task retry policies with `retryIf` and backoff/jitter timing in TS runtime.
+- Emitted per-task attempt histories in trace payloads.
+
+Guardrail:
+- Any retry or provider parser change must add/update deterministic tests that assert trace-level diagnosis fields.

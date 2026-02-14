@@ -113,7 +113,7 @@ Status: in_progress
 
 Milestone status:
 - `T1` TypeScript core runtime bootstrap (Standard Schema contracts + trace-first pipeline): completed
-- `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): pending
+- `T2` Real LLM adapter hardening (OpenAI/Anthropic integration tests + retry policy): completed
 - `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): pending
 
 Notes:
@@ -123,3 +123,5 @@ Notes:
 - Added OpenAI and Anthropic JSON provider adapters for real LLM-backed tasks.
 - Added `llmTask` helper and runnable 3-step example (`ts/examples/research-write.ts`).
 - Added TypeScript tests for success path, contract violation diagnostics, and dependency validation.
+- Added task-level retry policy in TS runtime (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces.
+- Added TS provider tests with mocked HTTP responses for OpenAI and Anthropic JSON parsing behavior.
