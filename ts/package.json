@@ -30,6 +30,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./trials": {
+      "types": "./dist/trials.d.ts",
+      "import": "./dist/trials.js"
     }
   },
   "files": [

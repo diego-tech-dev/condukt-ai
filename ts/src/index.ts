@@ -53,28 +53,3 @@ export type { ContractIssue, ContractValidationResult } from "./contracts.js";
 
 export { diagnoseFailure } from "./diagnostics.js";
 export type { FailureDiagnosis } from "./diagnostics.js";
-
-export {
-  completeTrialSession,
-  createTrialSession,
-  evaluateTrialSummary,
-  normalizeTrialMode,
-  normalizeTrialRecord,
-  renderTrialSummaryMarkdown,
-  summarizeTrialRecords,
-} from "./trials.js";
-export type {
-  CompleteTrialSessionInput,
-  CreateTrialSessionInput,
-  TrialExpectation,
-  TrialMode,
-  TrialPair,
-  TrialPairSummary,
-  TrialQualityGate,
-  TrialQualityGateResult,
-  TrialSummaryMarkdownOptions,
-  TrialModeSummary,
-  TrialRecord,
-  TrialSession,
-  TrialSummary,
-} from "./trials.js";

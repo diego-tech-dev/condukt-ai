@@ -160,7 +160,7 @@ function buildBrokenTrace(): PipelineTrace {
     started_at: "2026-02-14T10:00:00.000Z",
     finished_at: "2026-02-14T10:00:02.000Z",
     execution: {
-      mode: "sequential",
+      mode: "level_parallel",
       levels: [["research"], ["draft"]],
     },
     task_order: ["research", "draft"],
@@ -188,6 +188,7 @@ function buildBrokenTrace(): PipelineTrace {
       total: 2,
       passed: 1,
       failed: 1,
+      skipped: 0,
     },
   };
 }

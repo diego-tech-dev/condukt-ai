@@ -27,6 +27,8 @@ See `/ts/README.md` for install and API examples.
 pnpm add condukt-ai zod
 ```
 
+Trials/diagnosis helpers are available via the `condukt-ai/trials` subpath.
+
 ## Repository Layout
 
 - `ts/`: active runtime, tests, docs, release scripts

@@ -10,7 +10,7 @@ test("diagnoseFailure returns first failing task boundary", () => {
     started_at: "2026-02-14T00:00:00.000Z",
     finished_at: "2026-02-14T00:00:02.000Z",
     execution: {
-      mode: "sequential",
+      mode: "level_parallel",
       levels: [["research"], ["draft"]],
     },
     task_order: ["research", "draft"],
@@ -38,6 +38,7 @@ test("diagnoseFailure returns first failing task boundary", () => {
       total: 2,
       passed: 1,
       failed: 1,
+      skipped: 0,
     },
   };
 
@@ -56,7 +57,7 @@ test("diagnoseFailure handles successful traces", () => {
     started_at: "2026-02-14T00:00:00.000Z",
     finished_at: "2026-02-14T00:00:01.000Z",
     execution: {
-      mode: "sequential",
+      mode: "level_parallel",
       levels: [["research"]],
     },
     task_order: ["research"],
@@ -74,6 +75,7 @@ test("diagnoseFailure handles successful traces", () => {
       total: 1,
       passed: 1,
       failed: 0,
+      skipped: 0,
     },
   };
 

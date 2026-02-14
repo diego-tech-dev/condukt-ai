@@ -393,3 +393,10 @@ Status: accepted
 Decision: add first-class conditional task execution (`when`) with explicit skipped-task traces.
 Rationale: adaptive agent workflows need lightweight branching without introducing a separate planner or imperative control language.
 Consequences: task definitions now support `when(context)`, skipped tasks emit `status: skipped` with `skip_reason`, and pipeline summaries report skipped counts alongside passed/failed totals.
+
+## 2026-02-14
+
+Status: accepted
+Decision: isolate trial instrumentation APIs behind a dedicated package surface (`condukt-ai/trials`) instead of the core root export.
+Rationale: diagnosis-trial tooling is useful but orthogonal to the core orchestration runtime; a separate entrypoint keeps the core surface focused and reduces accidental coupling.
+Consequences: trial helpers are removed from `src/index.ts`, exposed through a subpath export in `package.json`, and tests/docs now import trial APIs from `condukt-ai/trials`.

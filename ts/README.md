@@ -73,6 +73,12 @@ pnpm trial:report -- --markdown-out trials/report.md --title "Condukt AI Trial R
 
 Trial protocol details: `docs/TRIALS.md`.
 
+Library consumers can import trial helpers from the dedicated subpath:
+
+```ts
+import { summarizeTrialRecords } from "condukt-ai/trials";
+```
+
 ## Minimal usage
 
 ```ts

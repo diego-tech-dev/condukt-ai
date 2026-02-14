@@ -305,13 +305,13 @@ Notes:
 
 ### Sprint: Ecosystem execution run
 
-Status: in progress
+Status: completed
 
 Milestone status:
 - `E1` TanStack AI adapter integration for pipeline tasks: completed
 - `E2` Parallel execution for independent dependency levels: completed
 - `E3` Adaptive control-flow primitives for conditional execution: completed
-- `E4` Trials API extraction into dedicated package surface: in progress
+- `E4` Trials API extraction into dedicated package surface: completed
 
 Notes:
 - Added `tanstackChatTask` (`ts/src/tanstack.ts`) to bridge TanStack AI text adapters into Condukt task execution.
@@ -323,3 +323,5 @@ Notes:
 - Added conditional task gating (`when`) across task definitions and LLM/TanStack task builders.
 - Added `skipped` task traces with explicit `skip_reason`, plus summary-level skipped counts for adaptive-flow diagnostics.
 - Added runtime and compile-time coverage for conditional execution semantics (`ts/test/pipeline.test.ts`, `ts/typecheck/pipeline-dependencies.typecheck.ts`).
+- Removed trial helpers from the core `condukt-ai` root export and exposed them via a dedicated `condukt-ai/trials` subpath export.
+- Updated tests and docs to use isolated trials imports (`ts/test/trials.test.ts`, `ts/README.md`).
