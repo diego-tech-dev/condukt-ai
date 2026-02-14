@@ -69,6 +69,13 @@ Read first for deeper context:
   - update `docs/PROJECT_COMPASS.md` if direction/invariants changed
 - Keep CLI output deterministic where possible.
 
+## Coding Conventions
+
+- JavaScript/TypeScript workflow must use `pnpm` for scripts, tests, and dependency management.
+- Never use `npm` or `yarn` for JS/TS scripts/tests/dependency operations.
+- Never use TypeScript `any`.
+- Prefer `unknown` + explicit narrowing, or runtime validation via Standard Schema/Zod contracts.
+
 ## Completion Checklist
 
 - Code compiles/runs locally.
