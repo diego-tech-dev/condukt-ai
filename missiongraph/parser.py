@@ -31,7 +31,9 @@ _ARTIFACT_TYPED_RE = re.compile(
     r"^([A-Za-z_][A-Za-z0-9_\-]*)(?::([A-Za-z_][A-Za-z0-9_]*))?$"
 )
 _RETRIES_RE = re.compile(r"^\d+$")
+_RETRY_IF_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _DURATION_RE = re.compile(r"^(\d+(?:\.\d+)?)(ms|s)?$")
+_RETRY_IF_VALUES = {"error", "timeout", "worker_failure"}
 _VALID_SCHEMA_TYPES = {
     "any",
     "bool",
@@ -62,7 +64,9 @@ class _ContractClause(NamedTuple):
 class _TaskPolicy(NamedTuple):
     timeout_seconds: float | None
     retries: int
+    retry_if: str
     backoff_seconds: float
+    jitter_seconds: float
 
 
 def parse_file(path: str | Path) -> Program:
@@ -297,7 +301,13 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
     produces: list[str] = []
     consumes_types: dict[str, str] = {}
     produces_types: dict[str, str] = {}
-    policy = _TaskPolicy(timeout_seconds=None, retries=0, backoff_seconds=0.0)
+    policy = _TaskPolicy(
+        timeout_seconds=None,
+        retries=0,
+        retry_if="error",
+        backoff_seconds=0.0,
+        jitter_seconds=0.0,
+    )
     seen_clauses: set[str] = set()
     remaining = (tail or "").strip()
 
@@ -394,7 +404,9 @@ def _parse_task_line(line: str, source: str, line_no: int) -> Task:
         produces_types=produces_types,
         timeout_seconds=policy.timeout_seconds,
         retries=policy.retries,
+        retry_if=policy.retry_if,
         backoff_seconds=policy.backoff_seconds,
+        jitter_seconds=policy.jitter_seconds,
         line=line_no,
     )
 
@@ -420,12 +432,14 @@ def _parse_task_policy(raw: str, source: str, line_no: int) -> _TaskPolicy:
     if len(tokens) % 2 != 0:
         raise ParseError(
             f"{source}:{line_no}: with clause expects key/value pairs "
-            "(timeout|retries|backoff)"
+            "(timeout|retries|retry_if|backoff|jitter)"
         )
 
     timeout_seconds: float | None = None
     retries = 0
+    retry_if = "error"
     backoff_seconds = 0.0
+    jitter_seconds = 0.0
     seen: set[str] = set()
 
     for idx in range(0, len(tokens), 2):
@@ -465,6 +479,30 @@ def _parse_task_policy(raw: str, source: str, line_no: int) -> _TaskPolicy:
             )
             continue
 
+        if key == "jitter":
+            jitter_seconds = _parse_duration_seconds(
+                value=value,
+                source=source,
+                line_no=line_no,
+                field_name="jitter",
+                allow_zero=True,
+            )
+            continue
+
+        if key == "retry_if":
+            if not _RETRY_IF_RE.fullmatch(value):
+                raise ParseError(
+                    f"{source}:{line_no}: retry_if value is invalid: {value}"
+                )
+            normalized = value.lower()
+            if normalized not in _RETRY_IF_VALUES:
+                allowed = ", ".join(sorted(_RETRY_IF_VALUES))
+                raise ParseError(
+                    f"{source}:{line_no}: retry_if must be one of: {allowed}"
+                )
+            retry_if = normalized
+            continue
+
         raise ParseError(
             f"{source}:{line_no}: unknown policy key '{key}' in with clause"
         )
@@ -472,7 +510,9 @@ def _parse_task_policy(raw: str, source: str, line_no: int) -> _TaskPolicy:
     return _TaskPolicy(
         timeout_seconds=timeout_seconds,
         retries=retries,
+        retry_if=retry_if,
         backoff_seconds=backoff_seconds,
+        jitter_seconds=jitter_seconds,
     )
 
 

@@ -191,18 +191,21 @@ Runtime behavior:
 
 - `timeout <duration>`: per-attempt timeout (for example `30s`, `250ms`).
 - `retries <int>`: number of retries after the first attempt.
+- `retry_if <mode>`: retry strategy (`error`, `timeout`, `worker_failure`).
 - `backoff <duration>`: exponential retry base delay (`delay * 2^(attempt-1)`).
+- `jitter <duration>`: random delay added per retry (`0..jitter`).
 
 Example:
 
 ```mgl
-task deploy_prod uses "../workers/deploy_prod.py" requires capability.prod_access after test_suite with timeout 30s retries 2 backoff 1s
+task deploy_prod uses "../workers/deploy_prod.py" requires capability.prod_access after test_suite with timeout 30s retries 2 retry_if timeout backoff 1s jitter 250ms
 ```
 
 Notes:
 
 - `with` keys can be ordered freely.
 - `backoff` requires `retries > 0`.
+- `jitter` requires `retries > 0`.
 
 Plan output includes both flattened `task_order` and per-level structure.
 

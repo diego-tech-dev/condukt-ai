@@ -25,6 +25,7 @@ _ARTIFACT_TYPE_ALIASES = {
     "object": "dict",
     "string": "str",
 }
+_RETRY_IF_VALUES = {"error", "timeout", "worker_failure"}
 
 
 def validate_program(
@@ -54,6 +55,11 @@ def validate_program(
             errors.append(
                 f"line {task.line}: task '{task.name}' retries must be >= 0"
             )
+        if task.retry_if not in _RETRY_IF_VALUES:
+            allowed = ", ".join(sorted(_RETRY_IF_VALUES))
+            errors.append(
+                f"line {task.line}: task '{task.name}' retry_if must be one of: {allowed}"
+            )
         if task.backoff_seconds < 0:
             errors.append(
                 f"line {task.line}: task '{task.name}' backoff_seconds must be >= 0"
@@ -61,6 +67,14 @@ def validate_program(
         if task.backoff_seconds > 0 and task.retries == 0:
             errors.append(
                 f"line {task.line}: task '{task.name}' backoff_seconds requires retries > 0"
+            )
+        if task.jitter_seconds < 0:
+            errors.append(
+                f"line {task.line}: task '{task.name}' jitter_seconds must be >= 0"
+            )
+        if task.jitter_seconds > 0 and task.retries == 0:
+            errors.append(
+                f"line {task.line}: task '{task.name}' jitter_seconds requires retries > 0"
             )
         if capabilities is not None:
             missing = sorted(task.requires - capabilities)

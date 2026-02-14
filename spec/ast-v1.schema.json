@@ -179,7 +179,19 @@
           "type": "integer",
           "minimum": 0
         },
+        "retry_if": {
+          "type": "string",
+          "enum": [
+            "error",
+            "timeout",
+            "worker_failure"
+          ]
+        },
         "backoff_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "jitter_seconds": {
           "type": "number",
           "minimum": 0
         },

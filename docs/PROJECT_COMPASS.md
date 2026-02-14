@@ -86,11 +86,12 @@ Rules for safe migration:
 - Added CLI preflight validation command (`mgl validate`).
 - Added artifact-flow runnable example coverage (`examples/release_artifacts.mgl`).
 - Added typed artifact contracts (`artifact:type`) for `consumes`/`produces`.
+- Added retry policy controls (`retry_if`, jitter) in task execution policy.
 
 ## Near-Term Direction
 
-1. Policy enhancements (retry jitter, retry conditions).
-2. Rust runtime prototype that can pass current golden suite.
+1. Rust runtime prototype that can pass current golden suite.
+2. Multi-runtime conformance harness (shared fixtures runner).
 
 ## Resume Checklist
 

@@ -29,9 +29,10 @@ Status: in_progress
 
 Milestone status:
 - `B1` Typed artifact payload contracts: completed
-- `B2` Policy enhancements (`retry_if`, jitter): pending
+- `B2` Policy enhancements (`retry_if`, jitter): completed
 - `B3` Rust runtime bootstrap: pending
 
 Notes:
 - Added typed artifact contracts (`artifact:type`) in `consumes`/`produces`.
 - Added static/runtime checks for artifact type compatibility.
+- Added `retry_if` strategy and retry jitter controls in `with` task policies.

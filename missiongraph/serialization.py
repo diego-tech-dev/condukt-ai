@@ -69,6 +69,10 @@ def _task_to_ast(task: Task) -> dict[str, Any]:
         item["timeout_seconds"] = task.timeout_seconds
     if task.retries > 0:
         item["retries"] = task.retries
+    if task.retry_if != "error":
+        item["retry_if"] = task.retry_if
     if task.backoff_seconds > 0:
         item["backoff_seconds"] = task.backoff_seconds
+    if task.jitter_seconds > 0:
+        item["jitter_seconds"] = task.jitter_seconds
     return item

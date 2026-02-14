@@ -23,6 +23,7 @@ from missiongraph.spec import (
     ERROR_CODE_ARTIFACT_OUTPUT_MISSING,
     ERROR_CODE_CONTRACT_INPUT_VIOLATION,
     ERROR_CODE_CONTRACT_OUTPUT_VIOLATION,
+    ERROR_CODE_WORKER_EXIT_NONZERO,
     ERROR_CODE_WORKER_TIMEOUT,
 )
 
@@ -266,7 +267,7 @@ plan {{
 goal "policy parse demo"
 
 plan {{
-  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" with timeout 250ms retries 2 backoff 1s requires capability.prod_access after lint consumes test_report produces release_ticket
+  task deploy_prod uses "{(ROOT / 'workers' / 'deploy_prod.py').as_posix()}" with timeout 250ms retries 2 retry_if timeout backoff 1s jitter 250ms requires capability.prod_access after lint consumes test_report produces release_ticket
   task lint uses "{(ROOT / 'workers' / 'lint.py').as_posix()}" requires capability.ci
 }}
 """.strip()
@@ -275,14 +276,18 @@ plan {{
         lint = program.tasks[1]
         self.assertAlmostEqual(deploy.timeout_seconds or 0.0, 0.25)
         self.assertEqual(deploy.retries, 2)
+        self.assertEqual(deploy.retry_if, "timeout")
         self.assertAlmostEqual(deploy.backoff_seconds, 1.0)
+        self.assertAlmostEqual(deploy.jitter_seconds, 0.25)
         self.assertEqual(deploy.requires, {"prod_access"})
         self.assertEqual(deploy.after, ["lint"])
         self.assertEqual(deploy.consumes, ["test_report"])
         self.assertEqual(deploy.produces, ["release_ticket"])
         self.assertIsNone(lint.timeout_seconds)
         self.assertEqual(lint.retries, 0)
+        self.assertEqual(lint.retry_if, "error")
         self.assertEqual(lint.backoff_seconds, 0.0)
+        self.assertEqual(lint.jitter_seconds, 0.0)
         self.assertEqual(lint.consumes, [])
         self.assertEqual(lint.produces, [])
 
@@ -291,12 +296,16 @@ plan {{
         lint_ast = ast["tasks"][1]
         self.assertAlmostEqual(deploy_ast["timeout_seconds"], 0.25)
         self.assertEqual(deploy_ast["retries"], 2)
+        self.assertEqual(deploy_ast["retry_if"], "timeout")
         self.assertAlmostEqual(deploy_ast["backoff_seconds"], 1.0)
+        self.assertAlmostEqual(deploy_ast["jitter_seconds"], 0.25)
         self.assertEqual(deploy_ast["consumes"], ["test_report"])
         self.assertEqual(deploy_ast["produces"], ["release_ticket"])
         self.assertNotIn("timeout_seconds", lint_ast)
         self.assertNotIn("retries", lint_ast)
+        self.assertNotIn("retry_if", lint_ast)
         self.assertNotIn("backoff_seconds", lint_ast)
+        self.assertNotIn("jitter_seconds", lint_ast)
         self.assertNotIn("consumes", lint_ast)
         self.assertNotIn("produces", lint_ast)
 
@@ -535,6 +544,142 @@ plan {{
         self.assertEqual(attempts[0]["status"], "error")
         self.assertEqual(attempts[1]["status"], "ok")
 
+    def test_retry_if_timeout_skips_non_timeout_errors(self) -> None:
+        program = parse_program(
+            f"""
+goal "retry-if timeout skip"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" with retries 3 retry_if timeout requires capability.ci
+}}
+""".strip()
+        )
+        attempts_seen: list[int] = []
+
+        def fake_run_task_attempt(**kwargs):  # type: ignore[no-untyped-def]
+            attempt = kwargs["attempt"]
+            attempts_seen.append(attempt)
+            return {
+                "task": "test_suite",
+                "worker": program.tasks[0].worker,
+                "status": "error",
+                "confidence": 0.0,
+                "output": {},
+                "error_code": ERROR_CODE_WORKER_EXIT_NONZERO,
+                "error": "worker exited with return code 1",
+                "started_at": "t0",
+                "finished_at": "t1",
+                "provenance": {},
+            }
+
+        with patch(
+            "missiongraph.executor._run_task_attempt",
+            side_effect=fake_run_task_attempt,
+        ):
+            trace = execute_program(program, capabilities={"ci"}, parallel=False)
+
+        self.assertEqual(trace["status"], "failed")
+        self.assertEqual(attempts_seen, [1])
+
+    def test_retry_if_timeout_retries_timeouts_only(self) -> None:
+        program = parse_program(
+            f"""
+goal "retry-if timeout only"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" with retries 2 retry_if timeout requires capability.ci
+}}
+""".strip()
+        )
+        attempts_seen: list[int] = []
+
+        def fake_run_task_attempt(**kwargs):  # type: ignore[no-untyped-def]
+            attempt = kwargs["attempt"]
+            attempts_seen.append(attempt)
+            if attempt == 1:
+                return {
+                    "task": "test_suite",
+                    "worker": program.tasks[0].worker,
+                    "status": "error",
+                    "confidence": 0.0,
+                    "output": {},
+                    "error_code": ERROR_CODE_WORKER_TIMEOUT,
+                    "error": "worker timed out",
+                    "started_at": "t0",
+                    "finished_at": "t1",
+                    "provenance": {},
+                }
+            return {
+                "task": "test_suite",
+                "worker": program.tasks[0].worker,
+                "status": "ok",
+                "confidence": 1.0,
+                "output": {},
+                "error_code": None,
+                "error": None,
+                "started_at": "t0",
+                "finished_at": "t1",
+                "provenance": {},
+            }
+
+        with patch(
+            "missiongraph.executor._run_task_attempt",
+            side_effect=fake_run_task_attempt,
+        ):
+            trace = execute_program(program, capabilities={"ci"}, parallel=False)
+
+        self.assertEqual(trace["status"], "ok")
+        self.assertEqual(attempts_seen, [1, 2])
+
+    def test_retry_jitter_contributes_to_sleep_delay(self) -> None:
+        program = parse_program(
+            f"""
+goal "retry jitter"
+
+plan {{
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" with retries 1 backoff 1s jitter 500ms requires capability.ci
+}}
+""".strip()
+        )
+
+        def fake_run_task_attempt(**kwargs):  # type: ignore[no-untyped-def]
+            if kwargs["attempt"] == 1:
+                return {
+                    "task": "test_suite",
+                    "worker": program.tasks[0].worker,
+                    "status": "error",
+                    "confidence": 0.0,
+                    "output": {},
+                    "error_code": ERROR_CODE_WORKER_TIMEOUT,
+                    "error": "worker timed out",
+                    "started_at": "t0",
+                    "finished_at": "t1",
+                    "provenance": {},
+                }
+            return {
+                "task": "test_suite",
+                "worker": program.tasks[0].worker,
+                "status": "ok",
+                "confidence": 1.0,
+                "output": {},
+                "error_code": None,
+                "error": None,
+                "started_at": "t0",
+                "finished_at": "t1",
+                "provenance": {},
+            }
+
+        with patch(
+            "missiongraph.executor._run_task_attempt",
+            side_effect=fake_run_task_attempt,
+        ), patch("missiongraph.executor.random.uniform", return_value=0.25), patch(
+            "missiongraph.executor.time.sleep"
+        ) as sleep_mock:
+            trace = execute_program(program, capabilities={"ci"}, parallel=False)
+
+        self.assertEqual(trace["status"], "ok")
+        sleep_mock.assert_called_once_with(1.25)
+
     def test_timeout_policy_returns_worker_timeout_error(self) -> None:
         program = parse_program(
             f"""
@@ -579,7 +724,7 @@ plan {{
 goal "invalid policy"
 
 plan {{
-  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" with jitter 1s requires capability.ci
+  task test_suite uses "{(ROOT / 'workers' / 'test_suite.py').as_posix()}" with foobar 1s requires capability.ci
 }}
 """.strip()
             )

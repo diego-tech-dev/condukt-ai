@@ -33,7 +33,9 @@ class Task:
     produces_types: dict[str, str] = field(default_factory=dict)
     timeout_seconds: float | None = None
     retries: int = 0
+    retry_if: str = "error"
     backoff_seconds: float = 0.0
+    jitter_seconds: float = 0.0
     input_schema: list[FieldSpec] = field(default_factory=list)
     output_schema: list[FieldSpec] = field(default_factory=list)
     line: int = 0

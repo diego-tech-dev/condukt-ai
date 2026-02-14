@@ -99,3 +99,10 @@ Status: accepted
 Decision: support typed artifact contracts in `consumes`/`produces` via `artifact:type`.
 Rationale: enforce payload compatibility at artifact boundaries without requiring every task I/O schema to inline artifact checks.
 Consequences: parser/AST encode artifact type annotations, validator checks static compatibility, and runtime enforces typed consume/produce contracts.
+
+## 2026-02-13
+
+Status: accepted
+Decision: extend retry policy with `retry_if` strategy and jittered delay.
+Rationale: give orchestration-level control over retry eligibility and thundering-herd mitigation.
+Consequences: `with` supports `retry_if` and `jitter`; executor retries conditionally and applies randomized delay on retries.

@@ -3,6 +3,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
+import random
 import shlex
 import shutil
 import subprocess
@@ -333,8 +334,14 @@ def _run_task(task: Task, payload: dict[str, Any], base_dir: Path) -> dict[str, 
         )
         if result.get("status") == "ok":
             break
+        if not _should_retry(task, result):
+            break
         if attempt < max_attempts:
-            delay = _retry_delay_seconds(task.backoff_seconds, attempt)
+            delay = _retry_delay_seconds(
+                task.backoff_seconds,
+                attempt,
+                task.jitter_seconds,
+            )
             if delay > 0:
                 time.sleep(delay)
 
@@ -450,8 +457,12 @@ def _build_task_result(
         default_provenance["timeout_seconds"] = task.timeout_seconds
     if task.retries > 0:
         default_provenance["retries"] = task.retries
+    if task.retry_if != "error":
+        default_provenance["retry_if"] = task.retry_if
     if task.backoff_seconds > 0:
         default_provenance["backoff_seconds"] = task.backoff_seconds
+    if task.jitter_seconds > 0:
+        default_provenance["jitter_seconds"] = task.jitter_seconds
     if task.consumes:
         default_provenance["consumes"] = task.consumes
     if task.produces:
@@ -508,10 +519,39 @@ def _coerce_stream_text(value: str | bytes | None) -> str:
     return value
 
 
-def _retry_delay_seconds(backoff_seconds: float, attempt: int) -> float:
-    if backoff_seconds <= 0:
-        return 0.0
-    return backoff_seconds * float(2 ** (attempt - 1))
+def _retry_delay_seconds(
+    backoff_seconds: float,
+    attempt: int,
+    jitter_seconds: float,
+) -> float:
+    base = 0.0
+    if backoff_seconds > 0:
+        base = backoff_seconds * float(2 ** (attempt - 1))
+    jitter = 0.0
+    if jitter_seconds > 0:
+        jitter = random.uniform(0.0, jitter_seconds)
+    return base + jitter
+
+
+def _should_retry(task: Task, result: dict[str, Any]) -> bool:
+    if task.retries <= 0:
+        return False
+    if result.get("status") == "ok":
+        return False
+    retry_if = task.retry_if
+    error_code = result.get("error_code")
+    if retry_if == "error":
+        return True
+    if retry_if == "timeout":
+        return error_code == ERROR_CODE_WORKER_TIMEOUT
+    if retry_if == "worker_failure":
+        return error_code in {
+            ERROR_CODE_WORKER_TIMEOUT,
+            ERROR_CODE_WORKER_EXIT_NONZERO,
+            ERROR_CODE_WORKER_OUTPUT_JSON_INVALID,
+            ERROR_CODE_RUNTIME_EXECUTION_FAILURE,
+        }
+    return False
 
 
 def _resolve_worker_command(worker: str, base_dir: Path) -> list[str]:

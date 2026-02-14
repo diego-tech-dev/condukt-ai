@@ -50,5 +50,5 @@ For each milestone:
 Status: in_progress
 
 1. `B1` Typed artifact payload contracts: completed
-2. `B2` Policy enhancements (`retry_if`, jitter): pending
+2. `B2` Policy enhancements (`retry_if`, jitter): completed
 3. `B3` Rust runtime bootstrap: pending
