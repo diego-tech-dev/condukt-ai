@@ -140,11 +140,34 @@ def run_case(
                 "--",
                 "check-ast",
                 str(ast_file),
+                "--json",
             ],
             cwd=root,
         )
+        try:
+            check_payload = json.loads(check_proc.stdout)
+        except json.JSONDecodeError as exc:
+            case["errors"].append(
+                f"rust check-ast returned invalid JSON: {exc}: {check_proc.stdout.strip()}"
+            )
+            return case
+        case["rust_check_ok"] = check_payload.get("ok")
+        case["rust_ast_version"] = check_payload.get("ast_version")
         if check_proc.returncode != 0:
-            case["errors"].append(_format_process_failure("check-ast", check_proc))
+            details = check_payload.get("errors") or [
+                _format_process_failure("check-ast", check_proc)
+            ]
+            case["errors"].append(f"check-ast failed: {details}")
+            return case
+        if not check_payload.get("ok"):
+            case["errors"].append(
+                f"check-ast returned non-ok payload: {check_payload.get('errors', [])}"
+            )
+            return case
+        if check_payload.get("ast_version") != AST_VERSION:
+            case["errors"].append(
+                f"rust AST version mismatch: {check_payload.get('ast_version')} != {AST_VERSION}"
+            )
             return case
 
         trace_proc = _run_command(

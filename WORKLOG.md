@@ -58,6 +58,11 @@ Notes:
 Status: in_progress
 
 Milestone status:
-- `N1` Rust contract CLI parity hardening: pending
+- `N1` Rust contract CLI parity hardening: completed
 - `N2` Rust trace semantics expansion: pending
 - `N3` Dual-runtime golden conformance gate: pending
+
+Notes:
+- Rust bootstrap validator now detects dependency cycles (`cycle detected in plan`).
+- `mgl-rs check-ast` now supports `--json` machine-readable output.
+- Python conformance harness now consumes Rust `check-ast --json` output for stronger contract assertions.

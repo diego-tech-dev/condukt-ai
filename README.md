@@ -229,7 +229,7 @@ Rust bootstrap runtime is available at `rust/missiongraph-rs`.
 
 ```bash
 python3 -m missiongraph parse examples/ship_release.mgl > /tmp/ship_release.ast.json
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json
+cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
 cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- trace-skeleton /tmp/ship_release.ast.json
 ```
 

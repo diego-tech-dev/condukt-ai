@@ -36,6 +36,8 @@ class ConformanceHarnessTests(unittest.TestCase):
         case = payload["cases"][0]
         self.assertTrue(case["ok"])
         self.assertEqual(case["python_ast_version"], AST_VERSION)
+        self.assertTrue(case["rust_check_ok"])
+        self.assertEqual(case["rust_ast_version"], AST_VERSION)
         self.assertEqual(case["rust_trace_version"], TRACE_VERSION)
 
 

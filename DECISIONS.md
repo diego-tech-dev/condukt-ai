@@ -134,3 +134,10 @@ Status: accepted
 Decision: bump AST/trace contract minor versions from `1.0` to `1.1` and codify versioning governance.
 Rationale: versioning rules should be explicit and test-enforced before adding more runtime surface area.
 Consequences: runtime constants, schemas, goldens, Rust bootstrap constants, and governance docs/tests move in lockstep for any future version bump.
+
+## 2026-02-14
+
+Status: accepted
+Decision: harden Rust `check-ast` with cycle detection and JSON report output.
+Rationale: bootstrap CLI should be directly usable by automation and should reject invalid DAGs consistently with planner semantics.
+Consequences: Rust validation now detects dependency cycles; `check-ast --json` emits machine-readable status used by conformance tooling/tests.

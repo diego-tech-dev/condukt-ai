@@ -18,7 +18,7 @@ python3 -m missiongraph parse examples/ship_release.mgl > /tmp/ship_release.ast.
 Validate AST with Rust bootstrap:
 
 ```bash
-cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json
+cargo run --manifest-path rust/missiongraph-rs/Cargo.toml -- check-ast /tmp/ship_release.ast.json --json
 ```
 
 Emit trace skeleton:

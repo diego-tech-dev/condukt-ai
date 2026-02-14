@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 pub const AST_VERSION: &str = "1.1";
 pub const TRACE_VERSION: &str = "1.1";
@@ -70,9 +70,14 @@ pub fn validate_ast(ast: &Ast) -> Result<(), String> {
     }
 
     let mut by_name = BTreeMap::new();
+    let mut adjacency: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut in_degree: BTreeMap<String, usize> = BTreeMap::new();
     for task in &ast.tasks {
         by_name.insert(task.name.clone(), task);
+        adjacency.insert(task.name.clone(), vec![]);
+        in_degree.insert(task.name.clone(), 0);
     }
+
     for task in &ast.tasks {
         for dep in &task.after {
             if !by_name.contains_key(dep) {
@@ -81,7 +86,47 @@ pub fn validate_ast(ast: &Ast) -> Result<(), String> {
                     task.name, dep
                 ));
             }
+            adjacency
+                .get_mut(dep)
+                .expect("dependency must have adjacency entry")
+                .push(task.name.clone());
+            *in_degree
+                .get_mut(&task.name)
+                .expect("task must have in-degree entry") += 1;
         }
+    }
+
+    let mut ready = VecDeque::new();
+    for task in &ast.tasks {
+        if in_degree.get(&task.name) == Some(&0) {
+            ready.push_back(task.name.clone());
+        }
+    }
+
+    let mut seen_count = 0usize;
+    while let Some(current) = ready.pop_front() {
+        seen_count += 1;
+        if let Some(children) = adjacency.get(&current) {
+            for child in children {
+                let degree = in_degree
+                    .get_mut(child)
+                    .expect("child must have in-degree entry");
+                *degree -= 1;
+                if *degree == 0 {
+                    ready.push_back(child.clone());
+                }
+            }
+        }
+    }
+
+    if seen_count != ast.tasks.len() {
+        let unresolved = ast
+            .tasks
+            .iter()
+            .filter(|task| in_degree.get(&task.name).copied().unwrap_or(0) > 0)
+            .map(|task| task.name.clone())
+            .collect::<Vec<_>>();
+        return Err(format!("cycle detected in plan: {}", unresolved.join(", ")));
     }
 
     Ok(())
@@ -158,5 +203,20 @@ mod tests {
         assert_eq!(trace.trace_version, TRACE_VERSION);
         assert_eq!(trace.goal, "hello");
         assert_eq!(trace.task_order, vec!["a".to_string(), "b".to_string()]);
+    }
+
+    #[test]
+    fn rejects_cycle_in_plan() {
+        let ast_text = r#"{
+          "ast_version":"1.1",
+          "goal":"cycle",
+          "tasks":[
+            {"name":"a","after":["b"]},
+            {"name":"b","after":["a"]}
+          ]
+        }"#;
+        let ast = parse_ast(ast_text).expect("json should parse");
+        let err = validate_ast(&ast).expect_err("cyclic plan should fail");
+        assert!(err.contains("cycle detected in plan"));
     }
 }
