@@ -19,9 +19,6 @@
     "check": {
       "dependsOn": ["lint", "typecheck"],
       "outputs": []
-    },
-    "@condukt-ai/web#build": {
-      "outputs": []
     }
   }
 }

@@ -2,6 +2,19 @@
 
 ## 2026-02-16
 
+### Sprint: Monorepo quality hardening follow-up
+
+Status: completed
+
+Milestone status:
+- `H1` Replace `apps/web` placeholder quality scripts with real checks: completed
+- `H2` Fix publish runbook workflow name drift (`ts-publish` -> `publish`): completed
+
+Notes:
+- Added real `apps/web` lint/typecheck/test/build commands using Biome, TypeScript, and Vitest.
+- Added minimal `apps/web/src` and `apps/web/test` coverage so CI validates real executable code paths.
+- Added `apps/web/tsconfig.build.json` to produce `dist/` artifacts for build-stage validation.
+
 ### Sprint: Monorepo migration run
 
 Status: completed

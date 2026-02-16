@@ -4,10 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "echo \"apps/web build placeholder\"",
-    "lint": "echo \"apps/web lint placeholder\"",
-    "typecheck": "echo \"apps/web typecheck placeholder\"",
-    "test": "echo \"apps/web test placeholder\"",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "biome lint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check": "pnpm lint && pnpm typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.15",
+    "@types/node": "^22.19.11",
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.18"
   }
 }

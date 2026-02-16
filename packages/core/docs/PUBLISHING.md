@@ -36,7 +36,7 @@ pnpm --filter condukt-ai publish --access public --provenance --no-git-checks
 ```
 
 Or use GitHub Actions manual workflow:
-- run `ts-publish`
+- run `publish`
 - ensure repo secret `NPM_TOKEN` is configured
 
 ## 4) Verify install
