@@ -1,0 +1,13 @@
+{
+  "name": "@condukt-ai/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"apps/web build placeholder\"",
+    "lint": "echo \"apps/web lint placeholder\"",
+    "typecheck": "echo \"apps/web typecheck placeholder\"",
+    "test": "echo \"apps/web test placeholder\"",
+    "check": "pnpm lint && pnpm typecheck"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "condukt-ai-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "check": "turbo run check",
+    "release:check:core": "pnpm --filter condukt-ai release:check"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.6"
+  }
+}

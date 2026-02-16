@@ -1,10 +1,10 @@
 # Condukt Learnings
 
-Last updated: 2026-02-14
+Last updated: 2026-02-16
 
 Note:
 - Entries below include historical learnings from the decommissioned Python/Rust runtime phase.
-- As of 2026-02-14, active implementation scope is TypeScript-only (`ts/`).
+- As of 2026-02-14, active implementation scope is TypeScript-only (`packages/core/`).
 
 Purpose:
 - capture implementation learnings that are easy to forget
@@ -17,6 +17,21 @@ Entry format:
 - `Learning`
 - `What changed`
 - `Guardrail`
+
+## 2026-02-16
+
+Context:
+- Migrated repository layout from single-package `ts/` to a monorepo (`packages/core`, `apps/web`).
+
+Learning:
+- Root-first workspace commands reduce drift across local dev, CI, and publish workflows; package-local command docs quickly become stale as repos scale.
+
+What changed:
+- Added `pnpm-workspace.yaml`, root `package.json` scripts, and `turbo.json`.
+- Moved package to `packages/core` and updated docs/workflows to run from repo root.
+
+Guardrail:
+- Prefer root commands in documentation (`pnpm lint/typecheck/test/build` + filtered package commands only when needed).
 
 ## 2026-02-14
 
@@ -42,7 +57,7 @@ Learning:
 
 What changed:
 - Added model-aware provider contracts and per-model settings maps.
-- Added compile-time type fixtures in `ts/typecheck/provider-models.typecheck.ts`.
+- Added compile-time type fixtures in `packages/core/typecheck/provider-models.typecheck.ts`.
 
 Guardrail:
 - Any new provider or model family must ship typed model IDs/settings and at least one compile-time fixture proving invalid settings fail typecheck.
@@ -202,7 +217,7 @@ Learning:
 - Standard Schema keeps the contract layer reusable across libraries while preserving strict runtime validation.
 
 What changed:
-- Added `ts/` runtime with `Pipeline`, `llmTask`, and per-task structured traces.
+- Added `packages/core/` runtime with `Pipeline`, `llmTask`, and per-task structured traces.
 - Bound task contracts to `StandardSchemaV1` and validated with `@standard-schema/spec`.
 - Kept examples in Zod without coupling runtime interfaces to Zod-only types.
 
@@ -280,8 +295,8 @@ Learning:
 
 What changed:
 - Added trace diagnosis helper (`diagnoseFailure`) and trial session/summary utilities in TS runtime.
-- Added `ts/scripts/trial-metrics.ts` to persist trial records in JSONL and compute baseline-vs-Condukt summary stats.
-- Added `ts/docs/TRIALS.md` protocol for repeatable external studies.
+- Added `packages/core/scripts/trial-metrics.ts` to persist trial records in JSONL and compute baseline-vs-Condukt summary stats.
+- Added `packages/core/docs/TRIALS.md` protocol for repeatable external studies.
 
 Guardrail:
 - Do not record elapsed diagnosis time without expected diagnosis fields (`task` and/or `error_code`), or speed claims become unauditable.

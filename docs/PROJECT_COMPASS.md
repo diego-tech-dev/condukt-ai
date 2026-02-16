@@ -20,7 +20,7 @@ It exists to make agent pipelines:
 ## Product Focus
 
 Primary track:
-- npm package `condukt-ai` in `ts/`
+- npm package `condukt-ai` in `packages/core/`
 - Standard Schema-compatible contracts
 - deterministic, machine-readable traces
 - practical CLI-assisted trial instrumentation for diagnosis-time measurement
@@ -36,9 +36,10 @@ The product should make it obvious:
 
 ## Current Scope
 
-- TypeScript library runtime and examples in `ts/`
+- TypeScript library runtime and examples in `packages/core/`
+- Website app location in `apps/web/` (placeholder; stack TBD)
 - LLM provider adapters (OpenAI, Anthropic)
-- Trial measurement tooling (`ts/scripts/trial-metrics.ts`)
+- Trial measurement tooling (`packages/core/scripts/trial-metrics.ts`)
 - CI and release checks focused on the TS package only
 
 ## Explicit Non-Goals
@@ -50,13 +51,13 @@ The product should make it obvious:
 
 ## Architecture Snapshot
 
-- Pipeline runtime: `ts/src/pipeline.ts`
-- Contract validation: `ts/src/contracts.ts`
-- Failure diagnosis: `ts/src/diagnostics.ts`
-- Trial domain: `ts/src/trials/`
-- Provider adapters: `ts/src/providers.ts`
-- Release identity guard: `ts/src/release_identity.ts`
-- Trial CLI: `ts/scripts/trial-metrics.ts`
+- Pipeline runtime: `packages/core/src/pipeline.ts`
+- Contract validation: `packages/core/src/contracts.ts`
+- Failure diagnosis: `packages/core/src/diagnostics.ts`
+- Trial domain: `packages/core/src/trials/`
+- Provider adapters: `packages/core/src/providers.ts`
+- Release identity guard: `packages/core/src/release_identity.ts`
+- Trial CLI: `packages/core/scripts/trial-metrics.ts`
 
 ## Resume Checklist
 
@@ -64,8 +65,12 @@ The product should make it obvious:
 2. Read `docs/FOUNDATIONS.md`.
 3. Read `docs/LEARNINGS.md`.
 4. Run:
-   - `cd ts && pnpm install`
-   - `cd ts && pnpm release:check`
+   - `pnpm install`
+   - `pnpm lint`
+   - `pnpm typecheck`
+   - `pnpm test`
+   - `pnpm build`
+   - `pnpm --filter condukt-ai release:check`
 5. Continue from open roadmap/worklog milestones.
 
 ## Update Protocol

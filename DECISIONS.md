@@ -9,6 +9,20 @@ Format:
 - `Rationale`
 - `Consequences`
 
+## 2026-02-16
+
+Status: accepted
+Decision: adopt a pnpm monorepo layout with `packages/core` and `apps/web`, orchestrated by Turborepo.
+Rationale: scale package/app growth with shared task graph execution, caching, and root-first CI workflows.
+Consequences: repository commands run from root (`pnpm lint/typecheck/test/build`), core package path moved to `packages/core`, and CI workflows now target workspace paths.
+
+## 2026-02-16
+
+Status: accepted
+Decision: keep repository tooling framework-neutral for the website app (`apps/web`) and avoid Next.js-specific assumptions.
+Rationale: preserve flexibility for future website stack decisions while keeping monorepo structure stable.
+Consequences: `apps/web` is a placeholder workspace package with no framework lock-in; Turbo config does not include Next.js-specific outputs.
+
 ## 2026-02-13
 
 Status: accepted
@@ -217,7 +231,7 @@ Consequences: Rust `run-plan` now evaluates constraint/verify expressions agains
 Status: accepted
 Decision: pivot product direction to a TypeScript-first runtime while keeping Python as a temporary reference implementation.
 Rationale: target users for agentic application development are concentrated in the TypeScript ecosystem; Python remains useful as behavioral reference during migration.
-Consequences: added `ts/` runtime package and tests; Python/Rust tracks remain maintained for parity and backward context until TS workflow path is validated.
+Consequences: added `packages/core/` runtime package and tests; Python/Rust tracks remain maintained for parity and backward context until TS workflow path is validated.
 
 ## 2026-02-14
 
@@ -238,7 +252,7 @@ Consequences: TS tasks now support `retries`, `backoffMs`, `jitterMs`, and `retr
 Status: accepted
 Decision: ship a built-in 10-minute TS quickstart with an intentionally broken variant.
 Rationale: adoption risk is reduced when users can experience trace-based diagnosis without credentials or external setup.
-Consequences: added `pnpm quickstart` and `pnpm quickstart:broken`, plus `ts/docs/TRACE_WALKTHROUGH.md` for deterministic diagnosis flow.
+Consequences: added `pnpm quickstart` and `pnpm quickstart:broken`, plus `packages/core/docs/TRACE_WALKTHROUGH.md` for deterministic diagnosis flow.
 
 ## 2026-02-14
 
@@ -273,7 +287,7 @@ Consequences: TS runtime now includes diagnosis/trial helpers, a trial metrics C
 Status: accepted
 Decision: standardize TypeScript lint/format checks on Biome and enforce pnpm-only JS/TS package operations.
 Rationale: fast deterministic linting plus one package-manager path reduces drift across local and CI workflows.
-Consequences: added `ts/biome.json`, new TS scripts (`lint`, `format`, `typecheck`), updated CI quality/publish workflows, and removed npm-based pack/publish commands from TS release paths.
+Consequences: added `packages/core/biome.json`, new TS scripts (`lint`, `format`, `typecheck`), updated CI quality/publish workflows, and removed npm-based pack/publish commands from TS release paths.
 
 ## 2026-02-14
 

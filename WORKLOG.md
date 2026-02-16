@@ -1,5 +1,25 @@
 # Condukt AI Worklog
 
+## 2026-02-16
+
+### Sprint: Monorepo migration run
+
+Status: completed
+
+Milestone status:
+- `M1` Workspace scaffolding (`pnpm-workspace.yaml`, root scripts, `turbo.json`): completed
+- `M2` Package move (`ts/` -> `packages/core/`) with API preservation: completed
+- `M3` Website app placeholder (`apps/web/`) with framework-neutral setup: completed
+- `M4` CI migration to root workspace commands: completed
+- `M5` Docs migration to root-first command examples: completed
+
+Notes:
+- Introduced root `package.json` and TypeScript solution config for scalable multi-package growth.
+- Renamed workflow files to `.github/workflows/quality.yml` and `.github/workflows/publish.yml`.
+- Updated package metadata to `repository.directory = packages/core` and matching homepage path.
+- Kept published package identity and exports unchanged (`condukt-ai`, `condukt-ai/trials`).
+- Validated migration with root `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm --filter condukt-ai release:check`.
+
 ## 2026-02-13
 
 ### Sprint: Autonomous 5-milestone run
@@ -117,16 +137,16 @@ Milestone status:
 - `T3` 10-minute user path (`pnpm dlx`/template + demo trace walkthrough): completed
 
 Notes:
-- Added `ts/` package managed by `pnpm`.
+- Added `packages/core/` package managed by `pnpm`.
 - Added Standard Schema-first contract validation (`@standard-schema/spec`) to keep schema-library choice open.
 - Added TypeScript `Pipeline` runtime with fail-fast task boundary contracts and structured per-task traces.
 - Added OpenAI and Anthropic JSON provider adapters for real LLM-backed tasks.
-- Added `llmTask` helper and runnable 3-step example (`ts/examples/research-write.ts`).
+- Added `llmTask` helper and runnable 3-step example (`packages/core/examples/research-write.ts`).
 - Added TypeScript tests for success path, contract violation diagnostics, and dependency validation.
 - Added task-level retry policy in TS runtime (`retries`, `backoffMs`, `jitterMs`, `retryIf`) with attempt history in traces.
 - Added TS provider tests with mocked HTTP responses for OpenAI and Anthropic JSON parsing behavior.
 - Added TS quickstart demo (`pnpm quickstart` / `pnpm quickstart:broken`) that writes a trace and demonstrates boundary-failure diagnosis.
-- Added 10-minute walkthrough doc at `ts/docs/TRACE_WALKTHROUGH.md`.
+- Added 10-minute walkthrough doc at `packages/core/docs/TRACE_WALKTHROUGH.md`.
 - Renamed TS package to `condukt-ai`.
 
 ### Sprint: Distribution run
@@ -140,22 +160,22 @@ Milestone status:
 
 Notes:
 - Started npm publish-readiness hardening for the `condukt-ai` package.
-- Added publish metadata (`exports`, `files`, `repository`, `engines`, `publishConfig`) and release scripts (`release:check`, `prepack`) to `ts/package.json`.
-- Added package publishing runbook at `ts/docs/PUBLISHING.md`.
-- Added local `ts/LICENSE` to ensure packaged license inclusion.
+- Added publish metadata (`exports`, `files`, `repository`, `engines`, `publishConfig`) and release scripts (`release:check`, `prepack`) to `packages/core/package.json`.
+- Added package publishing runbook at `packages/core/docs/PUBLISHING.md`.
+- Added local `packages/core/LICENSE` to ensure packaged license inclusion.
 - Regenerated normalized trace goldens after canonical workspace path rename to keep conformance deterministic.
-- Added GitHub Actions quality workflow (`.github/workflows/ts-quality.yml`) for TS typecheck/tests/build/release-check gates on push/PR.
-- Added GitHub Actions manual publish workflow (`.github/workflows/ts-publish.yml`) using `NPM_TOKEN`.
+- Added GitHub Actions quality workflow (`.github/workflows/quality.yml`) for TS typecheck/tests/build/release-check gates on push/PR.
+- Added GitHub Actions manual publish workflow (`.github/workflows/publish.yml`) using `NPM_TOKEN`.
 - Added trace diagnosis helpers (`diagnoseFailure`) and trial instrumentation utilities (`createTrialSession`, `completeTrialSession`, `summarizeTrialRecords`) in TS runtime.
-- Added trial metrics CLI (`ts/scripts/trial-metrics.ts`) with start/finish/report commands writing JSONL records.
-- Added trial instrumentation docs (`ts/docs/TRIALS.md`) and TS test coverage for diagnosis/trial metrics behavior.
+- Added trial metrics CLI (`packages/core/scripts/trial-metrics.ts`) with start/finish/report commands writing JSONL records.
+- Added trial instrumentation docs (`packages/core/docs/TRIALS.md`) and TS test coverage for diagnosis/trial metrics behavior.
 
 ### Sprint: TS tooling conventions
 
 Status: completed
 
 Notes:
-- Added Biome configuration at `ts/biome.json`.
+- Added Biome configuration at `packages/core/biome.json`.
 - Added TS scripts: `pnpm lint`, `pnpm format`, and `pnpm typecheck`.
 - Updated `pnpm check` and `pnpm release:check` to include lint/typecheck and pnpm-based pack validation.
 - Updated TS GitHub workflows to run lint and to publish with `pnpm publish`.
@@ -212,7 +232,7 @@ Notes:
 - Updated normalized trace goldens for canonical workspace rename (`condukt` -> `condukt-ai` path segment).
 - Added trial-mode normalization (`condukt` alias -> `condukt-ai`) in runtime and CLI.
 - Added strict trial-record input normalization for report ingestion with line-numbered validation errors.
-- Added release identity validator (`ts/src/release_identity.ts`) and CLI guard (`pnpm release:guard`).
+- Added release identity validator (`packages/core/src/release_identity.ts`) and CLI guard (`pnpm release:guard`).
 - Integrated release identity guard into `pnpm release:check` and added TS guard unit tests.
 
 ### Sprint: Trial refactor run
@@ -225,9 +245,9 @@ Milestone status:
 - `J3` Path-agnostic trace goldens + CLI integration coverage: completed
 
 Notes:
-- Split `ts/src/trials.ts` into focused modules under `ts/src/trials/` while preserving public API exports.
-- Hardened `ts/scripts/trial-metrics.ts` parser with explicit command/flag validation, typed option parsing, and early failures for malformed flags.
-- Added end-to-end CLI integration coverage in `ts/test/trial-metrics-cli.test.ts` for `start`/`finish`/`report` workflow plus boolean-flag validation.
+- Split `packages/core/src/trials.ts` into focused modules under `packages/core/src/trials/` while preserving public API exports.
+- Hardened `packages/core/scripts/trial-metrics.ts` parser with explicit command/flag validation, typed option parsing, and early failures for malformed flags.
+- Added end-to-end CLI integration coverage in `packages/core/test/trial-metrics-cli.test.ts` for `start`/`finish`/`report` workflow plus boolean-flag validation.
 - Normalized golden trace worker provenance to `workers/<file>` and updated Python trace normalization to remove machine-specific path prefixes.
 
 ### Sprint: TS-only consolidation run
@@ -254,9 +274,9 @@ Milestone status:
 - `L3` Add compile-time type fixtures for provider/model contract safety: completed
 
 Notes:
-- Refactored `ts/src/providers.ts` to expose model-aware provider generics and exported provider model catalogs (`OPENAI_MODELS`, `ANTHROPIC_MODELS`).
-- Updated `llmTask` typing in `ts/src/pipeline.ts` so `modelSettings` are inferred from selected provider/model instead of generic untyped task-level knobs.
-- Added compile-time provider typing fixtures under `ts/typecheck/` and moved `pnpm typecheck` to `tsconfig.typecheck.json` to enforce these contracts.
+- Refactored `packages/core/src/providers.ts` to expose model-aware provider generics and exported provider model catalogs (`OPENAI_MODELS`, `ANTHROPIC_MODELS`).
+- Updated `llmTask` typing in `packages/core/src/pipeline.ts` so `modelSettings` are inferred from selected provider/model instead of generic untyped task-level knobs.
+- Added compile-time provider typing fixtures under `packages/core/typecheck/` and moved `pnpm typecheck` to `tsconfig.typecheck.json` to enforce these contracts.
 - Expanded provider runtime tests to validate request payload shaping for chat vs reasoning settings.
 
 ### Sprint: Typed dependency context run
@@ -272,7 +292,7 @@ Notes:
 - Refactored `TaskRuntimeContext`, `TaskDefinition`, and `LLMTaskDefinition` to carry output/dependency generics.
 - Added `Pipeline<TOutputs>` accumulation and `addLLMTask(...)` to make dependency outputs typed from declared `after` keys.
 - Migrated TS examples and core pipeline tests to builder chaining without manual `as` casts for dependency outputs.
-- Added compile-time dependency fixtures at `ts/typecheck/pipeline-dependencies.typecheck.ts`.
+- Added compile-time dependency fixtures at `packages/core/typecheck/pipeline-dependencies.typecheck.ts`.
 
 ### Sprint: Typed run result run
 
@@ -314,17 +334,17 @@ Milestone status:
 - `E4` Trials API extraction into dedicated package surface: completed
 
 Notes:
-- Added `tanstackChatTask` (`ts/src/tanstack.ts`) to bridge TanStack AI text adapters into Condukt task execution.
-- Added runtime coverage for TanStack integration (`ts/test/tanstack.test.ts`) including valid JSON flow and malformed JSON failure diagnostics.
-- Added compile-time fixture for adapter option typing (`ts/typecheck/tanstack.typecheck.ts`).
-- Updated TS package metadata to include `@tanstack/ai` runtime dependency and documented TanStack adapter usage in `ts/README.md`.
+- Added `tanstackChatTask` (`packages/core/src/tanstack.ts`) to bridge TanStack AI text adapters into Condukt task execution.
+- Added runtime coverage for TanStack integration (`packages/core/test/tanstack.test.ts`) including valid JSON flow and malformed JSON failure diagnostics.
+- Added compile-time fixture for adapter option typing (`packages/core/typecheck/tanstack.typecheck.ts`).
+- Updated TS package metadata to include `@tanstack/ai` runtime dependency and documented TanStack adapter usage in `packages/core/README.md`.
 - Switched pipeline execution to run tasks in parallel within dependency levels (`execution.mode = level_parallel`) while preserving deterministic per-level trace ordering.
-- Added runtime coverage to verify concurrent fan-out behavior and ordering guarantees (`ts/test/pipeline.test.ts`).
+- Added runtime coverage to verify concurrent fan-out behavior and ordering guarantees (`packages/core/test/pipeline.test.ts`).
 - Added conditional task gating (`when`) across task definitions and LLM/TanStack task builders.
 - Added `skipped` task traces with explicit `skip_reason`, plus summary-level skipped counts for adaptive-flow diagnostics.
-- Added runtime and compile-time coverage for conditional execution semantics (`ts/test/pipeline.test.ts`, `ts/typecheck/pipeline-dependencies.typecheck.ts`).
+- Added runtime and compile-time coverage for conditional execution semantics (`packages/core/test/pipeline.test.ts`, `packages/core/typecheck/pipeline-dependencies.typecheck.ts`).
 - Removed trial helpers from the core `condukt-ai` root export and exposed them via a dedicated `condukt-ai/trials` subpath export.
-- Updated tests and docs to use isolated trials imports (`ts/test/trials.test.ts`, `ts/README.md`).
+- Updated tests and docs to use isolated trials imports (`packages/core/test/trials.test.ts`, `packages/core/README.md`).
 
 ### Sprint: Runtime architecture run
 
@@ -337,7 +357,7 @@ Milestone status:
 - `R4` Consolidate JSON parsing/preview logic into shared runtime utility: completed
 
 Notes:
-- Replaced the former monolithic `ts/src/pipeline.ts` implementation with a facade + modular internals under `ts/src/pipeline/`.
-- Added `PipelineRuntimeEnvironment` with overrideable `nowMs`, `nowIso`, `random`, and `sleep` hooks, plus deterministic runtime coverage in `ts/test/pipeline.test.ts`.
+- Replaced the former monolithic `packages/core/src/pipeline.ts` implementation with a facade + modular internals under `packages/core/src/pipeline/`.
+- Added `PipelineRuntimeEnvironment` with overrideable `nowMs`, `nowIso`, `random`, and `sleep` hooks, plus deterministic runtime coverage in `packages/core/test/pipeline.test.ts`.
 - Refactored `Pipeline` builder internals to use shared state and typed helper methods, removing prior `as unknown as` casts in task registration/chaining paths.
-- Added shared JSON utility module (`ts/src/json.ts`) and migrated OpenAI/Anthropic/TanStack parsing + preview behavior to use it.
+- Added shared JSON utility module (`packages/core/src/json.ts`) and migrated OpenAI/Anthropic/TanStack parsing + preview behavior to use it.

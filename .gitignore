@@ -3,6 +3,9 @@ AGENT.md
 __pycache__/
 *.py[cod]
 rust/**/target/
-ts/node_modules/
-ts/dist/
-ts/trace.quickstart.json
+.turbo/
+node_modules/
+**/node_modules/
+packages/*/dist/
+apps/*/dist/
+packages/core/trace.quickstart.json

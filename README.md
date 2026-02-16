@@ -6,22 +6,21 @@ Condukt AI is a TypeScript library for agent workflow orchestration with:
 - structured traces for fast failure diagnosis
 - LLM task adapters for OpenAI and Anthropic
 
-The active product lives in `ts/` and is published as `condukt-ai`.
+The active product lives in `packages/core/` and is published as `condukt-ai`.
 
 ## Quick Start
 
 ```bash
-cd ts
 pnpm install
 pnpm check
 pnpm test
-pnpm quickstart
-pnpm quickstart:broken
+pnpm --filter condukt-ai quickstart
+pnpm --filter condukt-ai quickstart:broken
 ```
 
 ## Package Usage
 
-See `/ts/README.md` for install and API examples.
+See `/packages/core/README.md` for install and API examples.
 
 ```bash
 pnpm add condukt-ai zod
@@ -31,7 +30,8 @@ Trials/diagnosis helpers are available via the `condukt-ai/trials` subpath.
 
 ## Repository Layout
 
-- `ts/`: active runtime, tests, docs, release scripts
+- `packages/core/`: active runtime, tests, docs, release scripts
+- `apps/web/`: website/docs app location (framework decided separately)
 - `docs/`: project context (`PROJECT_COMPASS.md`, `FOUNDATIONS.md`, `LEARNINGS.md`)
 - `ROADMAP.md`, `WORKLOG.md`, `DECISIONS.md`: planning and decision history
 
