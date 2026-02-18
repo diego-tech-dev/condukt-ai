@@ -18,7 +18,8 @@ async function processDir(dir) {
     }
 
     const content = await readFile(fullPath, "utf8");
-    const rewrittenLinks = rewriteMarkdownLinks(content);
+    const rewrittenSourceLinks = normalizeGitHubBlobRefs(content);
+    const rewrittenLinks = rewriteMarkdownLinks(rewrittenSourceLinks);
     if (rewrittenLinks.startsWith("---\n")) {
       if (rewrittenLinks !== content) {
         await writeFile(fullPath, rewrittenLinks, "utf8");
@@ -92,4 +93,11 @@ function rewriteTarget(target) {
   }
 
   return `${asRoute}#${hashPart}`;
+}
+
+function normalizeGitHubBlobRefs(content) {
+  return content.replace(
+    /(https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/)[0-9a-f]{7,40}(\/[^)\s]+)/g,
+    "$1main$2",
+  );
 }

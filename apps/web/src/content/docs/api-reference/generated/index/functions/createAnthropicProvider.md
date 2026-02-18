@@ -10,7 +10,7 @@ title: "Function: createAnthropicProvider()"
 
 > **createAnthropicProvider**(`options?`): [`LLMProvider`](../interfaces/llmprovider/)\<[`AnthropicModel`](../type-aliases/anthropicmodel/), [`AnthropicModelSettingsByModel`](../type-aliases/anthropicmodelsettingsbymodel/)\>
 
-Defined in: [providers.ts:224](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L224)
+Defined in: [providers.ts:224](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L224)
 
 Creates an Anthropic-backed provider that returns parsed JSON payloads.
 

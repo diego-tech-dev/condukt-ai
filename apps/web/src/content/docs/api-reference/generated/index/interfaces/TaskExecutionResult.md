@@ -8,7 +8,7 @@ title: "Interface: TaskExecutionResult"
 
 # Interface: TaskExecutionResult
 
-Defined in: [pipeline/types.ts:67](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L67)
+Defined in: [pipeline/types.ts:67](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L67)
 
 Structured result returned by a task executor before contract validation.
 
@@ -18,7 +18,7 @@ Structured result returned by a task executor before contract validation.
 
 > `readonly` **data**: `unknown`
 
-Defined in: [pipeline/types.ts:68](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L68)
+Defined in: [pipeline/types.ts:68](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L68)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [pipeline/types.ts:68](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **input**: `unknown`
 
-Defined in: [pipeline/types.ts:69](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L69)
+Defined in: [pipeline/types.ts:69](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L69)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [pipeline/types.ts:69](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **meta**: `Record`\<`string`, `unknown`\>
 
-Defined in: [pipeline/types.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L71)
+Defined in: [pipeline/types.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L71)
 
 ***
 
@@ -42,4 +42,4 @@ Defined in: [pipeline/types.ts:71](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **rawOutput**: `string`
 
-Defined in: [pipeline/types.ts:70](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L70)
+Defined in: [pipeline/types.ts:70](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L70)

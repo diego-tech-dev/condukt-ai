@@ -8,7 +8,7 @@ title: "Interface: ContractIssue"
 
 # Interface: ContractIssue
 
-Defined in: [contracts.ts:4](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/contracts.ts#L4)
+Defined in: [contracts.ts:4](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/contracts.ts#L4)
 
 A normalized contract validation issue.
 
@@ -18,7 +18,7 @@ A normalized contract validation issue.
 
 > `readonly` **message**: `string`
 
-Defined in: [contracts.ts:5](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/contracts.ts#L5)
+Defined in: [contracts.ts:5](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/contracts.ts#L5)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [contracts.ts:5](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` **path**: `string`
 
-Defined in: [contracts.ts:6](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/contracts.ts#L6)
+Defined in: [contracts.ts:6](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/contracts.ts#L6)

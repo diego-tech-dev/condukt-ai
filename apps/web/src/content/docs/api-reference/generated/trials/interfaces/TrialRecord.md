@@ -8,7 +8,7 @@ title: "Interface: TrialRecord"
 
 # Interface: TrialRecord
 
-Defined in: [trials/types.ts:25](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L25)
+Defined in: [trials/types.ts:25](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L25)
 
 Completed trial record with measured diagnosis outcome.
 
@@ -18,7 +18,7 @@ Completed trial record with measured diagnosis outcome.
 
 > `readonly` **diagnosed**: `object`
 
-Defined in: [trials/types.ts:34](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L34)
+Defined in: [trials/types.ts:34](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L34)
 
 #### error\_code?
 
@@ -34,7 +34,7 @@ Defined in: [trials/types.ts:34](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **diagnosis\_correct**: `boolean`
 
-Defined in: [trials/types.ts:40](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L40)
+Defined in: [trials/types.ts:40](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L40)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [trials/types.ts:40](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **elapsed\_ms**: `number`
 
-Defined in: [trials/types.ts:32](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L32)
+Defined in: [trials/types.ts:32](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L32)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [trials/types.ts:32](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **expected**: [`TrialExpectation`](trialexpectation/)
 
-Defined in: [trials/types.ts:33](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L33)
+Defined in: [trials/types.ts:33](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L33)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [trials/types.ts:33](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **finished\_at**: `string`
 
-Defined in: [trials/types.ts:31](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L31)
+Defined in: [trials/types.ts:31](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L31)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [trials/types.ts:31](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **matched\_error\_code**: `boolean` \| `null`
 
-Defined in: [trials/types.ts:39](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L39)
+Defined in: [trials/types.ts:39](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L39)
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: [trials/types.ts:39](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **matched\_task**: `boolean` \| `null`
 
-Defined in: [trials/types.ts:38](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L38)
+Defined in: [trials/types.ts:38](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L38)
 
 ***
 
@@ -82,7 +82,7 @@ Defined in: [trials/types.ts:38](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **mode**: [`TrialMode`](../type-aliases/trialmode/)
 
-Defined in: [trials/types.ts:29](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L29)
+Defined in: [trials/types.ts:29](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L29)
 
 ***
 
@@ -90,7 +90,7 @@ Defined in: [trials/types.ts:29](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` `optional` **notes**: `string`
 
-Defined in: [trials/types.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L41)
+Defined in: [trials/types.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L41)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [trials/types.ts:41](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **participant**: `string`
 
-Defined in: [trials/types.ts:27](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L27)
+Defined in: [trials/types.ts:27](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L27)
 
 ***
 
@@ -106,7 +106,7 @@ Defined in: [trials/types.ts:27](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **scenario**: `string`
 
-Defined in: [trials/types.ts:28](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L28)
+Defined in: [trials/types.ts:28](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L28)
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: [trials/types.ts:28](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **session\_id**: `string`
 
-Defined in: [trials/types.ts:26](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L26)
+Defined in: [trials/types.ts:26](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L26)
 
 ***
 
@@ -122,4 +122,4 @@ Defined in: [trials/types.ts:26](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **started\_at**: `string`
 
-Defined in: [trials/types.ts:30](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L30)
+Defined in: [trials/types.ts:30](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L30)

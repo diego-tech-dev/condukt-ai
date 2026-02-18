@@ -10,7 +10,7 @@ title: "Function: evaluateTrialSummary()"
 
 > **evaluateTrialSummary**(`summary`, `gate`): [`TrialQualityGateResult`](../interfaces/trialqualitygateresult/)
 
-Defined in: [trials/summary.ts:44](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/summary.ts#L44)
+Defined in: [trials/summary.ts:44](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/summary.ts#L44)
 
 Applies minimum quality thresholds to a trial summary.
 

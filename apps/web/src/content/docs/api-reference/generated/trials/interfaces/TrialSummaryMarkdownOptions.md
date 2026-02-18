@@ -8,7 +8,7 @@ title: "Interface: TrialSummaryMarkdownOptions"
 
 # Interface: TrialSummaryMarkdownOptions
 
-Defined in: [trials/types.ts:125](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L125)
+Defined in: [trials/types.ts:125](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L125)
 
 Markdown rendering options for trial summary reports.
 
@@ -18,7 +18,7 @@ Markdown rendering options for trial summary reports.
 
 > `readonly` `optional` **max\_pairs**: `number`
 
-Defined in: [trials/types.ts:127](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L127)
+Defined in: [trials/types.ts:127](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L127)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [trials/types.ts:127](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` `optional` **title**: `string`
 
-Defined in: [trials/types.ts:126](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L126)
+Defined in: [trials/types.ts:126](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L126)

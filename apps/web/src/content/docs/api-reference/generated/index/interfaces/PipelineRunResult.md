@@ -8,7 +8,7 @@ title: "Interface: PipelineRunResult\\<TOutputs\\>"
 
 # Interface: PipelineRunResult\<TOutputs\>
 
-Defined in: [pipeline/types.ts:149](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L149)
+Defined in: [pipeline/types.ts:149](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L149)
 
 Detailed result returned by [Pipeline.runDetailed](../classes/pipeline/#rundetailed).
 
@@ -26,7 +26,7 @@ Typed map of task outputs keyed by task id.
 
 > `readonly` **outputs**: `Readonly`\<`Partial`\<`TOutputs`\>\>
 
-Defined in: [pipeline/types.ts:151](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L151)
+Defined in: [pipeline/types.ts:151](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L151)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [pipeline/types.ts:151](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **taskResults**: `Readonly`\<`Record`\<`string`, [`TaskTrace`](tasktrace/)\>\>
 
-Defined in: [pipeline/types.ts:152](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L152)
+Defined in: [pipeline/types.ts:152](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L152)
 
 ***
 
@@ -42,4 +42,4 @@ Defined in: [pipeline/types.ts:152](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **trace**: [`PipelineTrace`](pipelinetrace/)
 
-Defined in: [pipeline/types.ts:150](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L150)
+Defined in: [pipeline/types.ts:150](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L150)

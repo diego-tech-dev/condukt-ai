@@ -8,7 +8,7 @@ title: "Interface: OpenAIReasoningModelSettings"
 
 # Interface: OpenAIReasoningModelSettings
 
-Defined in: [providers.ts:84](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L84)
+Defined in: [providers.ts:84](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L84)
 
 Settings supported by OpenAI reasoning-class models.
 
@@ -18,7 +18,7 @@ Settings supported by OpenAI reasoning-class models.
 
 > `readonly` `optional` **maxTokens**: `number`
 
-Defined in: [providers.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L85)
+Defined in: [providers.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L85)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [providers.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **reasoningEffort**: `"low"` \| `"medium"` \| `"high"`
 
-Defined in: [providers.ts:86](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L86)
+Defined in: [providers.ts:86](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L86)

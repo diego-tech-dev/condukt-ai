@@ -10,7 +10,7 @@ title: "Function: validateContract()"
 
 > **validateContract**\<`TOutput`\>(`contract`, `value`): `Promise`\<[`ContractValidationResult`](../interfaces/contractvalidationresult/)\<`TOutput`\>\>
 
-Defined in: [contracts.ts:27](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/contracts.ts#L27)
+Defined in: [contracts.ts:27](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/contracts.ts#L27)
 
 Validates a runtime value against a Standard Schema contract.
 

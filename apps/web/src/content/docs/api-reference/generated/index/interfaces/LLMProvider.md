@@ -8,7 +8,7 @@ title: "Interface: LLMProvider\\<TModel, TSettingsByModel\\>"
 
 # Interface: LLMProvider\<TModel, TSettingsByModel\>
 
-Defined in: [providers.ts:35](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L35)
+Defined in: [providers.ts:35](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L35)
 
 LLM provider contract used by `llmTask`.
 
@@ -32,7 +32,7 @@ Settings map keyed by model id.
 
 > `readonly` **models**: readonly `TModel`[]
 
-Defined in: [providers.ts:40](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L40)
+Defined in: [providers.ts:40](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L40)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [providers.ts:40](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` **name**: `string`
 
-Defined in: [providers.ts:39](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L39)
+Defined in: [providers.ts:39](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L39)
 
 ## Methods
 
@@ -48,7 +48,7 @@ Defined in: [providers.ts:39](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > **generateJSON**\<`TSelectedModel`\>(`request`): `Promise`\<[`LLMJsonResponse`](llmjsonresponse/)\<`TSelectedModel`\>\>
 
-Defined in: [providers.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L41)
+Defined in: [providers.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L41)
 
 #### Type Parameters
 

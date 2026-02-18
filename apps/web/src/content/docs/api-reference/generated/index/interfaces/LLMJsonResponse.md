@@ -8,7 +8,7 @@ title: "Interface: LLMJsonResponse\\<TModel\\>"
 
 # Interface: LLMJsonResponse\<TModel\>
 
-Defined in: [providers.ts:20](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L20)
+Defined in: [providers.ts:20](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L20)
 
 Normalized JSON generation response returned by an LLM provider adapter.
 
@@ -24,7 +24,7 @@ Normalized JSON generation response returned by an LLM provider adapter.
 
 > `readonly` **data**: `unknown`
 
-Defined in: [providers.ts:24](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L24)
+Defined in: [providers.ts:24](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L24)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [providers.ts:24](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` **model**: `TModel`
 
-Defined in: [providers.ts:22](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L22)
+Defined in: [providers.ts:22](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L22)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [providers.ts:22](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` **provider**: `string`
 
-Defined in: [providers.ts:21](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L21)
+Defined in: [providers.ts:21](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L21)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [providers.ts:21](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` **rawText**: `string`
 
-Defined in: [providers.ts:23](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L23)
+Defined in: [providers.ts:23](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L23)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: [providers.ts:23](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **responseId**: `string`
 
-Defined in: [providers.ts:25](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L25)
+Defined in: [providers.ts:25](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L25)
 
 ***
 
@@ -64,4 +64,4 @@ Defined in: [providers.ts:25](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **usage**: `Record`\<`string`, `unknown`\>
 
-Defined in: [providers.ts:26](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L26)
+Defined in: [providers.ts:26](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L26)

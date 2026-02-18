@@ -10,7 +10,7 @@ title: "Function: normalizeTrialMode()"
 
 > **normalizeTrialMode**(`mode`): [`TrialMode`](../type-aliases/trialmode/)
 
-Defined in: [trials/normalization.ts:11](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/normalization.ts#L11)
+Defined in: [trials/normalization.ts:11](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/normalization.ts#L11)
 
 Normalizes trial mode aliases to canonical values.
 

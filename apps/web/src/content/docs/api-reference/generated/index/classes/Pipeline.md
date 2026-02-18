@@ -8,7 +8,7 @@ title: "Class: Pipeline\\<TOutputs\\>"
 
 # Class: Pipeline\<TOutputs\>
 
-Defined in: [pipeline/class.ts:42](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L42)
+Defined in: [pipeline/class.ts:42](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L42)
 
 Fluent pipeline builder and runner.
 
@@ -37,7 +37,7 @@ const pipeline = new Pipeline("demo")
 
 > **new Pipeline**\<`TOutputs`\>(`name`, `options?`, `state?`): `Pipeline`\<`TOutputs`\>
 
-Defined in: [pipeline/class.ts:45](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L45)
+Defined in: [pipeline/class.ts:45](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L45)
 
 #### Parameters
 
@@ -63,7 +63,7 @@ Defined in: [pipeline/class.ts:45](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` **name**: `string`
 
-Defined in: [pipeline/class.ts:46](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L46)
+Defined in: [pipeline/class.ts:46](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L46)
 
 ## Methods
 
@@ -71,7 +71,7 @@ Defined in: [pipeline/class.ts:46](https://github.com/diego-tech-dev/condukt-ai/
 
 > **addLLMTask**\<`TOutput`, `TModel`, `TSettingsByModel`, `TSelectedModel`, `TDependencies`, `TTaskId`\>(`definition`): `Pipeline`\<`MergeTaskOutputs`\<`TOutputs`, `TTaskId`, `TOutput`\>\>
 
-Defined in: [pipeline/class.ts:69](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L69)
+Defined in: [pipeline/class.ts:69](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L69)
 
 Adds an LLM-backed task with provider/model-aware typing.
 
@@ -117,7 +117,7 @@ Adds an LLM-backed task with provider/model-aware typing.
 
 > **addTask**\<`TOutput`, `TDependencies`, `TTaskId`\>(`task`): `Pipeline`\<`MergeTaskOutputs`\<`TOutputs`, `TTaskId`, `TOutput`\>\>
 
-Defined in: [pipeline/class.ts:57](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L57)
+Defined in: [pipeline/class.ts:57](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L57)
 
 Adds a task to the pipeline and returns a builder with merged output typing.
 
@@ -151,7 +151,7 @@ Adds a task to the pipeline and returns a builder with merged output typing.
 
 > **run**(): `Promise`\<[`PipelineTrace`](../interfaces/pipelinetrace/)\>
 
-Defined in: [pipeline/class.ts:101](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L101)
+Defined in: [pipeline/class.ts:101](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L101)
 
 Runs the pipeline and returns only the pipeline trace.
 
@@ -165,7 +165,7 @@ Runs the pipeline and returns only the pipeline trace.
 
 > **runDetailed**(): `Promise`\<[`PipelineRunResult`](../interfaces/pipelinerunresult/)\<`TOutputs`\>\>
 
-Defined in: [pipeline/class.ts:92](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/class.ts#L92)
+Defined in: [pipeline/class.ts:92](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/class.ts#L92)
 
 Runs the pipeline and returns trace plus typed outputs and task results.
 

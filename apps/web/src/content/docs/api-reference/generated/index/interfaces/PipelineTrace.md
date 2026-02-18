@@ -8,7 +8,7 @@ title: "Interface: PipelineTrace"
 
 # Interface: PipelineTrace
 
-Defined in: [pipeline/types.ts:124](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L124)
+Defined in: [pipeline/types.ts:124](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L124)
 
 Top-level trace payload emitted by a pipeline run.
 
@@ -18,7 +18,7 @@ Top-level trace payload emitted by a pipeline run.
 
 > `readonly` **execution**: `object`
 
-Defined in: [pipeline/types.ts:130](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L130)
+Defined in: [pipeline/types.ts:130](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L130)
 
 #### levels
 
@@ -34,7 +34,7 @@ Defined in: [pipeline/types.ts:130](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **finished\_at**: `string`
 
-Defined in: [pipeline/types.ts:129](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L129)
+Defined in: [pipeline/types.ts:129](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L129)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [pipeline/types.ts:129](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **pipeline**: `string`
 
-Defined in: [pipeline/types.ts:126](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L126)
+Defined in: [pipeline/types.ts:126](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L126)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [pipeline/types.ts:126](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **started\_at**: `string`
 
-Defined in: [pipeline/types.ts:128](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L128)
+Defined in: [pipeline/types.ts:128](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L128)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [pipeline/types.ts:128](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **status**: `"ok"` \| `"failed"`
 
-Defined in: [pipeline/types.ts:127](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L127)
+Defined in: [pipeline/types.ts:127](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L127)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [pipeline/types.ts:127](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **summary**: `object`
 
-Defined in: [pipeline/types.ts:136](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L136)
+Defined in: [pipeline/types.ts:136](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L136)
 
 #### failed
 
@@ -90,7 +90,7 @@ Defined in: [pipeline/types.ts:136](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **task\_order**: readonly `string`[]
 
-Defined in: [pipeline/types.ts:134](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L134)
+Defined in: [pipeline/types.ts:134](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L134)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [pipeline/types.ts:134](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **tasks**: readonly [`TaskTrace`](tasktrace/)[]
 
-Defined in: [pipeline/types.ts:135](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L135)
+Defined in: [pipeline/types.ts:135](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L135)
 
 ***
 
@@ -106,4 +106,4 @@ Defined in: [pipeline/types.ts:135](https://github.com/diego-tech-dev/condukt-ai
 
 > `readonly` **trace\_version**: `string`
 
-Defined in: [pipeline/types.ts:125](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L125)
+Defined in: [pipeline/types.ts:125](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L125)

@@ -8,7 +8,7 @@ title: "Interface: LLMJsonRequest\\<TModel, TSettings\\>"
 
 # Interface: LLMJsonRequest\<TModel, TSettings\>
 
-Defined in: [providers.ts:9](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L9)
+Defined in: [providers.ts:9](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L9)
 
 Provider-agnostic JSON generation request payload.
 
@@ -32,7 +32,7 @@ Model-specific settings type.
 
 > `readonly` **model**: `TModel`
 
-Defined in: [providers.ts:13](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L13)
+Defined in: [providers.ts:13](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L13)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [providers.ts:13](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` **prompt**: `string`
 
-Defined in: [providers.ts:14](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L14)
+Defined in: [providers.ts:14](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L14)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [providers.ts:14](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **settings**: `TSettings`
 
-Defined in: [providers.ts:16](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L16)
+Defined in: [providers.ts:16](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L16)
 
 ***
 
@@ -56,4 +56,4 @@ Defined in: [providers.ts:16](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **system**: `string`
 
-Defined in: [providers.ts:15](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L15)
+Defined in: [providers.ts:15](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L15)

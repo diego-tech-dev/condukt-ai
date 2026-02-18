@@ -10,7 +10,7 @@ title: "Type Alias: LLMTaskDefinition\\<TOutput, TModel, TSettingsByModel, TSele
 
 > **LLMTaskDefinition**\<`TOutput`, `TModel`, `TSettingsByModel`, `TSelectedModel`, `TOutputs`, `TDependencies`, `TTaskId`\> = `object` & `LLMTaskModelSettingsField`\<`TSettingsByModel`\[`TSelectedModel`\]\>
 
-Defined in: [pipeline/llm.ts:28](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/llm.ts#L28)
+Defined in: [pipeline/llm.ts:28](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/llm.ts#L28)
 
 Declarative definition for an LLM-backed task.
 

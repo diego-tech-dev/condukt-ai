@@ -8,7 +8,7 @@ title: "Interface: TrialQualityGate"
 
 # Interface: TrialQualityGate
 
-Defined in: [trials/types.ts:111](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L111)
+Defined in: [trials/types.ts:111](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L111)
 
 Optional quality thresholds for trial result evaluation.
 
@@ -18,7 +18,7 @@ Optional quality thresholds for trial result evaluation.
 
 > `readonly` `optional` **min\_accuracy**: `number`
 
-Defined in: [trials/types.ts:113](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L113)
+Defined in: [trials/types.ts:113](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L113)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [trials/types.ts:113](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` `optional` **min\_paired\_speedup**: `number`
 
-Defined in: [trials/types.ts:115](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L115)
+Defined in: [trials/types.ts:115](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L115)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [trials/types.ts:115](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` `optional` **min\_pairs**: `number`
 
-Defined in: [trials/types.ts:114](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L114)
+Defined in: [trials/types.ts:114](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L114)
 
 ***
 
@@ -42,4 +42,4 @@ Defined in: [trials/types.ts:114](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` `optional` **min\_records**: `number`
 
-Defined in: [trials/types.ts:112](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L112)
+Defined in: [trials/types.ts:112](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L112)

@@ -8,7 +8,7 @@ title: "Interface: TrialSummary"
 
 # Interface: TrialSummary
 
-Defined in: [trials/types.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L71)
+Defined in: [trials/types.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L71)
 
 Aggregate summary metrics across trial records.
 
@@ -18,7 +18,7 @@ Aggregate summary metrics across trial records.
 
 > `readonly` **accuracy**: `number`
 
-Defined in: [trials/types.ts:74](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L74)
+Defined in: [trials/types.ts:74](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L74)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [trials/types.ts:74](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **by\_mode**: `Record`\<[`TrialMode`](../type-aliases/trialmode/), [`TrialModeSummary`](trialmodesummary/)\>
 
-Defined in: [trials/types.ts:77](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L77)
+Defined in: [trials/types.ts:77](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L77)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [trials/types.ts:77](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **condukt\_ai\_vs\_baseline\_speedup**: `number` \| `null`
 
-Defined in: [trials/types.ts:78](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L78)
+Defined in: [trials/types.ts:78](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L78)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [trials/types.ts:78](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **correct**: `number`
 
-Defined in: [trials/types.ts:73](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L73)
+Defined in: [trials/types.ts:73](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L73)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [trials/types.ts:73](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **median\_elapsed\_ms**: `number` \| `null`
 
-Defined in: [trials/types.ts:75](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L75)
+Defined in: [trials/types.ts:75](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L75)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [trials/types.ts:75](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **p90\_elapsed\_ms**: `number` \| `null`
 
-Defined in: [trials/types.ts:76](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L76)
+Defined in: [trials/types.ts:76](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L76)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [trials/types.ts:76](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **paired**: [`TrialPairSummary`](trialpairsummary/)
 
-Defined in: [trials/types.ts:79](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L79)
+Defined in: [trials/types.ts:79](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L79)
 
 ***
 
@@ -74,4 +74,4 @@ Defined in: [trials/types.ts:79](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **total**: `number`
 
-Defined in: [trials/types.ts:72](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L72)
+Defined in: [trials/types.ts:72](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L72)

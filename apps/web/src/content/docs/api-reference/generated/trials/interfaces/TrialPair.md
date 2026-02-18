@@ -8,7 +8,7 @@ title: "Interface: TrialPair"
 
 # Interface: TrialPair
 
-Defined in: [trials/types.ts:92](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L92)
+Defined in: [trials/types.ts:92](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L92)
 
 Participant/scenario baseline-vs-condukt paired comparison.
 
@@ -18,7 +18,7 @@ Participant/scenario baseline-vs-condukt paired comparison.
 
 > `readonly` **baseline\_correct**: `boolean`
 
-Defined in: [trials/types.ts:98](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L98)
+Defined in: [trials/types.ts:98](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L98)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [trials/types.ts:98](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **baseline\_elapsed\_ms**: `number`
 
-Defined in: [trials/types.ts:95](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L95)
+Defined in: [trials/types.ts:95](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L95)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [trials/types.ts:95](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **condukt\_ai\_correct**: `boolean`
 
-Defined in: [trials/types.ts:99](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L99)
+Defined in: [trials/types.ts:99](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L99)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [trials/types.ts:99](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **condukt\_ai\_elapsed\_ms**: `number`
 
-Defined in: [trials/types.ts:96](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L96)
+Defined in: [trials/types.ts:96](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L96)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [trials/types.ts:96](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **participant**: `string`
 
-Defined in: [trials/types.ts:93](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L93)
+Defined in: [trials/types.ts:93](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L93)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [trials/types.ts:93](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **scenario**: `string`
 
-Defined in: [trials/types.ts:94](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L94)
+Defined in: [trials/types.ts:94](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L94)
 
 ***
 
@@ -66,4 +66,4 @@ Defined in: [trials/types.ts:94](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **speedup**: `number`
 
-Defined in: [trials/types.ts:97](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L97)
+Defined in: [trials/types.ts:97](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L97)

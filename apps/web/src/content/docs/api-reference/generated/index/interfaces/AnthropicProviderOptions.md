@@ -8,7 +8,7 @@ title: "Interface: AnthropicProviderOptions"
 
 # Interface: AnthropicProviderOptions
 
-Defined in: [providers.ts:70](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L70)
+Defined in: [providers.ts:70](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L70)
 
 Options for creating an Anthropic JSON provider.
 
@@ -18,7 +18,7 @@ Options for creating an Anthropic JSON provider.
 
 > `readonly` `optional` **anthropicVersion**: `string`
 
-Defined in: [providers.ts:73](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L73)
+Defined in: [providers.ts:73](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L73)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [providers.ts:73](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **apiKey**: `string`
 
-Defined in: [providers.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L71)
+Defined in: [providers.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L71)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [providers.ts:71](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **baseUrl**: `string`
 
-Defined in: [providers.ts:72](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L72)
+Defined in: [providers.ts:72](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L72)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [providers.ts:72](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **fetchFn**: \{(`input`, `init?`): `Promise`\<`Response`\>; (`input`, `init?`): `Promise`\<`Response`\>; \}
 
-Defined in: [providers.ts:74](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L74)
+Defined in: [providers.ts:74](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L74)
 
 #### Call Signature
 

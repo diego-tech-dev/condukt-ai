@@ -8,7 +8,7 @@ title: "Interface: TaskRetryPolicy"
 
 # Interface: TaskRetryPolicy
 
-Defined in: [pipeline/types.ts:16](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L16)
+Defined in: [pipeline/types.ts:16](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L16)
 
 Retry behavior configuration for a single task.
 
@@ -18,7 +18,7 @@ Retry behavior configuration for a single task.
 
 > `readonly` `optional` **backoffMs**: `number`
 
-Defined in: [pipeline/types.ts:18](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L18)
+Defined in: [pipeline/types.ts:18](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L18)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [pipeline/types.ts:18](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **jitterMs**: `number`
 
-Defined in: [pipeline/types.ts:19](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L19)
+Defined in: [pipeline/types.ts:19](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L19)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [pipeline/types.ts:19](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **retries**: `number`
 
-Defined in: [pipeline/types.ts:17](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L17)
+Defined in: [pipeline/types.ts:17](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L17)
 
 ***
 
@@ -42,4 +42,4 @@ Defined in: [pipeline/types.ts:17](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **retryIf**: `"error"` \| `"execution_error"` \| `"contract_violation"`
 
-Defined in: [pipeline/types.ts:20](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L20)
+Defined in: [pipeline/types.ts:20](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L20)

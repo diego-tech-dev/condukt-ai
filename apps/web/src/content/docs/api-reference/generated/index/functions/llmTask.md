@@ -10,7 +10,7 @@ title: "Function: llmTask()"
 
 > **llmTask**\<`TOutput`, `TModel`, `TSettingsByModel`, `TSelectedModel`, `TOutputs`, `TDependencies`, `TTaskId`\>(`definition`): [`TaskDefinition`](../interfaces/taskdefinition/)\<`TOutput`, `TOutputs`, `TDependencies`, `TTaskId`\>
 
-Defined in: [pipeline/llm.ts:56](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/llm.ts#L56)
+Defined in: [pipeline/llm.ts:56](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/llm.ts#L56)
 
 Adapts an [LLMTaskDefinition](../type-aliases/llmtaskdefinition/) into a runtime [TaskDefinition](../interfaces/taskdefinition/).
 

@@ -8,7 +8,7 @@ title: "Interface: OpenAIProviderOptions"
 
 # Interface: OpenAIProviderOptions
 
-Defined in: [providers.ts:61](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L61)
+Defined in: [providers.ts:61](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L61)
 
 Options for creating an OpenAI JSON provider.
 
@@ -18,7 +18,7 @@ Options for creating an OpenAI JSON provider.
 
 > `readonly` `optional` **apiKey**: `string`
 
-Defined in: [providers.ts:62](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L62)
+Defined in: [providers.ts:62](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L62)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [providers.ts:62](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **baseUrl**: `string`
 
-Defined in: [providers.ts:63](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L63)
+Defined in: [providers.ts:63](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L63)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [providers.ts:63](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **fetchFn**: \{(`input`, `init?`): `Promise`\<`Response`\>; (`input`, `init?`): `Promise`\<`Response`\>; \}
 
-Defined in: [providers.ts:66](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L66)
+Defined in: [providers.ts:66](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L66)
 
 #### Call Signature
 
@@ -82,7 +82,7 @@ Defined in: [providers.ts:66](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **organization**: `string`
 
-Defined in: [providers.ts:64](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L64)
+Defined in: [providers.ts:64](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L64)
 
 ***
 
@@ -90,4 +90,4 @@ Defined in: [providers.ts:64](https://github.com/diego-tech-dev/condukt-ai/blob/
 
 > `readonly` `optional` **project**: `string`
 
-Defined in: [providers.ts:65](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/providers.ts#L65)
+Defined in: [providers.ts:65](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/providers.ts#L65)

@@ -8,7 +8,7 @@ title: "Interface: TrialPairSummary"
 
 # Interface: TrialPairSummary
 
-Defined in: [trials/types.ts:103](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L103)
+Defined in: [trials/types.ts:103](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L103)
 
 Summary of paired speedup calculations.
 
@@ -18,7 +18,7 @@ Summary of paired speedup calculations.
 
 > `readonly` **median\_speedup**: `number` \| `null`
 
-Defined in: [trials/types.ts:105](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L105)
+Defined in: [trials/types.ts:105](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L105)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [trials/types.ts:105](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` **p90\_speedup**: `number` \| `null`
 
-Defined in: [trials/types.ts:106](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L106)
+Defined in: [trials/types.ts:106](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L106)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [trials/types.ts:106](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` **pairs**: readonly [`TrialPair`](trialpair/)[]
 
-Defined in: [trials/types.ts:107](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L107)
+Defined in: [trials/types.ts:107](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L107)
 
 ***
 
@@ -42,4 +42,4 @@ Defined in: [trials/types.ts:107](https://github.com/diego-tech-dev/condukt-ai/b
 
 > `readonly` **total\_pairs**: `number`
 
-Defined in: [trials/types.ts:104](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L104)
+Defined in: [trials/types.ts:104](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L104)

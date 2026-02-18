@@ -8,7 +8,7 @@ title: "Interface: TrialModeSummary"
 
 # Interface: TrialModeSummary
 
-Defined in: [trials/types.ts:83](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L83)
+Defined in: [trials/types.ts:83](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L83)
 
 Per-mode summary metrics.
 
@@ -18,7 +18,7 @@ Per-mode summary metrics.
 
 > `readonly` **accuracy**: `number`
 
-Defined in: [trials/types.ts:86](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L86)
+Defined in: [trials/types.ts:86](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L86)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [trials/types.ts:86](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **correct**: `number`
 
-Defined in: [trials/types.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L85)
+Defined in: [trials/types.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L85)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [trials/types.ts:85](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **median\_elapsed\_ms**: `number` \| `null`
 
-Defined in: [trials/types.ts:87](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L87)
+Defined in: [trials/types.ts:87](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L87)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [trials/types.ts:87](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **p90\_elapsed\_ms**: `number` \| `null`
 
-Defined in: [trials/types.ts:88](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L88)
+Defined in: [trials/types.ts:88](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L88)
 
 ***
 
@@ -50,4 +50,4 @@ Defined in: [trials/types.ts:88](https://github.com/diego-tech-dev/condukt-ai/bl
 
 > `readonly` **total**: `number`
 
-Defined in: [trials/types.ts:84](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/trials/types.ts#L84)
+Defined in: [trials/types.ts:84](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/trials/types.ts#L84)

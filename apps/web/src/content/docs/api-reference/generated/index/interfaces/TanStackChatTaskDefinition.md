@@ -8,7 +8,7 @@ title: "Interface: TanStackChatTaskDefinition\\<TOutput, TAdapter, TOutputs, TDe
 
 # Interface: TanStackChatTaskDefinition\<TOutput, TAdapter, TOutputs, TDependencies, TTaskId\>
 
-Defined in: [tanstack.ts:23](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L23)
+Defined in: [tanstack.ts:23](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L23)
 
 Declarative task definition for TanStack AI chat adapters.
 
@@ -40,7 +40,7 @@ Declarative task definition for TanStack AI chat adapters.
 
 > `readonly` **adapter**: `TAdapter`
 
-Defined in: [tanstack.ts:36](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L36)
+Defined in: [tanstack.ts:36](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L36)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [tanstack.ts:36](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` `optional` **after**: `TDependencies`
 
-Defined in: [tanstack.ts:32](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L32)
+Defined in: [tanstack.ts:32](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L32)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: [tanstack.ts:32](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` `optional` **description**: `string`
 
-Defined in: [tanstack.ts:31](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L31)
+Defined in: [tanstack.ts:31](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L31)
 
 ***
 
@@ -64,7 +64,7 @@ Defined in: [tanstack.ts:31](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` **id**: `TTaskId`
 
-Defined in: [tanstack.ts:30](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L30)
+Defined in: [tanstack.ts:30](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L30)
 
 ***
 
@@ -72,7 +72,7 @@ Defined in: [tanstack.ts:30](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` `optional` **options**: `TanStackTaskChatOptions`\<`TAdapter`\> \| (`context`) => `MaybePromise`\<`TanStackTaskChatOptions`\<`TAdapter`\>\>
 
-Defined in: [tanstack.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L41)
+Defined in: [tanstack.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L41)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: [tanstack.ts:41](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` **output**: `StandardSchemaV1`\<`unknown`, `TOutput`\>
 
-Defined in: [tanstack.ts:35](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L35)
+Defined in: [tanstack.ts:35](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L35)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [tanstack.ts:35](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` **prompt**: (`context`) => `MaybePromise`\<`string`\>
 
-Defined in: [tanstack.ts:37](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L37)
+Defined in: [tanstack.ts:37](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L37)
 
 #### Parameters
 
@@ -106,7 +106,7 @@ Defined in: [tanstack.ts:37](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` `optional` **retry**: [`TaskRetryPolicy`](taskretrypolicy/)
 
-Defined in: [tanstack.ts:34](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L34)
+Defined in: [tanstack.ts:34](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L34)
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: [tanstack.ts:34](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` `optional` **system**: `string` \| (`context`) => `MaybePromise`\<`string`\>
 
-Defined in: [tanstack.ts:38](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L38)
+Defined in: [tanstack.ts:38](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L38)
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: [tanstack.ts:38](https://github.com/diego-tech-dev/condukt-ai/blob/0
 
 > `readonly` `optional` **when**: (`context`) => `MaybePromise`\<`boolean`\>
 
-Defined in: [tanstack.ts:33](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/tanstack.ts#L33)
+Defined in: [tanstack.ts:33](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/tanstack.ts#L33)
 
 #### Parameters
 

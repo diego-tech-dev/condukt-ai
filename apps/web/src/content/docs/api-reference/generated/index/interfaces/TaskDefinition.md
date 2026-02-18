@@ -8,7 +8,7 @@ title: "Interface: TaskDefinition\\<TOutput, TOutputs, TDependencies, TTaskId\\>
 
 # Interface: TaskDefinition\<TOutput, TOutputs, TDependencies, TTaskId\>
 
-Defined in: [pipeline/types.ts:79](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L79)
+Defined in: [pipeline/types.ts:79](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L79)
 
 Task definition consumed by the pipeline runtime.
 
@@ -38,7 +38,7 @@ Contract-validated output type for the task.
 
 > `readonly` `optional` **after**: `TDependencies`
 
-Defined in: [pipeline/types.ts:87](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L87)
+Defined in: [pipeline/types.ts:87](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L87)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [pipeline/types.ts:87](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **description**: `string`
 
-Defined in: [pipeline/types.ts:86](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L86)
+Defined in: [pipeline/types.ts:86](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L86)
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: [pipeline/types.ts:86](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` **id**: `TTaskId`
 
-Defined in: [pipeline/types.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L85)
+Defined in: [pipeline/types.ts:85](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L85)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [pipeline/types.ts:85](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` **output**: `StandardSchemaV1`\<`unknown`, `TOutput`\>
 
-Defined in: [pipeline/types.ts:90](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L90)
+Defined in: [pipeline/types.ts:90](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L90)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [pipeline/types.ts:90](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **retry**: [`TaskRetryPolicy`](taskretrypolicy/)
 
-Defined in: [pipeline/types.ts:89](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L89)
+Defined in: [pipeline/types.ts:89](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L89)
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: [pipeline/types.ts:89](https://github.com/diego-tech-dev/condukt-ai/
 
 > `readonly` `optional` **when**: (`context`) => `boolean` \| `Promise`\<`boolean`\>
 
-Defined in: [pipeline/types.ts:88](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L88)
+Defined in: [pipeline/types.ts:88](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L88)
 
 #### Parameters
 
@@ -96,7 +96,7 @@ Defined in: [pipeline/types.ts:88](https://github.com/diego-tech-dev/condukt-ai/
 
 > **run**(`context`): `Promise`\<[`TaskExecutionResult`](taskexecutionresult/)\>
 
-Defined in: [pipeline/types.ts:91](https://github.com/diego-tech-dev/condukt-ai/blob/081c57a376a08f1d575dd0dca665084fa696e68f/packages/core/src/pipeline/types.ts#L91)
+Defined in: [pipeline/types.ts:91](https://github.com/diego-tech-dev/condukt-ai/blob/main/packages/core/src/pipeline/types.ts#L91)
 
 #### Parameters
 
