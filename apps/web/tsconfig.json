@@ -1,9 +1,7 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "noEmit": true,
-    "rootDir": ".",
-    "types": ["node"]
+    "types": ["node", "vitest/globals"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": [".astro/types.d.ts", "src/**/*", "scripts/**/*", "test/**/*", "astro.config.mjs"]
 }

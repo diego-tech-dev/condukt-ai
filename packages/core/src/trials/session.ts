@@ -11,6 +11,13 @@ import type {
   TrialSession,
 } from "./types.js";
 
+/**
+ * Starts a diagnosis trial session with normalized expectation metadata.
+ *
+ * @remarks
+ * If `trace` is provided, expectation fields are derived from its first failure
+ * unless explicitly overridden in `expected`.
+ */
 export function createTrialSession(input: CreateTrialSessionInput): TrialSession {
   const expectedFromTrace = input.trace ? expectationFromTrace(input.trace) : undefined;
   const expected: TrialExpectation = {
@@ -36,6 +43,9 @@ export function createTrialSession(input: CreateTrialSessionInput): TrialSession
   };
 }
 
+/**
+ * Completes a trial session and computes elapsed time and correctness flags.
+ */
 export function completeTrialSession(input: CompleteTrialSessionInput): TrialRecord {
   const finishedAt = input.finishedAt ?? nowIso();
   const elapsedMs = Math.max(

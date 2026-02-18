@@ -1,16 +1,29 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 
+/** A normalized contract validation issue. */
 export interface ContractIssue {
   readonly message: string;
   readonly path: string;
 }
 
+/**
+ * Result returned by {@link validateContract}.
+ *
+ * @typeParam TOutput - The validated output shape produced by the contract.
+ */
 export interface ContractValidationResult<TOutput> {
   readonly ok: boolean;
   readonly value?: TOutput;
   readonly issues?: readonly ContractIssue[];
 }
 
+/**
+ * Validates a runtime value against a Standard Schema contract.
+ *
+ * @remarks
+ * This function normalizes provider-specific issue paths into dotted strings
+ * so traces and diagnostics can render stable failure locations.
+ */
 export async function validateContract<TOutput>(
   contract: StandardSchemaV1<unknown, TOutput>,
   value: unknown,

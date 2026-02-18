@@ -2,6 +2,38 @@
 
 ## 2026-02-16
 
+### Sprint: API docs DX pass
+
+Status: completed
+
+Milestone status:
+- `D1` Add JSDoc coverage for core public API surface: completed
+- `D2` Add JSDoc coverage for trials public API surface: completed
+
+Notes:
+- Added JSDoc for exported symbols in `packages/core/src/pipeline`, `packages/core/src/providers.ts`, `packages/core/src/tanstack.ts`, `packages/core/src/contracts.ts`, and `packages/core/src/diagnostics.ts`.
+- Added JSDoc for trial exports in `packages/core/src/trials/*`, including report rendering and normalization APIs.
+
+### Sprint: Docs launch implementation run
+
+Status: completed
+
+Milestone status:
+- `D1` Replace `apps/web` placeholder with Astro Starlight docs stack: completed
+- `D2` Add branded docs content and Monaco simulation playground: completed
+- `D3` Add TypeDoc API generation pipeline into website docs tree: completed
+- `D4` Add CI drift/link checks and Cloudflare Pages deployment workflow: completed
+
+Notes:
+- Replaced framework-neutral `apps/web` placeholder with Astro + Starlight + React-islands implementation.
+- Added docs information architecture under `apps/web/src/content/docs` with TS-only product guidance and explicit `.mgl` non-scope messaging.
+- Added reusable docs UI primitives (`HeroShell`, `FeatureGrid`, `Callout`, `DiagramPanel`) and custom tokenized styling.
+- Added Monaco simulation playground (`Playground.tsx`) with deterministic local scenarios and diagnosis output.
+- Added brand assets (`public/brand`, `public/illustrations`) and prompt provenance metadata (`assets/branding/prompt-provenance.md`).
+- Added TypeDoc generation (`packages/core/typedoc.json`, `pnpm docs:api`) writing generated references into `apps/web/src/content/docs/api-reference/generated`.
+- Added docs drift check (`pnpm docs:api:check`), website link checker (`apps/web/scripts/check-links.mjs`), and CI integration in `.github/workflows/quality.yml`.
+- Added Cloudflare Pages deployment workflow `.github/workflows/docs-deploy.yml` for PR previews and production deployment.
+
 ### Sprint: Monorepo quality hardening follow-up
 
 Status: completed

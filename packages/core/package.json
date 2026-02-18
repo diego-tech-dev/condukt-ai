@@ -57,6 +57,8 @@
     "check": "pnpm lint && pnpm typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
+    "docs:api": "typedoc --options typedoc.json && node ./scripts/postprocess-api-docs.mjs",
+    "docs:api:check": "pnpm docs:api && git diff --exit-code -- ../../apps/web/src/content/docs/api-reference/generated",
     "quickstart": "tsx examples/quickstart-debug.ts",
     "quickstart:broken": "tsx examples/quickstart-debug.ts --broken",
     "trial:start": "tsx scripts/trial-metrics.ts start",
@@ -74,6 +76,8 @@
     "@biomejs/biome": "^2.3.15",
     "@types/node": "^22.19.11",
     "tsx": "^4.19.2",
+    "typedoc": "^0.28.17",
+    "typedoc-plugin-markdown": "^4.10.0",
     "typescript": "^5.7.3",
     "vitest": "^4.0.18",
     "zod": "^3.24.1"

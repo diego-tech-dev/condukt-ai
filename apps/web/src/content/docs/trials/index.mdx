@@ -1,0 +1,18 @@
+---
+title: Trials Instrumentation
+description: Measure diagnosis speed and correctness with `condukt-ai/trials`.
+---
+
+Import trial helpers from the dedicated subpath:
+
+```ts
+import { summarizeTrialRecords } from "condukt-ai/trials";
+```
+
+Command workflow:
+
+```bash
+pnpm --filter condukt-ai trial:start --participant p1 --scenario quickstart-broken --mode condukt-ai --trace packages/core/trace.quickstart.json
+pnpm --filter condukt-ai trial:finish --session packages/core/trials/sessions/<session-id>.session.json --diagnosed-task draft --diagnosed-error-code CONTRACT_OUTPUT_VIOLATION
+pnpm --filter condukt-ai trial:report -- --markdown-out packages/core/trials/report.md
+```

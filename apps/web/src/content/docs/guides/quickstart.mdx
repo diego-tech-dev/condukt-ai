@@ -1,0 +1,21 @@
+---
+title: Quickstart Diagnosis
+description: Diagnose a broken pipeline run using trace-only evidence.
+---
+
+## Flow
+
+1. Run `pnpm --filter condukt-ai quickstart:broken`.
+2. Open `packages/core/trace.quickstart.json`.
+3. Find the first task with `status: "error"`.
+4. Read `error_code` and `contract_issues`.
+
+Expected failure boundary:
+
+- task: `draft`
+- error code: `CONTRACT_OUTPUT_VIOLATION`
+- contract path: `claims`
+
+## Why this is deterministic
+
+`condukt-ai` records contract failures at execution boundary time, not as inferred post-processing. This keeps diagnosis reproducible between local and CI runs.

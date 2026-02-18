@@ -37,10 +37,10 @@ The product should make it obvious:
 ## Current Scope
 
 - TypeScript library runtime and examples in `packages/core/`
-- Website app location in `apps/web/` (placeholder; stack TBD)
+- Astro Starlight docs site in `apps/web/` (deployed to `condukt-ai.dev`)
 - LLM provider adapters (OpenAI, Anthropic)
 - Trial measurement tooling (`packages/core/scripts/trial-metrics.ts`)
-- CI and release checks focused on the TS package only
+- CI checks for both workspaces (runtime + docs site)
 
 ## Explicit Non-Goals
 
@@ -70,6 +70,8 @@ The product should make it obvious:
    - `pnpm typecheck`
    - `pnpm test`
    - `pnpm build`
+   - `pnpm docs:api:check`
+   - `pnpm --filter @condukt-ai/web linkcheck`
    - `pnpm --filter condukt-ai release:check`
 5. Continue from open roadmap/worklog milestones.
 

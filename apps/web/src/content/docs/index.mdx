@@ -1,0 +1,48 @@
+---
+title: condukt-ai
+description: Contract-first orchestration docs for TypeScript teams.
+template: splash
+hero:
+  tagline: Deterministic traces for agent workflow debugging
+  image:
+    file: ../../assets/illustrations/hero.svg
+    alt: Abstract condukt-ai orchestration illustration
+actions:
+  - text: Get Started
+    link: /getting-started/
+    icon: right-arrow
+  - text: Open Playground
+    link: /guides/playground/
+    icon: play
+---
+
+import HeroShell from "../../components/HeroShell.astro";
+import FeatureGrid from "../../components/FeatureGrid.astro";
+import Callout from "../../components/Callout.astro";
+
+<HeroShell
+  kicker="TypeScript-only orchestration runtime"
+  title="Build agent pipelines with explicit contract boundaries."
+  description="condukt-ai keeps failure surfaces deterministic: you can inspect exact task boundaries, error codes, and contract path mismatches from one trace artifact."
+/>
+
+<FeatureGrid
+  items={[
+    {
+      title: "Contract-first tasks",
+      description: "Use Standard Schema-compatible output validation for every task boundary.",
+    },
+    {
+      title: "Trace-first diagnosis",
+      description: "Read a single JSON trace to identify first failing task, error code, and mismatch path.",
+    },
+    {
+      title: "Adaptive execution",
+      description: "Run dependency levels in parallel with retry policies and conditional task gating.",
+    },
+  ]}
+/>
+
+<Callout title="Scope statement" tone="warning">
+`condukt-ai` is TypeScript-only. `.mgl`/DSL runtime tracks are not part of the active product path.
+</Callout>

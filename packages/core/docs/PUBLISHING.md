@@ -1,4 +1,4 @@
-# Publishing Condukt
+# Publishing condukt-ai
 
 ## Preconditions
 

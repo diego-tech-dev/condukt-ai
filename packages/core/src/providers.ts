@@ -1,5 +1,11 @@
 import { parseJsonText, previewJson } from "./json.js";
 
+/**
+ * Provider-agnostic JSON generation request payload.
+ *
+ * @typeParam TModel - Model id accepted by the provider.
+ * @typeParam TSettings - Model-specific settings type.
+ */
 export interface LLMJsonRequest<
   TModel extends string = string,
   TSettings extends object = Record<string, never>,
@@ -10,6 +16,7 @@ export interface LLMJsonRequest<
   readonly settings?: TSettings;
 }
 
+/** Normalized JSON generation response returned by an LLM provider adapter. */
 export interface LLMJsonResponse<TModel extends string = string> {
   readonly provider: string;
   readonly model: TModel;
@@ -19,6 +26,12 @@ export interface LLMJsonResponse<TModel extends string = string> {
   readonly usage?: Record<string, unknown>;
 }
 
+/**
+ * LLM provider contract used by `llmTask`.
+ *
+ * @typeParam TModel - Valid model ids.
+ * @typeParam TSettingsByModel - Settings map keyed by model id.
+ */
 export interface LLMProvider<
   TModel extends string = string,
   TSettingsByModel extends Record<TModel, object> = Record<TModel, Record<string, never>>,
@@ -30,11 +43,13 @@ export interface LLMProvider<
   ): Promise<LLMJsonResponse<TSelectedModel>>;
 }
 
+/** Extracts provider model names from an {@link LLMProvider} type. */
 export type ProviderModelName<TProvider> =
   TProvider extends LLMProvider<infer TModel extends string, infer _TSettingsByModel>
     ? TModel
     : never;
 
+/** Resolves model settings type for a provider/model pair. */
 export type ProviderModelSettings<TProvider, TModel extends ProviderModelName<TProvider>> =
   TProvider extends LLMProvider<infer _TProviderModel extends string, infer TSettingsByModel>
     ? TSettingsByModel extends Record<string, object>
@@ -42,6 +57,7 @@ export type ProviderModelSettings<TProvider, TModel extends ProviderModelName<TP
       : never
     : never;
 
+/** Options for creating an OpenAI JSON provider. */
 export interface OpenAIProviderOptions {
   readonly apiKey?: string;
   readonly baseUrl?: string;
@@ -50,6 +66,7 @@ export interface OpenAIProviderOptions {
   readonly fetchFn?: typeof fetch;
 }
 
+/** Options for creating an Anthropic JSON provider. */
 export interface AnthropicProviderOptions {
   readonly apiKey?: string;
   readonly baseUrl?: string;
@@ -57,26 +74,33 @@ export interface AnthropicProviderOptions {
   readonly fetchFn?: typeof fetch;
 }
 
+/** Settings supported by OpenAI chat-class models. */
 export interface OpenAIChatModelSettings {
   readonly temperature?: number;
   readonly maxTokens?: number;
 }
 
+/** Settings supported by OpenAI reasoning-class models. */
 export interface OpenAIReasoningModelSettings {
   readonly maxTokens?: number;
   readonly reasoningEffort?: "low" | "medium" | "high";
 }
 
+/** OpenAI chat model ids currently supported by Condukt. */
 export type OpenAIChatModel = "gpt-4.1" | "gpt-4.1-mini" | "gpt-4o" | "gpt-4o-mini";
+/** OpenAI reasoning model ids currently supported by Condukt. */
 export type OpenAIReasoningModel = "o3-mini" | "o4-mini";
+/** Union of all supported OpenAI model ids. */
 export type OpenAIModel = OpenAIChatModel | OpenAIReasoningModel;
 
+/** Model-specific OpenAI settings map keyed by model id. */
 export type OpenAIModelSettingsByModel = {
   readonly [TModel in OpenAIChatModel]: OpenAIChatModelSettings;
 } & {
   readonly [TModel in OpenAIReasoningModel]: OpenAIReasoningModelSettings;
 };
 
+/** Ordered list of supported OpenAI model ids. */
 export const OPENAI_MODELS: readonly OpenAIModel[] = [
   "gpt-4.1",
   "gpt-4.1-mini",
@@ -86,26 +110,38 @@ export const OPENAI_MODELS: readonly OpenAIModel[] = [
   "o4-mini",
 ] as const;
 
+/** Settings supported by Anthropic models. */
 export interface AnthropicModelSettings {
   readonly maxTokens?: number;
   readonly temperature?: number;
 }
 
+/** Anthropic model ids currently supported by Condukt. */
 export type AnthropicModel =
   | "claude-opus-4-1-20250805"
   | "claude-sonnet-4-5-20250929"
   | "claude-3-5-haiku-latest";
 
+/** Model-specific Anthropic settings map keyed by model id. */
 export type AnthropicModelSettingsByModel = {
   readonly [TModel in AnthropicModel]: AnthropicModelSettings;
 };
 
+/** Ordered list of supported Anthropic model ids. */
 export const ANTHROPIC_MODELS: readonly AnthropicModel[] = [
   "claude-opus-4-1-20250805",
   "claude-sonnet-4-5-20250929",
   "claude-3-5-haiku-latest",
 ] as const;
 
+/**
+ * Creates an OpenAI-backed provider that returns parsed JSON payloads.
+ *
+ * @example
+ * ```ts
+ * const provider = createOpenAIProvider({ apiKey: process.env.OPENAI_API_KEY });
+ * ```
+ */
 export function createOpenAIProvider(
   options: OpenAIProviderOptions = {},
 ): LLMProvider<OpenAIModel, OpenAIModelSettingsByModel> {
@@ -182,6 +218,9 @@ export function createOpenAIProvider(
   };
 }
 
+/**
+ * Creates an Anthropic-backed provider that returns parsed JSON payloads.
+ */
 export function createAnthropicProvider(
   options: AnthropicProviderOptions = {},
 ): LLMProvider<AnthropicModel, AnthropicModelSettingsByModel> {

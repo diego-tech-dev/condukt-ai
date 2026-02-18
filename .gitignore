@@ -4,8 +4,10 @@ __pycache__/
 *.py[cod]
 rust/**/target/
 .turbo/
+**/.turbo/
 node_modules/
 **/node_modules/
+apps/web/.astro/
 packages/*/dist/
 apps/*/dist/
 packages/core/trace.quickstart.json

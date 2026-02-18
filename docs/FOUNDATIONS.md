@@ -71,6 +71,7 @@ Decision:
 - `pnpm` for all JS/TS operations.
 - Biome for lint/format and Vitest for tests.
 - Release guardrails enforced by `pnpm release:check`.
+- Astro Starlight for product documentation in `apps/web`.
 
 Why:
 - Fast feedback and deterministic release gates.

@@ -8,6 +8,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "check": "turbo run check",
+    "docs:api": "pnpm --filter condukt-ai docs:api",
+    "docs:api:check": "pnpm --filter condukt-ai docs:api:check",
     "release:check:core": "pnpm --filter condukt-ai release:check"
   },
   "devDependencies": {

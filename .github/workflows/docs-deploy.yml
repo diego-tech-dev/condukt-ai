@@ -1,0 +1,107 @@
+name: docs-deploy
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "packages/core/src/**"
+      - "packages/core/typedoc.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/docs-deploy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "packages/core/src/**"
+      - "packages/core/typedoc.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/docs-deploy.yml"
+
+jobs:
+  preview:
+    if: ${{ github.event_name == 'pull_request' && secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API docs
+        run: pnpm docs:api
+
+      - name: Build docs site
+        run: pnpm --filter @condukt-ai/web build
+
+      - name: Link check
+        run: pnpm --filter @condukt-ai/web linkcheck
+
+      - name: Deploy preview
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy apps/web/dist
+            --project-name condukt-ai-docs
+            --branch pr-${{ github.event.pull_request.number }}
+
+  production:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API docs
+        run: pnpm docs:api
+
+      - name: Build docs site
+        run: pnpm --filter @condukt-ai/web build
+
+      - name: Link check
+        run: pnpm --filter @condukt-ai/web linkcheck
+
+      - name: Deploy production
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy apps/web/dist
+            --project-name condukt-ai-docs
+            --branch main

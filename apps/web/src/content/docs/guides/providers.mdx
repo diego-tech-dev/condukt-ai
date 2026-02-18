@@ -1,0 +1,16 @@
+---
+title: Providers
+description: OpenAI and Anthropic provider adapters for JSON task execution.
+---
+
+## OpenAI provider
+
+Use `createOpenAIProvider()` and model-specific settings inferred from the selected model.
+
+## Anthropic provider
+
+Use `createAnthropicProvider()` for Claude-family JSON text responses.
+
+## Provider-model typed safety
+
+`llmTask` infers `modelSettings` from provider + model combination and rejects invalid settings at compile time.

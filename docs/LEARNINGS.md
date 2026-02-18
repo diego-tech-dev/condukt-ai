@@ -33,6 +33,22 @@ What changed:
 Guardrail:
 - Prefer root commands in documentation (`pnpm lint/typecheck/test/build` + filtered package commands only when needed).
 
+## 2026-02-16
+
+Context:
+- Replaced `apps/web` placeholder scripts with a real docs stack and deployment path.
+
+Learning:
+- Website placeholders create false confidence in CI; docs work needs executable build, typecheck, test, and link checks from day one.
+
+What changed:
+- Implemented Astro Starlight docs app with Monaco simulation playground.
+- Added API-doc generation and drift checks (`pnpm docs:api`, `pnpm docs:api:check`).
+- Added web link checker and Cloudflare Pages deployment workflow.
+
+Guardrail:
+- Never leave app-level quality gates as placeholders once a workspace is part of release-facing docs or product surfaces.
+
 ## 2026-02-14
 
 Context:

@@ -1,0 +1,43 @@
+---
+import PlaygroundShell from "../components/PlaygroundShell.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>condukt-ai playground</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        background: #fbfaf6;
+        color: #1e1e1e;
+      }
+
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 2rem 1rem 3rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: "Fraunces", serif;
+      }
+
+      .back {
+        margin-top: 0.6rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>condukt-ai playground</h1>
+      <p class="back">
+        <a href="/guides/playground/">Back to docs guide</a>
+      </p>
+      <PlaygroundShell />
+    </main>
+  </body>
+</html>

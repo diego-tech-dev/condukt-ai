@@ -1,13 +1,16 @@
 import type { PipelineTrace } from "../pipeline.js";
 
+/** Trial mode labels used for diagnosis studies. */
 export type TrialMode = "condukt-ai" | "baseline";
 
+/** Expected failure boundary for a trial session. */
 export interface TrialExpectation {
   readonly task?: string;
   readonly error_code?: string;
   readonly contract_paths: readonly string[];
 }
 
+/** In-progress trial session metadata. */
 export interface TrialSession {
   readonly session_id: string;
   readonly participant: string;
@@ -18,6 +21,7 @@ export interface TrialSession {
   readonly pipeline?: string;
 }
 
+/** Completed trial record with measured diagnosis outcome. */
 export interface TrialRecord {
   readonly session_id: string;
   readonly participant: string;
@@ -37,6 +41,7 @@ export interface TrialRecord {
   readonly notes?: string;
 }
 
+/** Input payload for starting a trial session. */
 export interface CreateTrialSessionInput {
   readonly participant: string;
   readonly scenario: string;
@@ -51,6 +56,7 @@ export interface CreateTrialSessionInput {
   readonly startedAt?: string;
 }
 
+/** Input payload for completing a trial session. */
 export interface CompleteTrialSessionInput {
   readonly session: TrialSession;
   readonly diagnosed: {
@@ -61,6 +67,7 @@ export interface CompleteTrialSessionInput {
   readonly finishedAt?: string;
 }
 
+/** Aggregate summary metrics across trial records. */
 export interface TrialSummary {
   readonly total: number;
   readonly correct: number;
@@ -72,6 +79,7 @@ export interface TrialSummary {
   readonly paired: TrialPairSummary;
 }
 
+/** Per-mode summary metrics. */
 export interface TrialModeSummary {
   readonly total: number;
   readonly correct: number;
@@ -80,6 +88,7 @@ export interface TrialModeSummary {
   readonly p90_elapsed_ms: number | null;
 }
 
+/** Participant/scenario baseline-vs-condukt paired comparison. */
 export interface TrialPair {
   readonly participant: string;
   readonly scenario: string;
@@ -90,6 +99,7 @@ export interface TrialPair {
   readonly condukt_ai_correct: boolean;
 }
 
+/** Summary of paired speedup calculations. */
 export interface TrialPairSummary {
   readonly total_pairs: number;
   readonly median_speedup: number | null;
@@ -97,6 +107,7 @@ export interface TrialPairSummary {
   readonly pairs: readonly TrialPair[];
 }
 
+/** Optional quality thresholds for trial result evaluation. */
 export interface TrialQualityGate {
   readonly min_records?: number;
   readonly min_accuracy?: number;
@@ -104,11 +115,13 @@ export interface TrialQualityGate {
   readonly min_paired_speedup?: number;
 }
 
+/** Evaluation result returned by trial quality gates. */
 export interface TrialQualityGateResult {
   readonly pass: boolean;
   readonly failures: readonly string[];
 }
 
+/** Markdown rendering options for trial summary reports. */
 export interface TrialSummaryMarkdownOptions {
   readonly title?: string;
   readonly max_pairs?: number;

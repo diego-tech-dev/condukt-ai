@@ -18,6 +18,13 @@ type LLMTaskModelSettingsField<TSettings extends object> = keyof TSettings exten
     ? { readonly modelSettings?: TSettings }
     : { readonly modelSettings: TSettings };
 
+/**
+ * Declarative definition for an LLM-backed task.
+ *
+ * @remarks
+ * `modelSettings` is conditionally required based on the selected model's
+ * required settings type.
+ */
 export type LLMTaskDefinition<
   TOutput = unknown,
   TModel extends string = string,
@@ -43,6 +50,9 @@ export type LLMTaskDefinition<
     | ((context: TaskRuntimeContext<TOutputs, TDependencies>) => string | Promise<string>);
 } & LLMTaskModelSettingsField<TSettingsByModel[TSelectedModel]>;
 
+/**
+ * Adapts an {@link LLMTaskDefinition} into a runtime {@link TaskDefinition}.
+ */
 export function llmTask<
   TOutput,
   TModel extends string,

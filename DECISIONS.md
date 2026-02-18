@@ -435,3 +435,31 @@ Status: accepted
 Decision: centralize JSON parse and preview behavior in a shared utility module.
 Rationale: provider and adapter paths duplicated JSON parsing/error-preview logic, creating drift risk and inconsistent diagnostics.
 Consequences: added `src/json.ts` and migrated OpenAI/Anthropic/TanStack integrations to shared parsing + preview helpers with per-integration error formatting hooks where needed.
+
+## 2026-02-16
+
+Status: accepted
+Decision: implement product documentation in `apps/web` using Astro Starlight.
+Rationale: Starlight provides a modern docs-first architecture with strong content ergonomics while fitting monorepo and static hosting requirements.
+Consequences: `apps/web` now runs Astro/Starlight build/typecheck/test commands, docs content lives in `apps/web/src/content/docs`, and root docs/tooling references point to the Starlight implementation.
+
+## 2026-02-16
+
+Status: accepted
+Decision: ship a deterministic browser-only Monaco simulation playground in docs.
+Rationale: users need a zero-credential interactive walkthrough for traces and diagnosis without backend execution complexity.
+Consequences: added `Playground` React island with local scenario fixtures and diagnosis panel; docs clearly label simulation mode and avoid remote provider calls.
+
+## 2026-02-16
+
+Status: accepted
+Decision: generate API reference docs via TypeDoc into the Starlight docs tree and enforce drift checks in CI.
+Rationale: API documentation must remain synchronized with runtime exports as the package evolves.
+Consequences: added `typedoc` + `typedoc-plugin-markdown`, `pnpm docs:api`, `pnpm docs:api:check`, generated docs under `apps/web/src/content/docs/api-reference/generated`, and quality workflow drift validation.
+
+## 2026-02-16
+
+Status: accepted
+Decision: deploy docs through Cloudflare Pages with preview and production workflows.
+Rationale: static docs delivery with fast previews aligns with low-ops requirements and the canonical public domain (`condukt-ai.dev`).
+Consequences: added `.github/workflows/docs-deploy.yml` for PR preview and main-branch production deployments, with deployment gated by Cloudflare secrets.

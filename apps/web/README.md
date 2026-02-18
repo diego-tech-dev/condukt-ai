@@ -1,14 +1,28 @@
 # apps/web
 
-This folder hosts the Condukt AI website application (docs + marketing + product web surface).
+`apps/web` is the Astro Starlight docs site for `condukt-ai`.
 
-Constraints:
-- Framework-agnostic placeholder for now.
-- No Next.js assumptions in repository tooling.
-- Consume workspace packages with `workspace:*` dependencies where needed.
+## Stack
 
-Quality commands (from repo root):
-- `pnpm --filter @condukt-ai/web lint`
-- `pnpm --filter @condukt-ai/web typecheck`
-- `pnpm --filter @condukt-ai/web test`
-- `pnpm --filter @condukt-ai/web build`
+- Astro + Starlight
+- React islands (Monaco playground)
+- Biome linting
+- Vitest smoke/unit tests
+
+## Commands (from repo root)
+
+```bash
+pnpm --filter @condukt-ai/web dev
+pnpm --filter @condukt-ai/web lint
+pnpm --filter @condukt-ai/web typecheck
+pnpm --filter @condukt-ai/web test
+pnpm --filter @condukt-ai/web build
+pnpm --filter @condukt-ai/web linkcheck
+```
+
+## Build output
+
+Static output is generated in `apps/web/dist` and deployed to Cloudflare Pages.
+
+- Production domain: `https://condukt-ai.dev`
+- Preview domain pattern: `*.pages.dev`

@@ -1,0 +1,49 @@
+---
+title: Getting Started
+description: Install condukt-ai and run your first successful and broken traces.
+---
+
+## Install
+
+```bash
+pnpm add condukt-ai zod
+```
+
+## Local validation flow (repo)
+
+```bash
+pnpm install
+pnpm check
+pnpm test
+pnpm build
+pnpm --filter condukt-ai release:check
+```
+
+## First quickstart
+
+```bash
+pnpm --filter condukt-ai quickstart
+pnpm --filter condukt-ai quickstart:broken
+```
+
+The broken run writes `packages/core/trace.quickstart.json` with deterministic diagnosis fields.
+
+## Minimal usage
+
+```ts
+import { z } from "zod";
+import { Pipeline, createOpenAIProvider } from "condukt-ai";
+
+const provider = createOpenAIProvider();
+
+const pipeline = new Pipeline("research-and-write").addLLMTask({
+  id: "research",
+  provider,
+  model: "gpt-4.1-mini",
+  output: z.object({ topics: z.array(z.string()) }),
+  prompt: () => "Return JSON with topics.",
+});
+
+const result = await pipeline.runDetailed();
+console.log(result.trace.status);
+```

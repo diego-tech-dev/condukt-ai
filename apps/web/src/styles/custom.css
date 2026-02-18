@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  --sl-font: "IBM Plex Sans", system-ui, sans-serif;
+  --sl-font-system: "IBM Plex Sans", system-ui, sans-serif;
+  --sl-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --sl-color-accent-low: #dbe8ff;
+  --sl-color-accent: #0d7d6f;
+  --sl-color-accent-high: #014c43;
+  --sl-color-bg: #fbfaf6;
+  --sl-color-bg-nav: #f5f2e9;
+  --sl-color-text: #212121;
+  --sl-color-text-accent: #0d7d6f;
+}
+
+:root[data-theme="dark"] {
+  --sl-color-bg: #171717;
+  --sl-color-bg-nav: #1f1f1f;
+  --sl-color-text: #f5f5f5;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Fraunces", serif;
+  letter-spacing: 0.01em;
+}
+
+.hero-shell {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(13, 125, 111, 0.12), rgba(5, 110, 168, 0.09));
+  border: 1px solid rgba(13, 125, 111, 0.25);
+}
+
+.hero-shell .hero-kicker {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sl-color-text-accent);
+  margin-bottom: 0.5rem;
+}
+
+.hero-shell h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.hero-shell p {
+  margin-top: 0.85rem;
+  max-width: 58ch;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.feature-card {
+  border-radius: 0.9rem;
+  padding: 1rem;
+  border: 1px solid rgba(13, 125, 111, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.feature-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.feature-card p {
+  margin-top: 0.5rem;
+}
+
+.callout {
+  border-radius: 0.8rem;
+  padding: 0.9rem 1rem;
+  margin: 1rem 0;
+  border: 1px solid transparent;
+}
+
+.callout h4 {
+  margin: 0 0 0.4rem;
+}
+
+.callout-neutral {
+  background: rgba(13, 125, 111, 0.08);
+  border-color: rgba(13, 125, 111, 0.25);
+}
+
+.callout-warning {
+  background: rgba(255, 161, 22, 0.15);
+  border-color: rgba(255, 161, 22, 0.45);
+}
+
+.callout-success {
+  background: rgba(49, 163, 84, 0.15);
+  border-color: rgba(49, 163, 84, 0.45);
+}
+
+.diagram-panel {
+  border: 1px solid rgba(5, 110, 168, 0.25);
+  border-radius: 0.9rem;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.diagram-panel h3 {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  background: rgba(5, 110, 168, 0.12);
+}
+
+.diagram-panel .diagram-body {
+  padding: 1rem;
+}
+
+.playground-root {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(13, 125, 111, 0.25);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(219, 232, 255, 0.4));
+}
+
+.playground-header {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.playground-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.playground-header p {
+  margin: 0.5rem 0 0;
+  max-width: 64ch;
+}
+
+.playground-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(13, 125, 111, 0.2);
+  border: 1px solid rgba(13, 125, 111, 0.35);
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+}
+
+.playground-controls {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.playground-controls select,
+.playground-controls button {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(13, 125, 111, 0.35);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+}
+
+.playground-controls button {
+  cursor: pointer;
+  background: #0d7d6f;
+  color: #fff;
+}
+
+.playground-description {
+  margin: 0.8rem 0 0;
+}
+
+.playground-editor {
+  margin-top: 0.8rem;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  border: 1px solid rgba(5, 110, 168, 0.25);
+}
+
+.playground-output {
+  margin-top: 1rem;
+}
+
+.playground-output pre {
+  max-height: 320px;
+  overflow: auto;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(5, 110, 168, 0.2);
+  padding: 0.8rem;
+  background: #f4f7fb;
+}

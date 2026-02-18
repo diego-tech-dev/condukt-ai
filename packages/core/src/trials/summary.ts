@@ -10,6 +10,7 @@ import type {
   TrialSummaryMarkdownOptions,
 } from "./types.js";
 
+/** Computes aggregate trial metrics, including paired speedup analysis. */
 export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSummary {
   const byMode: Record<TrialMode, TrialRecord[]> = {
     "condukt-ai": [],
@@ -39,6 +40,7 @@ export function summarizeTrialRecords(records: readonly TrialRecord[]): TrialSum
   };
 }
 
+/** Applies minimum quality thresholds to a trial summary. */
 export function evaluateTrialSummary(
   summary: TrialSummary,
   gate: TrialQualityGate,
@@ -75,6 +77,14 @@ export function evaluateTrialSummary(
   };
 }
 
+/**
+ * Renders a markdown report from a computed trial summary.
+ *
+ * @example
+ * ```ts
+ * const markdown = renderTrialSummaryMarkdown(summary, { title: "Trial Report" });
+ * ```
+ */
 export function renderTrialSummaryMarkdown(
   summary: TrialSummary,
   options: TrialSummaryMarkdownOptions = {},

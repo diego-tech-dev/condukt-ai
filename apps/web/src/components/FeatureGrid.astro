@@ -1,0 +1,23 @@
+---
+interface FeatureItem {
+  readonly title: string;
+  readonly description: string;
+}
+
+interface Props {
+  readonly items: readonly FeatureItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="feature-grid" aria-label="Key capabilities">
+  {
+    items.map((item) => (
+      <article class="feature-card">
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
+      </article>
+    ))
+  }
+</section>

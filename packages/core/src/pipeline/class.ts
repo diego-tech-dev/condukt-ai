@@ -20,10 +20,25 @@ interface PipelineState {
   readonly tasksById: Map<string, TaskDefinition>;
 }
 
+/** Construction options for {@link Pipeline}. */
 export interface PipelineOptions {
   readonly runtime?: PipelineRuntimeEnvironmentOverrides;
 }
 
+/**
+ * Fluent pipeline builder and runner.
+ *
+ * @remarks
+ * `Pipeline` preserves task output types across `addTask`/`addLLMTask` calls,
+ * so downstream task contexts and `runDetailed().outputs` stay strongly typed.
+ *
+ * @example
+ * ```ts
+ * const pipeline = new Pipeline("demo")
+ *   .addTask({ ... })
+ *   .addLLMTask({ ... });
+ * ```
+ */
 export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
   private readonly state: PipelineState;
 
@@ -38,6 +53,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     };
   }
 
+  /** Adds a task to the pipeline and returns a builder with merged output typing. */
   addTask<
     TOutput,
     TDependencies extends readonly TaskOutputKey<TOutputs>[],
@@ -49,6 +65,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     return this.addTaskInternal(task);
   }
 
+  /** Adds an LLM-backed task with provider/model-aware typing. */
   addLLMTask<
     TOutput,
     TModel extends string,
@@ -71,6 +88,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     return this.addTaskInternal(llmTask(definition));
   }
 
+  /** Runs the pipeline and returns trace plus typed outputs and task results. */
   async runDetailed(): Promise<PipelineRunResult<TOutputs>> {
     return runPipeline<TOutputs>({
       pipelineName: this.name,
@@ -79,6 +97,7 @@ export class Pipeline<TOutputs extends TaskOutputMap = Record<never, never>> {
     });
   }
 
+  /** Runs the pipeline and returns only the pipeline trace. */
   async run(): Promise<PipelineTrace> {
     const result = await this.runDetailed();
     return result.trace;

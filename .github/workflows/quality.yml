@@ -59,5 +59,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: API docs drift check
+        run: pnpm docs:api:check
+
+      - name: Website link check
+        run: pnpm --filter @condukt-ai/web linkcheck
+
       - name: Core release check
         run: pnpm --filter condukt-ai release:check

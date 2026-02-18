@@ -1,6 +1,13 @@
 import type { TrialMode, TrialRecord } from "./types.js";
 import { normalizeRequiredString, normalizeString } from "./shared.js";
 
+/**
+ * Normalizes trial mode aliases to canonical values.
+ *
+ * @remarks
+ * Legacy `condukt` is accepted for backwards compatibility and normalized to
+ * `condukt-ai`.
+ */
 export function normalizeTrialMode(mode: unknown): TrialMode {
   if (mode === "baseline") {
     return "baseline";
@@ -13,6 +20,7 @@ export function normalizeTrialMode(mode: unknown): TrialMode {
   throw new Error("mode must be one of: baseline, condukt-ai, condukt");
 }
 
+/** Validates and normalizes untrusted JSON input into a {@link TrialRecord}. */
 export function normalizeTrialRecord(value: unknown): TrialRecord {
   const raw = asObject(value, "record");
   const expectedRaw = asObject(raw.expected, "record.expected");

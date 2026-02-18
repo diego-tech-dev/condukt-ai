@@ -8,6 +8,7 @@ type TaskOutputMap = Record<string, unknown>;
 type TaskOutputKey<TOutputs extends TaskOutputMap> = Extract<keyof TOutputs, string>;
 type MaybePromise<TValue> = TValue | Promise<TValue>;
 
+/** Additional options forwarded to `@tanstack/ai` chat execution. */
 export interface TanStackTaskChatOptions<TAdapter extends AnyTextAdapter> {
   readonly temperature?: number;
   readonly topP?: number;
@@ -16,6 +17,9 @@ export interface TanStackTaskChatOptions<TAdapter extends AnyTextAdapter> {
   readonly modelOptions?: TAdapter["~types"]["providerOptions"];
 }
 
+/**
+ * Declarative task definition for TanStack AI chat adapters.
+ */
 export interface TanStackChatTaskDefinition<
   TOutput = unknown,
   TAdapter extends AnyTextAdapter = AnyTextAdapter,
@@ -41,6 +45,12 @@ export interface TanStackChatTaskDefinition<
       ) => MaybePromise<TanStackTaskChatOptions<TAdapter>>);
 }
 
+/**
+ * Builds a Condukt task from a TanStack AI adapter.
+ *
+ * @remarks
+ * The adapter response is expected to be JSON text that satisfies `output`.
+ */
 export function tanstackChatTask<
   TOutput,
   TAdapter extends AnyTextAdapter,

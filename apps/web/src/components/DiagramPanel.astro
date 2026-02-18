@@ -1,0 +1,14 @@
+---
+interface Props {
+  readonly title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<section class="diagram-panel">
+  <h3>{title}</h3>
+  <div class="diagram-body">
+    <slot />
+  </div>
+</section>

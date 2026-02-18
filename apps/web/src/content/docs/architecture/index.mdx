@@ -1,0 +1,28 @@
+---
+title: Architecture
+description: Internal execution surfaces and diagnosis-first trace model.
+---
+
+## Runtime modules
+
+Core runtime is split into focused modules under `packages/core/src/pipeline/`:
+
+- `types`
+- `llm`
+- `graph`
+- `execution`
+- `trace`
+- `runtime`
+- `class`
+
+Public facade remains `packages/core/src/pipeline.ts`.
+
+## Diagnosis model
+
+A trace includes:
+
+- first failing task boundary
+- normalized `error_code`
+- contract issue paths when validation fails
+
+This allows deterministic debugging without rerunning pipelines.
